@@ -9,15 +9,15 @@ import {
   VPTeamMembers
 } from 'vitepress/theme'
 
-const title = 'Friends Links'
-const lead = 'Here are my friends~(ฅ´ω`ฅ)'
+const title = '友情链接'
+const lead = '这里是我的朋友们~(ฅ´ω`ฅ)'
 
 // icon: <https://simpleicons.org/>
 const members = [
   {
     avatar: '/friendly/lumi.PNG',
-    name: 'CatRoll',
-    title: 'CatRoll\'s Cattery',
+    name: '猫卷',
+    title: '善良的猫卷，纯洁的猫卷，乖孩子猫卷',
     links: [
       { icon: 'devbox', link: 'https://github.com/lumigj' },
     ]
@@ -25,7 +25,7 @@ const members = [
   {
     avatar: '/friendly/nhui.jpg',
     name: '玲雨兰夜',
-    title: 'Nya!',
+    title: '诶嘿嘿...',
     links: [
       { icon: 'devbox', link: 'http://nhui.top/' },
     ]
@@ -33,7 +33,7 @@ const members = [
   {
     avatar: 'https://avatars.githubusercontent.com/u/85744569',
     name: '香菜',
-    title: "Xiangcai's blog",
+    title: '香菜的博客',
     links: [
       { icon: 'devbox', link: 'https://mdzz.pro/' },
     ]
@@ -41,7 +41,7 @@ const members = [
   {
     avatar: 'https://www.iacg.moe/upload/cat.png',
     name: 'DokiDoki·大黄猫',
-    title: 'Yellow Cat Grocery',
+    title: '黄猫杂货店',
     links: [
       { icon: 'devbox', link: 'https://www.iacg.moe/' },
     ]
