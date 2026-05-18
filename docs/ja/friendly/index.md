@@ -15,6 +15,14 @@ const lead = 'ここは私の友人たちです～(ฅ´ω`ฅ)'
 // icon: <https://simpleicons.org/>
 const members = [
   {
+    avatar: '/friendly/lumi.PNG',
+    name: '猫巻',
+    title: '猫用ベッド',
+    links: [
+      { icon: 'devbox', link: 'https://github.com/lumigj' },
+    ]
+  },
+  {
     avatar: '/friendly/nhui.jpg',
     name: '玲雨兰夜',
     title: 'えへへ...',
