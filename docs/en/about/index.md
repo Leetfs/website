@@ -32,12 +32,8 @@ Welcome to view my [resume](./resume) to learn more about me.
 
 ### 📊 GitHub Stats
 
-<a href="https://github.com/Leetfs/">
-  <img align="center" src="https://github-readme-stats.vercel.app/api?username=Leetfs&show_icons=true&count_private=true&theme=transparent&hide_border=true&show=reviews" width="49%" />
-</a>
-<a href="https://github.com/Leetfs/">
-  <img align="center" src="https://github-readme-stats.vercel.app/api/top-langs?username=Leetfs&layout=compact&langs_count=8&theme=transparent&hide_border=true&hide=markdown" width="49%" />
-</a>
+| [![Leetfs's GitHub stats](https://github-readme-stats-neon-nine-18.vercel.app/api?username=Leetfs&show_icons=true&include_all_commits=true&theme=buefy&hide_border=true)](https://github.com/Leetfs) | [![Top Langs](https://github-readme-stats-neon-nine-18.vercel.app/api/top-langs/?username=Leetfs&layout=compact&theme=buefy&hide_border=true)](https://github.com/Leetfs) |
+| :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
 
 ---
 

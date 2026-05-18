@@ -7,25 +7,24 @@ author: Lee
 
 **Passionate about open-source, technology, and equality.**\*\*
 
-With experience in frontend development, CI/CD systems, and compiler development, familiar with development and debugging in Linux environments, deeply involved in the RISC-V ecosystem and GPGPU toolchain development, enjoys doing _meaningful_ things.
+Experience in front-end development, CI/CD systems, and Linux distribution development, with deep involvement in the RISC-V ecosystem.
 
 ## Skills
 
-- Programming Languages: Python, JavaScript, C/C++, Groovy
-- Front-end development: Vue, React, Node.js, Electron
-- Back-end & Automation: FastAPI, Jenkins Pipeline (Groovy), CI/CD
-- Development and Operations Tools: Docker, Git, Jenkins, Make, CMake
-- Systems and Low-Level: Linux, LLVM
+- Programming Languages: Proficient in C/C++, familiar with React, Vue frontend frameworks and Electron cross-platform desktop application development.
+- System Development: Deep understanding of Linux system architecture, experience independently building LFS (Linux From Scratch); familiar with RISC-V architecture and underlying toolchains (including systemd, glibc, and riscv64 cross-compilation).
+- Compilation Technology: Familiar with LLVM framework and code generation flow, skilled in using CMake and other build tools.
+- Infrastructure: Proficient in setting up CI/CD automation pipelines such as Jenkins and GitHub Actions, familiar with Docker containers and Nginx configuration.
 
 ## Project Experience
 
-### openEuler RISC-V SIG Package Maintainer
+### openRuyi Linux distribution development
 
-_Institute of Software, Chinese Academy of Sciences_ | 2025.12 - Present
+_Institute of Software, Chinese Academy of Sciences_ | 2026.03 - Present
 
-- Maintain and build RPM packages on the openEuler RISC-V (riscv64) platform, identify and resolve cross-architecture build failures.
-- Analyze and optimize spec files and build scripts for complex build issues, complete version upgrade adaptation and dependency adjustments.
-- Perform source-level debugging (gdb/log analysis), fix runtime functional bugs and crash issues.
+- Independently completed the refactoring and adaptation of the Amazon SageMaker SDK for the RISC-V ecosystem, handling complex namespace conflicts.
+- Responsible for tracking upstream CVE vulnerability dynamics, performing vulnerability fixes through backporting security patches, and conducting rigorous compilation and regression testing in the RISC-V environment to ensure the stability of the fix.
+- Participate in the design, development, and maintenance of innovative distribution tools, introducing automation and AI capabilities to the distribution infrastructure.
 
 ### Shadow GPGPU LLVM Toolchain Development
 
