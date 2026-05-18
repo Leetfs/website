@@ -9,23 +9,23 @@ import {
   VPTeamMembers
 } from 'vitepress/theme'
 
-const title = '友情链接'
-const lead = '这里是我的朋友们~(ฅ´ω`ฅ)'
+const title = '友達リンク'
+const lead = 'ここは私の友人たちです～(ฅ´ω`ฅ)'
 
 // icon: <https://simpleicons.org/>
 const members = [
   {
     avatar: '/friendly/lumi.PNG',
-    name: '猫卷',
-    title: '善良的猫卷，纯洁的猫卷，乖孩子猫卷',
+    name: '猫巻',
+    title: '善良な猫巻、純粋な猫巻、良い子猫巻',
     links: [
       { icon: 'devbox', link: 'https://github.com/lumigj' },
     ]
   },
   {
     avatar: '/friendly/nhui.jpg',
-    name: '玲雨兰夜',
-    title: '诶嘿嘿...',
+    name: '玲雨蘭夜',
+    title: 'えへへ...',
     links: [
       { icon: 'devbox', link: 'http://nhui.top/' },
     ]
@@ -33,15 +33,15 @@ const members = [
   {
     avatar: 'https://avatars.githubusercontent.com/u/85744569',
     name: '香菜',
-    title: '香菜的博客',
+    title: '香菜のブログ',
     links: [
       { icon: 'devbox', link: 'https://mdzz.pro/' },
     ]
   },
   {
     avatar: 'https://www.iacg.moe/upload/cat.png',
-    name: 'DokiDoki·大黄猫',
-    title: '黄猫杂货店',
+    name: 'DokiDoki・大黄猫',
+    title: '黄猫雑貨店',
     links: [
       { icon: 'devbox', link: 'https://www.iacg.moe/' },
     ]
