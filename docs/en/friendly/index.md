@@ -15,6 +15,14 @@ const lead = 'Here are my friends~(ฅ´ω`ฅ)'
 // icon: <https://simpleicons.org/>
 const members = [
   {
+    avatar: '/friendly/lumi.PNG',
+    name: 'CatRoll',
+    title: 'CatRoll\'s Cattery',
+    links: [
+      { icon: 'devbox', link: 'https://github.com/lumigj' },
+    ]
+  },
+  {
     avatar: '/friendly/nhui.jpg',
     name: '玲雨兰夜',
     title: 'Nya!',

@@ -14,6 +14,14 @@ const lead = '这里是我的朋友们~(ฅ´ω`ฅ)'
 // icon: <https://simpleicons.org/>
 const members = [
   {
+    avatar: '/friendly/lumi.PNG',
+    name: '猫卷',
+    title: '善良的猫卷，纯洁的猫卷，乖孩子猫卷',
+    links: [
+      { icon: 'devbox', link: 'https://github.com/lumigj' },
+    ]
+  },
+  {
     avatar: '/friendly/nhui.jpg',
     name: '玲雨兰夜',
     title: '诶嘿嘿...',
