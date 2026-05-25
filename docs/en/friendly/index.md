@@ -16,31 +16,31 @@ const lead = 'Here are my friends~(ฅ´ω`ฅ)'
 const members = [
   {
     avatar: '/friendly/lumi.PNG',
-    name: 'CatRoll',
-    title: 'CatRoll\'s Cattery',
+    name: 'Cat Roll',
+    title: 'Kind cat roll, pure cat roll, good child cat roll',
     links: [
       { icon: 'devbox', link: 'https://github.com/lumigj' },
     ]
   },
   {
     avatar: '/friendly/nhui.jpg',
-    name: '玲雨兰夜',
-    title: 'Nya!',
+    name: 'Rainy Night',
+    title: 'Hehe...',
     links: [
       { icon: 'devbox', link: 'http://nhui.top/' },
     ]
   },
   {
     avatar: 'https://avatars.githubusercontent.com/u/85744569',
-    name: '香菜',
-    title: "Xiangcai's blog",
+    name: 'Coriander',
+    title: "Coriander's Blog",
     links: [
       { icon: 'devbox', link: 'https://mdzz.pro/' },
     ]
   },
   {
     avatar: 'https://www.iacg.moe/upload/cat.png',
-    name: 'DokiDoki·大黄猫',
+    name: 'DokiDoki·Big Yellow Cat',
     title: 'Yellow Cat Grocery',
     links: [
       { icon: 'devbox', link: 'https://www.iacg.moe/' },

@@ -17,14 +17,14 @@ const members = [
   {
     avatar: '/friendly/lumi.PNG',
     name: '猫巻',
-    title: '猫用ベッド',
+    title: '善良な猫巻、純粋な猫巻、良い子猫巻',
     links: [
       { icon: 'devbox', link: 'https://github.com/lumigj' },
     ]
   },
   {
     avatar: '/friendly/nhui.jpg',
-    name: '玲雨兰夜',
+    name: '玲雨蘭夜',
     title: 'えへへ...',
     links: [
       { icon: 'devbox', link: 'http://nhui.top/' },
