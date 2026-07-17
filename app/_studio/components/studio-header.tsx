@@ -15,7 +15,7 @@ const navItems = [
 const editorMenus = [
   { label: "文件", items: [["打开主页", "/"], ["打开博客", "/blog"]] },
   { label: "编辑", items: [["个人简介", "/resume"], ["友链", "/friends"]] },
-  { label: "资源", items: [["全部文章", "/blog"], ["GitHub", "https://github.com/Leetfs"]] },
+  { label: "资源", items: [["全部文章", "/blog"], ["GitHub", "https://github.com/Leetfs/website"]] },
   { label: "窗口", items: [["3D 场景", "/"], ["项目资源", "/#project"]] },
 ] as const;
 
@@ -61,7 +61,7 @@ export default function StudioHeader({ compact = false }: { compact?: boolean })
         <span>INSPECTOR</span>
         <dl><div><dt>Type</dt><dd>{current.type}</dd></div><div><dt>Name</dt><dd>{current.label}</dd></div></dl>
         <a href="mailto:lee@mtftm.com">lee@mtftm.com ↗</a>
-        <a href="https://github.com/Leetfs" target="_blank" rel="noreferrer">GitHub ↗</a>
+        <a href="https://github.com/Leetfs/website" target="_blank" rel="noreferrer">GitHub ↗</a>
       </div>
     </header>
   );

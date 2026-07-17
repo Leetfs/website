@@ -8,7 +8,7 @@ export default function StudioFooter() {
       <nav aria-label="页脚导航">
         <Link href="/blog">博客</Link>
         <Link href="/resume">个人简介</Link>
-        <a href="https://github.com/Leetfs" target="_blank" rel="noreferrer">GitHub</a>
+        <a href="https://github.com/Leetfs/website" target="_blank" rel="noreferrer">GitHub</a>
         <a href="mailto:lee@mtftm.com">Email</a>
       </nav>
       <span>© 2026 LEE</span>

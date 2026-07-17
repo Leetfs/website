@@ -98,7 +98,7 @@ test("keeps Unity interactions and project assets wired", async () => {
   assert.match(studio, /new Reflector/);
   assert.match(studio, /renderer\.shadowMap\.enabled = balanced/);
   assert.match(studio, /motionSettingsRef/);
-  assert.match(studio, /playingRef\.current/);
+  assert.match(studio, /playbackStateRef\.current/);
   assert.match(studio, /Record<string, MotionConfig>/);
   assert.match(studio, /const selectedMotion = motionSettings\[selected\]/);
   assert.match(studio, /updateSelectedMotion\(\{ enabled: event\.target\.checked \}\)/);
@@ -106,8 +106,23 @@ test("keeps Unity interactions and project assets wired", async () => {
   for (const model of ["riscv", "terminal", "portal", "shark"]) {
     assert.match(studio, new RegExp(`id === "${model}"`));
   }
-  assert.match(studio, /motionSettings,\s+orbit:/);
+  assert.match(studio, /motionSettings,\s+labels: customLabels,\s+orbit:/);
   assert.match(studio, /setMotionSettings\(restoredMotionSettings\)/);
+  for (const mode of ["float", "rotate", "orbit", "sway", "bounce", "pulse"]) {
+    assert.match(studio, new RegExp(`value="${mode}"`));
+  }
+  assert.match(studio, /type ProjectTab = "project" \| "console" \| "animation"/);
+  assert.match(studio, /className=\{styles\.timelineScrubber\}/);
+  assert.match(studio, /setTranslationSnap/);
+  assert.match(studio, /setRotationSnap/);
+  assert.match(studio, /setCameraView\("front"\)/);
+  assert.match(studio, /setCameraView\("right"\)/);
+  assert.match(studio, /setCameraView\("top"\)/);
+  assert.match(studio, /setSpace\(toolSpace\)/);
+  assert.match(studio, /objectNameInputRef\.current\?\.focus/);
+  assert.match(studio, /labels: customLabels/);
+  assert.match(studio, /setCustomLabels\(data\.labels\)/);
+  assert.match(studio, /https:\/\/github\.com\/Leetfs\/website/);
   assert.match(studio, /onClick=\{\(\) => openProjectAsset\(asset\)\}/);
   assert.match(studio, /copyPanelShareLink/);
   assert.match(studio, /className=\{styles\.panelShareButton\}/);
@@ -158,6 +173,7 @@ test("keeps subpage links safe and friend avatars local", async () => {
     readFile(new URL("../app/resume/page.tsx", import.meta.url), "utf8"),
   ]);
   assert.doesNotMatch(header, /复制分享链接|copyShareLink/);
+  assert.match(header, /https:\/\/github\.com\/Leetfs\/website/);
   assert.match(friends, /https:\/\/catherina\.moe\//);
   assert.match(friends, /description: "是朋友，也是很好的同事"/);
   assert.match(friends, /\/friends\/catherina\.png/);
@@ -241,7 +257,7 @@ test("configures safe Cloudflare Pages previews for pull requests", async () => 
   assert.match(publish, /ref: \$\{\{ github\.event\.repository\.default_branch \}\}/);
   assert.match(publish, /secrets\.CLOUDFLARE_PAGES_TOKEN/);
   assert.match(publish, /secrets\.CLOUDFLARE_PAGES_ACCOUNT/);
-  assert.match(publish, /pages deploy preview-output --project-name=blog --branch=pr-/);
+  assert.match(publish, /pages deploy preview-output --project-name=[a-z0-9-]+ --branch=pr-/);
   assert.match(publish, /_worker\.js/);
   assert.match(publish, /pull-requests: write/);
   assert.match(publish, /createComment|updateComment/);

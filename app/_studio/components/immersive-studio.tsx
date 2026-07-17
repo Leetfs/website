@@ -34,7 +34,11 @@ type CreateKind =
 type ToolMode = "translate" | "rotate" | "scale";
 type AssetPanel = "blog" | "profile" | "friends" | "social" | null;
 type ProjectFolder = "Website" | "Assets" | "Scenes" | "Models" | "Content" | "Images" | "Materials";
-type ProjectTab = "project" | "console";
+type ProjectTab = "project" | "console" | "animation";
+type MotionMode = "float" | "rotate" | "orbit" | "sway" | "bounce" | "pulse";
+type MotionAxis = "x" | "y" | "z";
+type MotionEasing = "linear" | "easeInOut" | "easeOut" | "bounce";
+type PlaybackState = "stopped" | "playing" | "paused";
 type ContextMenuState = {
   x: number;
   y: number;
@@ -68,8 +72,13 @@ type InspectorState = {
 };
 type MotionConfig = {
   enabled: boolean;
+  mode: MotionMode;
+  axis: MotionAxis;
+  easing: MotionEasing;
+  loop: boolean;
   speed: number;
   amount: number;
+  phase: number;
 };
 type TransformSnapshot = {
   position: THREE.Vector3;
@@ -92,15 +101,20 @@ const LANGUAGE_STORAGE_KEY = "lee-studio-language";
 const SCENE_STORAGE_KEY = "lee-unity-scene";
 const builtinSceneObjects: BuiltinSceneObject[] = ["riscv", "terminal", "portal", "shark", "stage", "light", "mirror"];
 const initialMotionSettings: Record<string, MotionConfig> = {
-  riscv: { enabled: false, speed: 1.15, amount: 0.08 },
-  terminal: { enabled: false, speed: 0.75, amount: 0.1 },
-  portal: { enabled: true, speed: 1, amount: 0.16 },
-  shark: { enabled: false, speed: 0.9, amount: 0.14 },
+  riscv: { enabled: false, mode: "pulse", axis: "y", easing: "easeInOut", loop: true, speed: 1.15, amount: 0.08, phase: 0 },
+  terminal: { enabled: false, mode: "float", axis: "y", easing: "easeInOut", loop: true, speed: 0.75, amount: 0.1, phase: 0.2 },
+  portal: { enabled: true, mode: "float", axis: "y", easing: "easeInOut", loop: true, speed: 1, amount: 0.16, phase: 0 },
+  shark: { enabled: false, mode: "sway", axis: "z", easing: "easeInOut", loop: true, speed: 0.9, amount: 0.14, phase: 0.35 },
 };
 const defaultMotionConfig = (id: SceneObject): MotionConfig => ({
   enabled: id === "portal",
+  mode: "float",
+  axis: "y",
+  easing: "easeInOut",
+  loop: true,
   speed: 1,
   amount: 0.12,
+  phase: 0,
 });
 const projectFolders: ProjectFolder[] = ["Website", "Assets", "Scenes", "Models", "Content", "Images", "Materials"];
 const createCatalog: { id: CreateCategory; icon: string; items: { id: CreateKind; icon: string }[] }[] = [
@@ -316,6 +330,7 @@ function markInteractive(object: THREE.Object3D, id: SceneObject) {
 
 export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
   const viewportRef = useRef<HTMLDivElement>(null);
+  const objectNameInputRef = useRef<HTMLInputElement>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
@@ -328,7 +343,9 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
   const objectsRef = useRef(new Map<SceneObject, THREE.Object3D>());
   const selectedRef = useRef<SceneObject>("riscv");
   const gizmoDraggingRef = useRef(false);
-  const playingRef = useRef(false);
+  const playbackStateRef = useRef<PlaybackState>("stopped");
+  const motionTimeRef = useRef(0);
+  const lastMotionUiUpdateRef = useRef(-1);
   const qualityRef = useRef<"lite" | "balanced">("lite");
   const motionSettingsRef = useRef<Record<string, MotionConfig>>(initialMotionSettings);
   const motionBaseTransformsRef = useRef(new Map<SceneObject, TransformSnapshot>());
@@ -352,9 +369,14 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
   const [panelFullscreen, setPanelFullscreen] = useState(false);
   const [sceneObjectIds, setSceneObjectIds] = useState<SceneObject[]>(builtinSceneObjects);
   const [customLabels, setCustomLabels] = useState<Record<string, string>>({});
-  const [playing, setPlaying] = useState(false);
+  const [playbackState, setPlaybackState] = useState<PlaybackState>("stopped");
+  const [motionTime, setMotionTime] = useState(0);
   const [gridVisible, setGridVisible] = useState(true);
   const [wireframe, setWireframe] = useState(false);
+  const [snapEnabled, setSnapEnabled] = useState(false);
+  const [snapValue, setSnapValue] = useState(0.25);
+  const [toolSpace, setToolSpace] = useState<"local" | "world">("local");
+  const [gizmosVisible, setGizmosVisible] = useState(true);
   const [sceneView, setSceneView] = useState<"scene" | "game">("scene");
   const [quality, setQuality] = useState<"lite" | "balanced">("lite");
   const [motionSettings, setMotionSettings] = useState<Record<string, MotionConfig>>(() => ({ ...initialMotionSettings }));
@@ -382,9 +404,11 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
   const [rightPanelWidth, setRightPanelWidth] = useState(320);
   const [bottomPanelHeight, setBottomPanelHeight] = useState(210);
   const t = messages[locale];
+  const playing = playbackState === "playing";
+  const playModeActive = playbackState !== "stopped";
 
   const objectLabel = useCallback((id: SceneObject) => {
-    return (t.objects as Record<string, string>)[id] ?? customLabels[id] ?? id;
+    return customLabels[id] ?? (t.objects as Record<string, string>)[id] ?? id;
   }, [customLabels, t.objects]);
   const selectedMotion = motionSettings[selected] ?? defaultMotionConfig(selected);
 
@@ -400,7 +424,7 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
     return () => { document.documentElement.lang = previous; };
   }, [locale]);
 
-  useEffect(() => { playingRef.current = playing; }, [playing]);
+  useEffect(() => { playbackStateRef.current = playbackState; }, [playbackState]);
   useEffect(() => {
     motionSettingsRef.current = motionSettings;
   }, [motionSettings]);
@@ -409,6 +433,28 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
     setLocale(nextLocale);
     window.localStorage.setItem(LANGUAGE_STORAGE_KEY, nextLocale);
   };
+
+  const toggleMotionPlayback = useCallback(() => {
+    setPlaybackState((state) => state === "playing" ? "paused" : "playing");
+  }, []);
+
+  const pauseMotion = useCallback(() => {
+    setPlaybackState((state) => state === "stopped" ? state : "paused");
+  }, []);
+
+  const stopMotion = useCallback(() => {
+    motionTimeRef.current = 0;
+    lastMotionUiUpdateRef.current = -1;
+    setMotionTime(0);
+    setPlaybackState("stopped");
+  }, []);
+
+  const seekMotion = useCallback((time: number) => {
+    const nextTime = THREE.MathUtils.clamp(time, 0, 10);
+    motionTimeRef.current = nextTime;
+    setMotionTime(nextTime);
+    setPlaybackState((state) => state === "stopped" ? "paused" : state);
+  }, []);
 
   const filteredArticles = useMemo(() => {
     const needle = search.trim().toLocaleLowerCase();
@@ -487,6 +533,13 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
 
   const resetCamera = useCallback(() => {
     orbitRef.current = { theta: 0.15, phi: 1.15, radius: 9.4, target: new THREE.Vector3(0, 1.15, 0) };
+    updateCamera();
+  }, [updateCamera]);
+
+  const setCameraView = useCallback((view: "front" | "right" | "top") => {
+    if (view === "front") { orbitRef.current.theta = 0; orbitRef.current.phi = Math.PI / 2; }
+    if (view === "right") { orbitRef.current.theta = Math.PI / 2; orbitRef.current.phi = Math.PI / 2; }
+    if (view === "top") { orbitRef.current.theta = 0; orbitRef.current.phi = 0.02; }
     updateCamera();
   }, [updateCamera]);
 
@@ -872,7 +925,9 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
     window.localStorage.setItem(SCENE_STORAGE_KEY, JSON.stringify({
       transforms,
       motionSettings,
+      labels: customLabels,
       orbit: orbitRef.current,
+      editor: { snapEnabled, snapValue, toolSpace, gridVisible, wireframe, quality, gizmosVisible },
       layout: {
         leftPanelVisible,
         rightPanelVisible,
@@ -883,7 +938,7 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
       },
     }));
     logAction(t.commands.saved);
-  }, [bottomPanelHeight, bottomPanelVisible, leftPanelVisible, leftPanelWidth, logAction, motionSettings, rightPanelVisible, rightPanelWidth, t.commands.saved]);
+  }, [bottomPanelHeight, bottomPanelVisible, customLabels, gizmosVisible, gridVisible, leftPanelVisible, leftPanelWidth, logAction, motionSettings, quality, rightPanelVisible, rightPanelWidth, snapEnabled, snapValue, t.commands.saved, toolSpace, wireframe]);
 
   const loadScene = useCallback(() => {
     const saved = window.localStorage.getItem(SCENE_STORAGE_KEY);
@@ -895,7 +950,9 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
       const data = JSON.parse(saved) as {
         transforms?: Record<string, { visible: boolean; position: number[]; rotation: number[]; scale: number[] }>;
         motionSettings?: Record<string, Partial<MotionConfig>>;
+        labels?: Record<string, string>;
         orbit?: { theta: number; phi: number; radius: number; target: { x: number; y: number; z: number } };
+        editor?: { snapEnabled?: boolean; snapValue?: number; toolSpace?: "local" | "world"; gridVisible?: boolean; wireframe?: boolean; quality?: "lite" | "balanced"; gizmosVisible?: boolean };
         layout?: { leftPanelVisible: boolean; rightPanelVisible: boolean; bottomPanelVisible: boolean; leftPanelWidth: number; rightPanelWidth: number; bottomPanelHeight: number };
       };
       Object.entries(data.transforms ?? {}).forEach(([id, transform]) => {
@@ -911,12 +968,29 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
         const fallback = defaultMotionConfig(id as SceneObject);
         restoredMotionSettings[id] = {
           enabled: typeof config.enabled === "boolean" ? config.enabled : fallback.enabled,
+          mode: ["float", "rotate", "orbit", "sway", "bounce", "pulse"].includes(config.mode ?? "") ? config.mode as MotionMode : fallback.mode,
+          axis: ["x", "y", "z"].includes(config.axis ?? "") ? config.axis as MotionAxis : fallback.axis,
+          easing: ["linear", "easeInOut", "easeOut", "bounce"].includes(config.easing ?? "") ? config.easing as MotionEasing : fallback.easing,
+          loop: typeof config.loop === "boolean" ? config.loop : fallback.loop,
           speed: THREE.MathUtils.clamp(Number(config.speed) || fallback.speed, 0.25, 2.5),
           amount: THREE.MathUtils.clamp(Number(config.amount) || fallback.amount, 0.04, 0.4),
+          phase: THREE.MathUtils.clamp(Number(config.phase) || 0, 0, 1),
         };
       });
-      setPlaying(false);
+      motionTimeRef.current = 0;
+      setMotionTime(0);
+      setPlaybackState("stopped");
       setMotionSettings(restoredMotionSettings);
+      if (data.labels && typeof data.labels === "object") setCustomLabels(data.labels);
+      if (data.editor) {
+        setSnapEnabled(Boolean(data.editor.snapEnabled));
+        setSnapValue(THREE.MathUtils.clamp(Number(data.editor.snapValue) || 0.25, 0.05, 1));
+        setToolSpace(data.editor.toolSpace === "world" ? "world" : "local");
+        if (typeof data.editor.gridVisible === "boolean") setGridVisible(data.editor.gridVisible);
+        if (typeof data.editor.wireframe === "boolean") setWireframe(data.editor.wireframe);
+        if (data.editor.quality === "balanced" || data.editor.quality === "lite") setQuality(data.editor.quality);
+        if (typeof data.editor.gizmosVisible === "boolean") setGizmosVisible(data.editor.gizmosVisible);
+      }
       if (data.orbit) {
         orbitRef.current = {
           theta: data.orbit.theta,
@@ -1394,8 +1468,15 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
     resizeObserver.observe(host);
     resize();
 
-    const clock = new THREE.Clock();
+    let previousFrameTime = performance.now();
     let frame = 0;
+    const motionWave = (cycle: number, easing: MotionEasing) => {
+      const sine = Math.sin(cycle * Math.PI * 2);
+      if (easing === "linear") return 1 - 4 * Math.abs(Math.round(cycle) - cycle);
+      if (easing === "easeOut") return Math.sign(sine) * Math.sqrt(Math.abs(sine));
+      if (easing === "bounce") return Math.abs(sine) * 2 - 1;
+      return sine;
+    };
     const restoreAnimatedObject = (id: SceneObject) => {
       if (!animatedObjects.has(id)) return;
       const object = sceneObjects.get(id);
@@ -1408,9 +1489,19 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
       animatedObjects.delete(id);
       motionBaseTransforms.delete(id);
     };
-    const animate = () => {
+    const animate = (timestamp = performance.now()) => {
       frame = requestAnimationFrame(animate);
-      const elapsed = clock.getElapsedTime();
+      const delta = Math.min(Math.max((timestamp - previousFrameTime) / 1000, 0), 0.1);
+      previousFrameTime = timestamp;
+      if (playbackStateRef.current === "playing") {
+        motionTimeRef.current += delta;
+        const uiTick = Math.floor(motionTimeRef.current * 10);
+        if (uiTick !== lastMotionUiUpdateRef.current) {
+          lastMotionUiUpdateRef.current = uiTick;
+          setMotionTime(motionTimeRef.current);
+        }
+      }
+      const elapsed = motionTimeRef.current;
       let portalPhase: number | null = null;
       let portalAmount = 0;
       let riscvPhase: number | null = null;
@@ -1418,7 +1509,7 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
       Object.entries(motionSettingsRef.current).forEach(([rawId, config]) => {
         const id = rawId as SceneObject;
         const object = sceneObjects.get(id);
-        const active = Boolean(object?.visible && playingRef.current && config.enabled);
+        const active = Boolean(object?.visible && playbackStateRef.current !== "stopped" && config.enabled);
         if (!object || !active) {
           restoreAnimatedObject(id);
           return;
@@ -1433,30 +1524,34 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
         }
         const base = motionBaseTransforms.get(id);
         if (!base) return;
-        const phase = elapsed * config.speed;
+        const rawCycle = elapsed * config.speed / (Math.PI * 2) + config.phase;
+        const cycle = config.loop ? ((rawCycle % 1) + 1) % 1 : THREE.MathUtils.clamp(rawCycle, 0, 1);
+        const phase = cycle * Math.PI * 2;
+        const wave = motionWave(cycle, config.easing);
         object.position.copy(base.position);
         object.rotation.copy(base.rotation);
+        object.scale.copy(base.scale);
 
-        if (id === "riscv") {
-          object.position.y += Math.sin(phase * 1.8) * config.amount * 0.45;
-          object.rotation.y += Math.sin(phase * 0.75) * config.amount * 0.22;
-          riscvPhase = phase;
-        } else if (id === "terminal") {
-          object.position.y += Math.sin(phase * 1.35) * config.amount * 0.65;
-          object.rotation.z += Math.sin(phase * 0.7) * config.amount * 0.12;
-        } else if (id === "portal") {
-          object.position.y += Math.sin(phase * 1.7) * config.amount;
-          object.rotation.z += Math.sin(phase * 0.82) * config.amount * 0.18;
-          portalPhase = phase;
-          portalAmount = config.amount;
-        } else if (id === "shark") {
-          object.position.x += Math.sin(phase * 0.72) * config.amount * 0.7;
-          object.position.y += Math.sin(phase * 1.45) * config.amount * 0.55;
-          object.rotation.z += Math.sin(phase * 1.1) * config.amount * 0.42;
-        } else {
-          object.position.y += Math.sin(phase * 1.5) * config.amount;
-          object.rotation.z += Math.sin(phase * 0.8) * config.amount * 0.2;
+        if (config.mode === "float") {
+          object.position[config.axis] += wave * config.amount;
+        } else if (config.mode === "rotate") {
+          object.rotation[config.axis] += (config.loop ? rawCycle : cycle) * Math.PI * 2 * config.amount;
+        } else if (config.mode === "orbit") {
+          const cosine = Math.cos(phase) * config.amount;
+          const sine = Math.sin(phase) * config.amount;
+          if (config.axis === "x") { object.position.y += cosine; object.position.z += sine; }
+          if (config.axis === "y") { object.position.x += cosine; object.position.z += sine; }
+          if (config.axis === "z") { object.position.x += cosine; object.position.y += sine; }
+        } else if (config.mode === "sway") {
+          object.rotation[config.axis] += wave * config.amount;
+        } else if (config.mode === "bounce") {
+          object.position[config.axis] += Math.abs(wave) * config.amount;
+        } else if (config.mode === "pulse") {
+          object.scale.multiplyScalar(Math.max(0.1, 1 + wave * config.amount));
         }
+
+        if (id === "portal") { portalPhase = phase; portalAmount = config.amount; }
+        if (id === "riscv") riscvPhase = phase;
       });
 
       if (portalPhase !== null) {
@@ -1476,7 +1571,7 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
         : 1.8 + Math.sin(riscvPhase * 3.1) * 0.7;
       renderer.render(scene, camera);
     };
-    animate();
+    animate(previousFrameTime);
 
     return () => {
       sceneDisposed = true;
@@ -1536,10 +1631,15 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
       if (event.key === "r" || event.key === "R") setToolMode("scale");
       if (event.key === "g" || event.key === "G") setGridVisible((value) => !value);
       if (event.key === "f" || event.key === "F") frameSelected();
+      if (event.key === "F2") {
+        event.preventDefault();
+        objectNameInputRef.current?.focus();
+        objectNameInputRef.current?.select();
+      }
       if (event.key === "Delete") deleteSelected();
       if (event.key === " ") {
         event.preventDefault();
-        setPlaying((value) => !value);
+        toggleMotionPlayback();
       }
       if (event.key === "Escape") {
         if (panelFullscreen) exitAssetFullscreen();
@@ -1550,9 +1650,21 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [closeAssetPanel, deleteSelected, duplicateSelected, exitAssetFullscreen, frameSelected, loadScene, panelFullscreen, saveScene]);
+  }, [closeAssetPanel, deleteSelected, duplicateSelected, exitAssetFullscreen, frameSelected, loadScene, panelFullscreen, saveScene, toggleMotionPlayback]);
 
   useEffect(() => { controlsRef.current?.setMode(toolMode); }, [toolMode]);
+  useEffect(() => { controlsRef.current?.setSpace(toolSpace); }, [toolSpace]);
+  useEffect(() => {
+    const controls = controlsRef.current;
+    if (!controls) return;
+    controls.setTranslationSnap(snapEnabled ? snapValue : null);
+    controls.setRotationSnap(snapEnabled ? THREE.MathUtils.degToRad(15) : null);
+    controls.setScaleSnap(snapEnabled ? snapValue : null);
+  }, [snapEnabled, snapValue]);
+  useEffect(() => {
+    const helper = controlsRef.current?.getHelper();
+    if (helper) helper.visible = gizmosVisible;
+  }, [gizmosVisible]);
   useEffect(() => { if (gridRef.current) gridRef.current.visible = gridVisible; }, [gridVisible]);
   useEffect(() => {
     qualityRef.current = quality;
@@ -1646,6 +1758,7 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
     [
       { id: "project", label: t.commands.project },
       { id: "console", label: t.commands.console },
+      { id: "animation", label: locale === "zh" ? "动画" : locale === "ja" ? "アニメーション" : "Animation" },
       { id: "inspector", label: t.inspector },
       { id: "toggle-left", label: `${leftPanelVisible ? "✓" : "　"} ${t.hierarchy}` },
       { id: "toggle-right", label: `${rightPanelVisible ? "✓" : "　"} ${t.inspector}` },
@@ -1673,6 +1786,7 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
     if (id === "cube" || id === "sphere" || id === "cylinder" || id === "plane") createSceneObject(id);
     if (id === "project") { setBottomPanelVisible(true); setProjectTab("project"); }
     if (id === "console") { setBottomPanelVisible(true); setProjectTab("console"); }
+    if (id === "animation") { setBottomPanelVisible(true); setProjectTab("animation"); }
     if (id === "inspector") { setRightPanelVisible(true); logAction(`${t.inspector}: ${objectLabel(selected)}`); }
     if (id === "toggle-left") setLeftPanelVisible((value) => !value);
     if (id === "toggle-right") setRightPanelVisible((value) => !value);
@@ -1703,6 +1817,7 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
         <button onClick={() => { frameSelected(); setContextMenu(null); }}>{t.commands.frame}<kbd>F</kbd></button>
         <button onClick={() => { duplicateSelected(); setContextMenu(null); }}>{t.commands.duplicate}<kbd>Ctrl+D</kbd></button>
         <button onClick={() => { resetSelected(); setContextMenu(null); }}>{t.commands.reset}</button>
+        <button onClick={() => { setBottomPanelVisible(true); setProjectTab("animation"); setContextMenu(null); }}>{locale === "zh" ? "编辑动画" : locale === "ja" ? "アニメーション編集" : "Edit Animation"}</button>
         <button onClick={() => { toggleSelected(); setContextMenu(null); }}>{t.commands.toggle}</button>
         <button onClick={() => { deleteSelected(); setContextMenu(null); }}>{t.commands.delete}<kbd>Del</kbd></button>
         {!contextMenu.objectId && <><button onClick={() => { createSceneObject("cube"); setContextMenu(null); }}>{t.commands.cube}</button><button onClick={() => { createSceneObject("sphere"); setContextMenu(null); }}>{t.commands.sphere}</button></>}
@@ -1782,7 +1897,7 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
       <select className={styles.languageSelect} value={locale} onChange={(event) => chooseLocale(event.target.value as Locale)} aria-label="Language">
         {(Object.keys(messages) as Locale[]).map((language) => <option value={language} key={language}>{messages[language].lang}</option>)}
       </select>
-      <a href="https://github.com/Leetfs" target="_blank" rel="noreferrer">{t.exit}</a>
+      <a href="https://github.com/Leetfs/website" target="_blank" rel="noreferrer">{t.exit}</a>
     </header>
 
     <div className={styles.toolBar}>
@@ -1790,12 +1905,16 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
         <button className={toolMode === "translate" ? styles.toolActive : ""} onClick={() => setToolMode("translate")} title="Move (W)">↔</button>
         <button className={toolMode === "rotate" ? styles.toolActive : ""} onClick={() => setToolMode("rotate")} title="Rotate (E)">⟳</button>
         <button className={toolMode === "scale" ? styles.toolActive : ""} onClick={() => setToolMode("scale")} title="Scale (R)">↗</button>
-        <button onClick={frameSelected} title="Frame selected">◎</button><button onClick={resetCamera} title="Reset camera">⌂</button>
+        <button onClick={frameSelected} title="Frame selected (F)">◎</button><button onClick={resetCamera} title="Reset camera">⌂</button>
+        <button onClick={() => setCameraView("front")} title="Front view">F</button><button onClick={() => setCameraView("right")} title="Right view">R</button><button onClick={() => setCameraView("top")} title="Top view">T</button>
       </div>
       <div className={styles.playTools}>
-        <button className={playing ? styles.playActive : ""} onClick={() => setPlaying((value) => !value)} title={playing ? "Pause animation" : "Play animation"} aria-pressed={playing}>▶</button><button onClick={() => setPlaying(false)} title="Pause animation">Ⅱ</button><button onClick={() => setPlaying(false)} title="Stop animation">■</button>
+        <button className={playModeActive ? styles.playActive : ""} onClick={toggleMotionPlayback} title={playing ? "Pause" : "Play"} aria-pressed={playModeActive}>▶</button><button className={playbackState === "paused" ? styles.toolActive : ""} onClick={pauseMotion} title="Pause and hold current frame">Ⅱ</button><button onClick={stopMotion} title="Stop and restore transforms">■</button>
       </div>
       <div className={styles.viewTools}>
+        <button className={toolSpace === "local" ? styles.toolActive : ""} onClick={() => setToolSpace((space) => space === "local" ? "world" : "local")} title="Handle orientation">{toolSpace === "local" ? "Local" : "Global"}</button>
+        <button className={snapEnabled ? styles.toolActive : ""} onClick={() => setSnapEnabled((value) => !value)} title={`Grid snapping: ${snapValue}`}>⌁ {snapValue}</button>
+        <button className={gizmosVisible ? styles.toolActive : ""} onClick={() => setGizmosVisible((value) => !value)} title="Toggle transform gizmo">Gizmos</button>
         <button className={gridVisible ? styles.toolActive : ""} onClick={() => setGridVisible((value) => !value)}>{t.grid}</button>
         <button className={wireframe ? styles.toolActive : ""} onClick={() => setWireframe((value) => !value)}>{t.wire}</button>
         <button onClick={() => setQuality((value) => value === "lite" ? "balanced" : "lite")}>{t.render}: {quality === "lite" ? t.lite : t.balanced}</button>
@@ -1836,13 +1955,13 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
       <div ref={viewportRef} className={styles.viewport} />
       {webglError && <div className={styles.webglError}>{webglError}</div>}
       <div className={styles.sceneHint}>{t.hint}</div>
-      {sceneView === "game" && <div className={styles.gameBadge}>{t.gamePreview}　{playing ? t.running : t.paused}</div>}
+      {sceneView === "game" && <div className={styles.gameBadge}>{t.gamePreview}　{playbackState === "playing" ? t.running : playbackState === "paused" ? "PAUSED" : "STOPPED"}</div>}
       {renderAssetPanel()}
     </section>
 
     {rightPanelVisible && <aside className={styles.inspectorPanel}>
       <header><strong>{t.inspector}</strong><div><button onClick={() => setRightPanelVisible(false)} title="Hide">×</button></div></header>
-      <div className={styles.objectHeader}><button className={`${styles.visibilityToggle} ${inspector.visible ? styles.objectEnabled : ""}`} onClick={toggleSelectedVisibility}>✓</button><div><small>{t.gameObject}</small><strong>{objectLabel(selected)}</strong></div></div>
+      <div className={styles.objectHeader}><button className={`${styles.visibilityToggle} ${inspector.visible ? styles.objectEnabled : ""}`} onClick={toggleSelectedVisibility}>✓</button><div><small>{t.gameObject} · F2</small><input ref={objectNameInputRef} className={styles.objectNameInput} value={objectLabel(selected)} onChange={(event) => setCustomLabels((labels) => ({ ...labels, [selected]: event.target.value }))} onBlur={(event) => { if (!event.target.value.trim()) setCustomLabels((labels) => { const next = { ...labels }; delete next[selected]; return next; }); }} aria-label={locale === "zh" ? "对象名称" : locale === "ja" ? "オブジェクト名" : "Object name"} /></div></div>
       <div className={styles.componentBlock}>
         <header><span>⌄　{t.transform}</span><button onClick={resetSelected}>↶</button></header>
         {(["position", "rotation", "scale"] as const).map((kind) => <div className={styles.vectorRow} key={kind}><label>{t[kind]}</label>{(["x", "y", "z"] as const).map((axis) => <span key={axis}><i>{axis.toUpperCase()}</i><input type="number" step={kind === "rotation" ? 5 : 0.1} value={transformValue(kind, axis)} onChange={(event) => updateTransform(kind, axis, Number(event.target.value))} /></span>)}</div>)}
@@ -1852,6 +1971,8 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
         <label className={styles.checkRow}><input type="checkbox" checked={inspector.visible} onChange={toggleSelectedVisibility} /><span>{t.enabled}</span></label>
         <label className={styles.checkRow}><input type="checkbox" checked={wireframe} onChange={() => setWireframe((value) => !value)} /><span>{t.wire}</span></label>
         <div className={styles.sliderRow}><span>{t.globalScale}</span><input type="range" min="0.35" max="1.8" step="0.05" value={inspector.scale[0]} onChange={(event) => updateUniformScale(Number(event.target.value))} /></div>
+        <label className={styles.checkRow}><input type="checkbox" checked={snapEnabled} onChange={() => setSnapEnabled((value) => !value)} /><span>{locale === "zh" ? "启用吸附" : locale === "ja" ? "スナップ" : "Snapping"}</span></label>
+        {snapEnabled && <div className={styles.sliderRow}><span>{locale === "zh" ? "移动步长" : locale === "ja" ? "移動間隔" : "Move snap"}　{snapValue.toFixed(2)}</span><input type="range" min="0.05" max="1" step="0.05" value={snapValue} onChange={(event) => setSnapValue(Number(event.target.value))} /></div>}
         {inspector.hasLight && <div className={styles.sliderRow}><span>{t.intensity}</span><input type="range" min="0" max="12" step="0.1" value={inspector.intensity} onChange={(event) => updateLightIntensity(Number(event.target.value))} /></div>}
       </div>
       {!inspector.hasLight && <div className={styles.componentBlock}>
@@ -1861,17 +1982,22 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
         <label className={styles.sliderRow}><span>Metallic</span><input type="range" min="0" max="1" step="0.02" value={inspector.metalness} onChange={(event) => updateMaterial("metalness", Number(event.target.value))} /></label>
       </div>}
       <div className={styles.componentBlock}>
-        <header><span>⌄　{locale === "zh" ? "动态效果" : locale === "ja" ? "アニメーション" : "Animation"}</span><button className={playing ? styles.animationRunning : ""} onClick={() => setPlaying((value) => !value)} title={playing ? "Pause all motion" : "Play enabled motion"}>{playing ? "Ⅱ" : "▶"}</button></header>
+        <header><span>⌄　{locale === "zh" ? "动态效果" : locale === "ja" ? "アニメーション" : "Animation"}</span><button className={playModeActive ? styles.animationRunning : ""} onClick={toggleMotionPlayback} title={playing ? "Pause all motion" : "Play enabled motion"}>{playing ? "Ⅱ" : "▶"}</button></header>
         <label className={styles.checkRow}><input type="checkbox" checked={selectedMotion.enabled} onChange={(event) => updateSelectedMotion({ enabled: event.target.checked })} /><span>{locale === "zh" ? "启用所选对象动态" : locale === "ja" ? "選択中のオブジェクトで有効化" : "Enable for selected object"}</span></label>
+        <label className={styles.selectRow}><span>{locale === "zh" ? "运动类型" : locale === "ja" ? "モーション" : "Motion"}</span><select value={selectedMotion.mode} onChange={(event) => updateSelectedMotion({ mode: event.target.value as MotionMode })}><option value="float">Float</option><option value="rotate">Rotate</option><option value="orbit">Orbit</option><option value="sway">Sway</option><option value="bounce">Bounce</option><option value="pulse">Pulse</option></select></label>
+        <label className={styles.selectRow}><span>{locale === "zh" ? "作用轴" : locale === "ja" ? "軸" : "Axis"}</span><select value={selectedMotion.axis} onChange={(event) => updateSelectedMotion({ axis: event.target.value as MotionAxis })}><option value="x">X</option><option value="y">Y</option><option value="z">Z</option></select></label>
+        <label className={styles.selectRow}><span>{locale === "zh" ? "缓动" : locale === "ja" ? "イージング" : "Easing"}</span><select value={selectedMotion.easing} onChange={(event) => updateSelectedMotion({ easing: event.target.value as MotionEasing })}><option value="linear">Linear</option><option value="easeInOut">Ease In Out</option><option value="easeOut">Ease Out</option><option value="bounce">Bounce</option></select></label>
+        <label className={styles.checkRow}><input type="checkbox" checked={selectedMotion.loop} onChange={(event) => updateSelectedMotion({ loop: event.target.checked })} /><span>{locale === "zh" ? "循环播放" : locale === "ja" ? "ループ" : "Loop Time"}</span></label>
         <label className={styles.sliderRow}><span>{locale === "zh" ? "速度" : locale === "ja" ? "速度" : "Speed"}　{selectedMotion.speed.toFixed(2)}×</span><input type="range" min="0.25" max="2.5" step="0.05" value={selectedMotion.speed} onChange={(event) => updateSelectedMotion({ speed: Number(event.target.value) })} /></label>
         <label className={styles.sliderRow}><span>{locale === "zh" ? "幅度" : locale === "ja" ? "振幅" : "Amplitude"}　{selectedMotion.amount.toFixed(2)}</span><input type="range" min="0.04" max="0.4" step="0.01" value={selectedMotion.amount} onChange={(event) => updateSelectedMotion({ amount: Number(event.target.value) })} /></label>
+        <label className={styles.sliderRow}><span>{locale === "zh" ? "相位" : locale === "ja" ? "位相" : "Phase"}　{selectedMotion.phase.toFixed(2)}</span><input type="range" min="0" max="1" step="0.01" value={selectedMotion.phase} onChange={(event) => updateSelectedMotion({ phase: Number(event.target.value) })} /></label>
         <p className={styles.animationHint}>{locale === "zh" ? `正在设置：${objectLabel(selected)}。顶部播放键会运行所有已启用对象。` : locale === "ja" ? `設定対象：${objectLabel(selected)}。上部の再生ボタンですべての有効な動きを実行します。` : `Editing: ${objectLabel(selected)}. The top Play button runs every enabled object.`}</p>
       </div>
     </aside>}
 
     {bottomPanelVisible && <section className={styles.projectPanel} id="project">
-      <header><button className={projectTab === "project" ? styles.projectTabActive : ""} onClick={() => setProjectTab("project")}>{t.project}</button><button className={projectTab === "console" ? styles.projectTabActive : ""} onClick={() => setProjectTab("console")}>{t.console}</button><button className={styles.panelClose} onClick={() => setBottomPanelVisible(false)} title="Hide">×</button></header>
-      <aside>{projectFolders.map((folder, index) => <button className={projectFolder === folder ? styles.folderActive : ""} onClick={() => { setProjectFolder(folder); setProjectTab("project"); setProjectSearch(""); }} key={folder}>{projectFolder === folder ? "▾ " : "　"}{t.folders[index]}</button>)}</aside>
+      <header><button className={projectTab === "project" ? styles.projectTabActive : ""} onClick={() => setProjectTab("project")}>{t.project}</button><button className={projectTab === "console" ? styles.projectTabActive : ""} onClick={() => setProjectTab("console")}>{t.console}</button><button className={projectTab === "animation" ? styles.projectTabActive : ""} onClick={() => setProjectTab("animation")}>{locale === "zh" ? "动画" : locale === "ja" ? "アニメーション" : "Animation"}</button><button className={styles.panelClose} onClick={() => setBottomPanelVisible(false)} title="Hide">×</button></header>
+      <aside>{projectTab === "animation" ? sceneObjectIds.map((id) => <button className={selected === id ? styles.folderActive : ""} onClick={() => selectObject(id)} key={id}>{motionSettings[id]?.enabled ? "● " : "○ "}{objectLabel(id)}</button>) : projectFolders.map((folder, index) => <button className={projectFolder === folder ? styles.folderActive : ""} onClick={() => { setProjectFolder(folder); setProjectTab("project"); setProjectSearch(""); }} key={folder}>{projectFolder === folder ? "▾ " : "　"}{t.folders[index]}</button>)}</aside>
       <div className={styles.projectWorkspace}>
         {projectTab === "project" ? <>
           <div className={styles.projectTools}>
@@ -1894,9 +2020,29 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
             ><i className={asset.type === "model" ? styles.blueAsset : asset.type === "content" ? styles.limeAsset : asset.type === "image" ? styles.pinkAsset : ""}>{asset.id === "website-blog" ? "▤" : asset.id === "website-profile" ? "▦" : asset.id === "website-friends" ? "◯" : asset.id === "website-links" ? "≈" : asset.type === "folder" ? "▰" : asset.type === "scene" ? "◇" : asset.type === "model" ? "⬡" : asset.type === "content" ? "MD" : asset.type === "image" ? "▧" : "●"}</i><span>{asset.label}</span><small>{asset.detail}</small></button>)}
             {!visibleProjectAssets.length && <div className={styles.emptyAssets}>{t.commands.empty}</div>}
           </div>
-        </> : <div className={styles.consoleView}>
+        </> : projectTab === "console" ? <div className={styles.consoleView}>
           <header><span>{consoleEntries.length} Messages</span><button onClick={() => setConsoleEntries([])}>Clear</button></header>
           {consoleEntries.map((entry, index) => <p key={`${entry}-${index}`}><i>●</i>{entry}</p>)}
+        </div> : <div className={styles.animationWindow}>
+          <header className={styles.animationToolbar}>
+            <button onClick={() => seekMotion(Math.max(0, motionTime - 1 / 30))} title="Previous frame">◀|</button>
+            <button className={playModeActive ? styles.toolActive : ""} onClick={toggleMotionPlayback} title="Play / Pause">{playing ? "Ⅱ" : "▶"}</button>
+            <button onClick={() => seekMotion(Math.min(10, motionTime + 1 / 30))} title="Next frame">|▶</button>
+            <button onClick={stopMotion} title="Stop">■</button>
+            <strong>{objectLabel(selected)} · {selectedMotion.mode}</strong>
+            <span>{motionTime.toFixed(2)}s</span>
+          </header>
+          <div className={styles.animationPresets}>
+            <span>{locale === "zh" ? "预设" : locale === "ja" ? "プリセット" : "Presets"}</span>
+            {(["float", "rotate", "orbit", "sway", "bounce", "pulse"] as MotionMode[]).map((mode) => <button className={selectedMotion.mode === mode ? styles.presetActive : ""} onClick={() => updateSelectedMotion({ enabled: true, mode })} key={mode}>{mode}</button>)}
+          </div>
+          <div className={styles.timelineRuler}>{[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((second) => <span key={second}>{second}s</span>)}</div>
+          <input className={styles.timelineScrubber} type="range" min="0" max="10" step="0.01" value={motionTime % 10} onChange={(event) => seekMotion(Number(event.target.value))} aria-label="Animation timeline" />
+          <div className={styles.animationTracks}>
+            <div><span>Motion.{selectedMotion.mode}</span><b><i style={{ left: `${selectedMotion.phase * 100}%` }} /><i style={{ left: `${((selectedMotion.phase + 0.5) % 1) * 100}%` }} /></b></div>
+            <div><span>Transform.{selectedMotion.mode === "pulse" ? "Scale" : selectedMotion.mode === "sway" || selectedMotion.mode === "rotate" ? "Rotation" : "Position"}.{selectedMotion.axis.toUpperCase()}</span><b><i style={{ left: `${selectedMotion.phase * 100}%` }} /><i style={{ left: `${((selectedMotion.phase + 0.25) % 1) * 100}%` }} /><i style={{ left: `${((selectedMotion.phase + 0.75) % 1) * 100}%` }} /></b></div>
+            {(selected === "portal" || selected === "riscv") && <div><span>{selected === "portal" ? "Light + Particles" : "LED.Emission"}</span><b><i style={{ left: "0%" }} /><i style={{ left: "50%" }} /><i style={{ left: "100%" }} /></b></div>}
+          </div>
         </div>}
       </div>
     </section>}

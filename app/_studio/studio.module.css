@@ -372,6 +372,21 @@
 .objectHeader strong { display: block; }
 .objectHeader small { margin-bottom: 4px; color: #9298a1; font: 10px/1 Consolas, monospace; letter-spacing: .08em; }
 .objectHeader strong { font-size: 13px; font-weight: 600; }
+.objectNameInput {
+  width: min(210px, 100%);
+  height: 24px;
+  padding: 0 5px;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  outline: none;
+  background: transparent;
+  color: #d5d8dc;
+  font-size: 13px;
+  font-weight: 600;
+  user-select: text;
+}
+.objectNameInput:hover { border-color: #41454b; background: #202226; }
+.objectNameInput:focus { border-color: #668db0; background: #1c2730; }
 
 .componentBlock { margin: 0; border-bottom: 1px solid #151619; }
 .componentBlock > header {
@@ -409,7 +424,8 @@
 }
 .vectorRow input:focus { background: #263a4b; }
 .checkRow,
-.sliderRow {
+.sliderRow,
+.selectRow {
   min-height: 31px;
   padding: 5px 9px;
   display: flex;
@@ -421,6 +437,19 @@
 .checkRow input { accent-color: #5f8db6; }
 .sliderRow { justify-content: space-between; }
 .sliderRow input { width: 130px; accent-color: #6a97bd; }
+.selectRow { justify-content: space-between; }
+.selectRow select {
+  width: 130px;
+  height: 23px;
+  padding: 0 5px;
+  border: 1px solid #45494f;
+  border-radius: 2px;
+  outline: none;
+  background: #202226;
+  color: #c6c9cd;
+  font: 10px/1 Consolas, monospace;
+}
+.selectRow select:focus { border-color: #668bab; }
 .materialRow { min-height: 34px; padding: 5px 9px; display: flex; align-items: center; justify-content: space-between; color: #9da1a7; font-size: 11px; }
 .materialRow input { width: 44px; height: 24px; padding: 0; border: 1px solid #474b51; background: #1d1f22; cursor: pointer; }
 .componentBlock > header .animationRunning { color: #9fd6ff; background: #315a78; }
@@ -560,6 +589,40 @@
 .consoleView > header button { padding: 4px 9px; border: 1px solid #454a51; border-radius: 3px; }
 .consoleView p { min-height: 28px; margin: 0; padding: 6px 10px; border-bottom: 1px solid #2a2d31; }
 .consoleView i { margin-right: 9px; color: #79bf84; font-style: normal; }
+
+.animationWindow {
+  grid-row: 1 / -1;
+  min-width: 0;
+  min-height: 0;
+  position: relative;
+  display: grid;
+  grid-template-rows: 34px 32px 24px 24px minmax(70px, 1fr);
+  overflow: hidden;
+  background: #1e2023;
+  color: #b9bdc3;
+  font: 10px/1.2 Consolas, monospace;
+}
+.animationToolbar,
+.animationPresets { padding: 4px 7px; display: flex; align-items: center; gap: 5px; border-bottom: 1px solid #15171a; background: #292c30; }
+.animationToolbar button,
+.animationPresets button { min-width: 28px; height: 24px; padding: 0 7px; border: 1px solid #45494f; border-radius: 2px; background: #303338; color: #b8bdc3; }
+.animationToolbar button:hover,
+.animationPresets button:hover { background: #3c4249; color: #fff; }
+.animationToolbar .toolActive,
+.animationPresets .presetActive { border-color: #6e94b5; background: #466b8d; color: #fff; }
+.animationToolbar strong { margin-left: 6px; color: #d6d9dd; font-weight: 500; }
+.animationToolbar > span { margin-left: auto; color: #8fc7ed; }
+.animationPresets { background: #24272b; }
+.animationPresets > span { margin-right: 4px; color: #8e949c; }
+.animationPresets button { height: 22px; text-transform: capitalize; }
+.timelineRuler { padding-left: 180px; display: grid; grid-template-columns: repeat(11, 1fr); align-items: end; border-bottom: 1px solid #34373c; background: repeating-linear-gradient(90deg, transparent 0, transparent calc(10% - 1px), #34373c calc(10% - 1px), #34373c 10%); color: #777e86; }
+.timelineRuler span { padding-left: 3px; }
+.timelineScrubber { width: calc(100% - 180px); margin-left: 180px; accent-color: #74a9d1; }
+.animationTracks { min-height: 0; overflow: auto; }
+.animationTracks > div { min-height: 29px; display: grid; grid-template-columns: 180px minmax(0, 1fr); border-bottom: 1px solid #303339; }
+.animationTracks span { padding: 8px 10px; overflow: hidden; border-right: 1px solid #15171a; color: #aeb3b9; text-overflow: ellipsis; white-space: nowrap; }
+.animationTracks b { position: relative; display: block; background: repeating-linear-gradient(90deg, transparent 0, transparent calc(10% - 1px), rgb(255 255 255 / 4%) calc(10% - 1px), rgb(255 255 255 / 4%) 10%); }
+.animationTracks i { width: 8px; height: 8px; position: absolute; top: 10px; translate: -4px 0; rotate: 45deg; border: 1px solid #b9d7ec; background: #527fa2; }
 
 .contextMenu {
   width: 220px;
