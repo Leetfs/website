@@ -92,6 +92,19 @@ test("keeps Unity interactions and project assets wired", async () => {
   assert.match(studio, /\/api\/articles\/\$\{slug\}\.json/);
   assert.match(studio, /useState<ProjectFolder>\("Website"\)/);
   assert.match(studio, /website-blog/);
+  assert.match(studio, /function WebsiteAssetIcon/);
+  for (const websiteAsset of ["website-blog", "website-profile", "website-friends", "website-links"]) {
+    assert.match(studio, new RegExp(`id === "${websiteAsset}"`));
+  }
+  assert.match(studio, /<WebsiteAssetIcon id=\{asset\.id\} \/>/);
+  assert.doesNotMatch(studio, /asset\.id === "website-blog" \? "▤"/);
+  assert.match(studioCss, /\.websiteBlogIcon/);
+  assert.match(studioCss, /\.websiteProfileIcon/);
+  assert.match(studioCss, /\.websiteFriendsIcon/);
+  assert.match(studioCss, /\.websiteLinksIcon/);
+  assert.match(studioCss, /\.websiteAssetIcon\s*\{[^}]*linear-gradient\(145deg, #3a3e44, #2c2f34\)/);
+  assert.match(studioCss, /\.websiteBlogIcon,[\s\S]*\.websiteLinksIcon\s*\{[^}]*border-color:\s*#57535c;\s*color:\s*#c4bdc7/);
+  assert.doesNotMatch(studioCss, /#315e82|#76506f|#5c5686|#356e70/);
   assert.match(studio, /beginPanelResize/);
   assert.match(studio, /toggle-bottom/);
   assert.match(studio, /portal\.rotation\.y = -Math\.PI \/ 2/);
@@ -105,7 +118,10 @@ test("keeps Unity interactions and project assets wired", async () => {
   assert.match(studio, /Object\.entries\(motionSettingsRef\.current\)/);
   for (const model of ["riscv", "terminal", "portal", "shark"]) {
     assert.match(studio, new RegExp(`id === "${model}"`));
+    assert.match(studio, new RegExp(`${model}: \\{ enabled: true`));
   }
+  assert.match(studio, /const animatedModelObjects: SceneObject\[\] = \["riscv", "terminal", "portal", "shark"\]/);
+  assert.match(studio, /enabled: animatedModelObjects\.includes\(id\)/);
   assert.match(studio, /motionSettings,\s+labels: customLabels,\s+orbit:/);
   assert.match(studio, /setMotionSettings\(restoredMotionSettings\)/);
   for (const mode of ["float", "rotate", "orbit", "sway", "bounce", "pulse"]) {

@@ -99,17 +99,27 @@ type ArticleDocument = {
   html: string;
 };
 
+function WebsiteAssetIcon({ id }: { id: string }) {
+  const common = { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.7, strokeLinecap: "round" as const, strokeLinejoin: "round" as const, "aria-hidden": true };
+  if (id === "website-blog") return <svg {...common}><path d="M6.5 3.5h8l3 3v14h-11z" /><path d="M14.5 3.5v3h3" /><path d="M9 10h6M9 13.5h6M9 17h4" /></svg>;
+  if (id === "website-profile") return <svg {...common}><circle cx="12" cy="8" r="3.25" /><path d="M5.75 20c.45-4.1 2.55-6.15 6.25-6.15s5.8 2.05 6.25 6.15" /></svg>;
+  if (id === "website-friends") return <svg {...common}><circle cx="9" cy="8.25" r="2.75" /><circle cx="16.5" cy="9.25" r="2.1" /><path d="M3.75 19c.4-3.75 2.15-5.65 5.25-5.65s4.85 1.9 5.25 5.65M14.2 14.2c3.35-.8 5.4.8 6.05 3.95" /></svg>;
+  if (id === "website-links") return <svg {...common}><path d="M9.6 14.4 8 16a3.4 3.4 0 0 1-4.8-4.8l2.35-2.35a3.4 3.4 0 0 1 4.8 0" /><path d="m14.4 9.6 1.6-1.6a3.4 3.4 0 1 1 4.8 4.8l-2.35 2.35a3.4 3.4 0 0 1-4.8 0M8.5 15.5l7-7" /></svg>;
+  return null;
+}
+
 const LANGUAGE_STORAGE_KEY = "lee-studio-language";
 const SCENE_STORAGE_KEY = "lee-unity-scene";
 const builtinSceneObjects: BuiltinSceneObject[] = ["riscv", "terminal", "portal", "shark", "stage", "light", "mirror"];
+const animatedModelObjects: SceneObject[] = ["riscv", "terminal", "portal", "shark"];
 const initialMotionSettings: Record<string, MotionConfig> = {
-  riscv: { enabled: false, mode: "pulse", axis: "y", easing: "easeInOut", loop: true, speed: 1.15, amount: 0.08, phase: 0 },
-  terminal: { enabled: false, mode: "float", axis: "y", easing: "easeInOut", loop: true, speed: 0.75, amount: 0.1, phase: 0.2 },
+  riscv: { enabled: true, mode: "pulse", axis: "y", easing: "easeInOut", loop: true, speed: 1.15, amount: 0.08, phase: 0 },
+  terminal: { enabled: true, mode: "float", axis: "y", easing: "easeInOut", loop: true, speed: 0.75, amount: 0.1, phase: 0.2 },
   portal: { enabled: true, mode: "float", axis: "y", easing: "easeInOut", loop: true, speed: 1, amount: 0.16, phase: 0 },
-  shark: { enabled: false, mode: "sway", axis: "z", easing: "easeInOut", loop: true, speed: 0.9, amount: 0.14, phase: 0.35 },
+  shark: { enabled: true, mode: "sway", axis: "z", easing: "easeInOut", loop: true, speed: 0.9, amount: 0.14, phase: 0.35 },
 };
 const defaultMotionConfig = (id: SceneObject): MotionConfig => ({
-  enabled: id === "portal",
+  enabled: animatedModelObjects.includes(id),
   mode: "float",
   axis: "y",
   easing: "easeInOut",
@@ -2039,7 +2049,7 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
               onContextMenu={(event) => { event.preventDefault(); event.stopPropagation(); setSelectedAsset(asset.id); setContextMenu({ x: Math.min(event.clientX, window.innerWidth - 230), y: Math.min(event.clientY, window.innerHeight - 130), kind: "asset", assetId: asset.id }); }}
               title={asset.path}
               key={asset.id}
-            ><i className={asset.type === "model" ? styles.blueAsset : asset.type === "content" ? styles.limeAsset : asset.type === "image" ? styles.pinkAsset : asset.type === "source" ? styles.sourceAsset : ""}>{asset.id === "website-blog" ? "▤" : asset.id === "website-profile" ? "▦" : asset.id === "website-friends" ? "◯" : asset.id === "website-links" ? "≈" : asset.type === "scene" ? "◇" : asset.type === "model" ? "⬡" : asset.type === "content" ? "MD" : asset.type === "image" ? "▧" : asset.type === "source" ? "</>" : "●"}</i><span>{asset.label}</span><small>{asset.detail}</small></button>)}
+            ><i className={asset.id.startsWith("website-") ? `${styles.websiteAssetIcon} ${asset.id === "website-blog" ? styles.websiteBlogIcon : asset.id === "website-profile" ? styles.websiteProfileIcon : asset.id === "website-friends" ? styles.websiteFriendsIcon : styles.websiteLinksIcon}` : asset.type === "model" ? styles.blueAsset : asset.type === "content" ? styles.limeAsset : asset.type === "image" ? styles.pinkAsset : asset.type === "source" ? styles.sourceAsset : ""}>{asset.id.startsWith("website-") ? <WebsiteAssetIcon id={asset.id} /> : asset.type === "scene" ? "◇" : asset.type === "model" ? "⬡" : asset.type === "content" ? "MD" : asset.type === "image" ? "▧" : asset.type === "source" ? "</>" : "●"}</i><span>{asset.label}</span><small>{asset.detail}</small></button>)}
             {!visibleProjectAssets.length && <div className={styles.emptyAssets}>{t.commands.empty}</div>}
           </div>
         </> : projectTab === "console" ? <div className={styles.consoleView}>

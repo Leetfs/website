@@ -554,6 +554,12 @@
 .assetGrid .limeAsset { border-radius: 50%; background: #7aa24f; color: #e4f6cf; font-size: 18px; }
 .assetGrid .pinkAsset { border-radius: 6px; background: #9b537d; color: #ffe4f3; font-size: 19px; }
 .assetGrid .sourceAsset { border-radius: 5px; background: #3a5268; color: #c9e9ff; font: normal 13px/1 Consolas, monospace; }
+.assetGrid .websiteAssetIcon { border: 1px solid #4b5159; border-radius: 7px; background: linear-gradient(145deg, #3a3e44, #2c2f34); box-shadow: inset 0 1px rgb(255 255 255 / 5%), 0 3px 8px rgb(0 0 0 / 16%); color: #b9c2cb; }
+.assetGrid .websiteAssetIcon svg { width: 28px; height: 28px; }
+.assetGrid .websiteBlogIcon,
+.assetGrid .websiteProfileIcon,
+.assetGrid .websiteFriendsIcon,
+.assetGrid .websiteLinksIcon { border-color: #57535c; color: #c4bdc7; }
 .assetGrid .sharkAsset { border-radius: 50% 55% 48% 52%; background: #5f8fae; color: #f4fbff; font-size: 25px; }
 .assetGrid span { width: 100%; overflow: hidden; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
 .assetGrid small { color: #969ca4; font: 10px/1 Consolas, monospace; }
