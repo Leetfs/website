@@ -84,7 +84,7 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_PAGES_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_PAGES_ACCOUNT }}
           wranglerVersion: "4"
-          command: pages deploy preview-output --project-name=blog --branch=pr-${{ steps.pr.outputs.result }}
+          command: pages deploy preview-output --project-name=website --branch=pr-${{ steps.pr.outputs.result }}
 
       - name: Add preview URL to the job summary
         if: steps.deploy.outcome == 'success'
