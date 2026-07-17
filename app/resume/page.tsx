@@ -72,8 +72,8 @@ export default function ResumePage() {
             openRuyi Linux 开发，也会写前端、维护 CI，偶尔折腾 VRChat。
           </p>
           <div>
-            <a href="mailto:lee@mtftm.com">lee@mtftm.com ↗</a>
-            <a href="https://github.com/Leetfs" target="_blank" rel="noreferrer">GitHub ↗</a>
+            <a href="mailto:lee@mtftm.com" target="_blank" rel="noopener noreferrer">lee@mtftm.com ↗</a>
+            <a href="https://github.com/Leetfs" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
           </div>
           <StudioPrintButton />
         </aside>
@@ -115,7 +115,7 @@ export default function ResumePage() {
           </div>
           <div className={styles.resumeLinks}>
             {communities.map(([name, role, href], index) => (
-              <a href={href} target="_blank" rel="noreferrer" key={name}>
+              <a href={href} target="_blank" rel="noopener noreferrer" key={name}>
                 <span>0{index + 1}</span><h3>{name}</h3><p>{role}</p><b>↗</b>
               </a>
             ))}

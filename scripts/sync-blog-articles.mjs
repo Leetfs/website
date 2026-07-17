@@ -131,7 +131,8 @@ function renderMarkdown(markdown, pageSlug, articleSlugs) {
 
   html = html
     .replace(/src="([^"]+)"/g, (_, value) => `src="${resolveContentUrl(value, pageSlug, "asset", articleSlugs)}"`)
-    .replace(/href="([^"]+)"/g, (_, value) => `href="${resolveContentUrl(value, pageSlug, "link", articleSlugs)}"`);
+    .replace(/href="([^"]+)"/g, (_, value) => `href="${resolveContentUrl(value, pageSlug, "link", articleSlugs)}"`)
+    .replace(/<a href=/g, '<a target="_blank" rel="noopener noreferrer" href=');
 
   return { html, toc };
 }

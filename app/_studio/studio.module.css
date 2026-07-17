@@ -653,12 +653,14 @@
 .assetPanelExpanded { width: auto; height: auto; left: 16px; right: 16px; bottom: 16px; }
 .assetPanelFullscreen { width: auto; height: auto; inset: 42px 16px 16px; }
 .assetPanel > header { height: 34px; padding: 0 10px; display: flex; justify-content: space-between; align-items: center; background: #34373c; border-bottom: 1px solid #17181b; }
-.assetPanel > header span { color: #bcc1c8; font: 10px/1 Consolas, monospace; letter-spacing: .08em; }
+.assetPanel > header > span { min-width: 0; overflow: hidden; color: #bcc1c8; font: 10px/1 Consolas, monospace; letter-spacing: .08em; text-overflow: ellipsis; white-space: nowrap; }
 .assetPanel > header > div { display: flex; gap: 2px; }
 .assetPanel > header button { width: 26px; height: 26px; border-radius: 3px; color: #a0a5ac; font-size: 15px; }
 .assetPanel > header button:hover { background: #484c52; color: #fff; }
 .assetPanel > header button:disabled { opacity: .35; cursor: default; }
 .assetPanel > header button:disabled:hover { background: transparent; color: #a0a5ac; }
+.assetPanel > header .panelShareButton { width: auto; min-width: 98px; padding: 0 9px; border: 1px solid #4a5159; color: #c2d9eb; font: 11px/1 "Segoe UI", "PingFang SC", sans-serif; white-space: nowrap; }
+.assetPanel > header .panelShareButton:hover { border-color: #72a9d5; background: #3d5f80; }
 .assetPanel > header .fullscreenButton { color: #a9cbe7; font-size: 17px; }
 .blogAsset,
 .profileAsset,

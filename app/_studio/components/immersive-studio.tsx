@@ -72,6 +72,7 @@ type ArticleDocument = {
   description: string;
   category: string;
   language: string;
+  href: string;
   displayDate: string;
   readingMinutes: number;
   html: string;
@@ -191,7 +192,7 @@ const messages = {
     gamePreview: "GAME PREVIEW", running: "RUNNING", paused: "PAUSED",
     transform: "Transform", position: "Position", rotation: "Rotation", scale: "Scale", meshRenderer: "Mesh Renderer",
     enabled: "Enabled", globalScale: "Global Scale", intensity: "Intensity",
-    folders: ["Site", "Assets", "Scenes", "Models", "Content", "Images", "Materials"],
+    folders: ["Website", "Assets", "Scenes", "Models", "Content", "Images", "Materials"],
     blogAsset: "Blog asset", profileAsset: "Profile asset", friendsAsset: "Friends asset", socialAsset: "Personal links",
     blogSearch: "Search article assets…", openBlog: "VIEW ALL POSTS", openResume: "OPEN RESUME", openFriends: "OPEN FRIEND LINKS",
     profileKicker: "LEE", profileTitle: "Hi, I'm Lee.",
@@ -228,6 +229,7 @@ const friends = [
   { name: "玲雨兰夜", description: { zh: "欢迎来到玲雨兰夜的个人站点。", en: "Welcome to Lingyu Lanye's personal site.", ja: "玲雨兰夜の個人サイトへようこそ。" }, href: "http://nhui.top/", avatar: "/friends/nhui.jpg" },
   { name: "香菜", description: { zh: "技术、生活与个人记录。", en: "Technology, life, and personal notes.", ja: "技術、生活、個人の記録。" }, href: "https://mdzz.pro/", avatar: "https://avatars.githubusercontent.com/u/85744569" },
   { name: "DokiDoki·大黄猫", description: { zh: "持续更新的网络杂货店。", en: "A continuously updated web variety store.", ja: "更新を続けるウェブ雑貨店。" }, href: "https://www.iacg.moe/", avatar: "https://www.iacg.moe/upload/cat.png" },
+  { name: "Catherina", description: { zh: "是朋友，也是很好的同事", en: "A friend and a great colleague.", ja: "友人であり、素晴らしい同僚でもあります。" }, href: "https://catherina.moe/", avatar: "/friends/catherina.png" },
 ];
 
 const personalLinks = [
@@ -309,6 +311,7 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
   const qualityRef = useRef<"lite" | "balanced">("lite");
   const motionSettingsRef = useRef({ speed: 1, amount: 0.16 });
   const bottomPanelBeforeFullscreenRef = useRef(true);
+  const deepLinkHandledRef = useRef(false);
   const orbitRef = useRef<Orbit>({ theta: 0.15, phi: 1.15, radius: 9.4, target: new THREE.Vector3(0, 1.15, 0) });
   const originalTransformsRef = useRef(new Map<SceneObject, { position: THREE.Vector3; rotation: THREE.Euler; scale: THREE.Vector3 }>());
 
@@ -318,6 +321,7 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
   const [assetPanel, setAssetPanel] = useState<AssetPanel>(null);
   const [showAllBlog, setShowAllBlog] = useState(false);
   const [articleDocument, setArticleDocument] = useState<ArticleDocument | null>(null);
+  const [panelShareState, setPanelShareState] = useState<"idle" | "copied" | "failed">("idle");
   const [articleLoading, setArticleLoading] = useState(false);
   const [panelExpanded, setPanelExpanded] = useState(false);
   const [panelFullscreen, setPanelFullscreen] = useState(false);
@@ -749,6 +753,48 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
       setArticleLoading(false);
     }
   }, [logAction]);
+
+  useEffect(() => {
+    if (deepLinkHandledRef.current) return;
+    deepLinkHandledRef.current = true;
+    const params = new URLSearchParams(window.location.search);
+    const articleHref = params.get("article");
+    if (articleHref) {
+      const article = articles.find((entry) => entry.href === articleHref);
+      if (article) {
+        window.history.replaceState(null, "", "/");
+        queueMicrotask(() => void openArticlePreview(article));
+      }
+      return;
+    }
+    const panel = params.get("panel");
+    if (panel === "blog" || panel === "profile" || panel === "friends" || panel === "social") {
+      window.history.replaceState(null, "", "/");
+      queueMicrotask(() => setAssetPanel(panel));
+    }
+  }, [articles, openArticlePreview]);
+
+  const copyPanelShareLink = async () => {
+    if (!assetPanel) return;
+    const url = new URL("/", window.location.origin);
+    if (articleDocument?.href) url.searchParams.set("article", articleDocument.href);
+    else url.searchParams.set("panel", assetPanel);
+    try {
+      await navigator.clipboard.writeText(url.href);
+      setPanelShareState("copied");
+    } catch {
+      const input = document.createElement("textarea");
+      input.value = url.href;
+      input.style.position = "fixed";
+      input.style.opacity = "0";
+      document.body.appendChild(input);
+      input.select();
+      const copied = document.execCommand("copy");
+      input.remove();
+      setPanelShareState(copied ? "copied" : "failed");
+    }
+    window.setTimeout(() => setPanelShareState("idle"), 1800);
+  };
 
   const saveScene = useCallback(() => {
     const transforms: Record<string, { visible: boolean; position: number[]; rotation: number[]; scale: number[] }> = {};
@@ -1526,8 +1572,13 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
   const renderAssetPanel = () => {
     if (!assetPanel) return null;
     const fullscreenLabel = locale === "zh" ? (panelFullscreen ? "退出全屏" : "全屏") : locale === "ja" ? (panelFullscreen ? "全画面を終了" : "全画面") : (panelFullscreen ? "Exit fullscreen" : "Fullscreen");
+    const sharePanelLabel = panelShareState === "copied"
+      ? (locale === "zh" ? "链接已复制" : locale === "ja" ? "コピー済み" : "Copied")
+      : panelShareState === "failed"
+        ? (locale === "zh" ? "复制失败" : locale === "ja" ? "コピー失敗" : "Copy failed")
+        : (locale === "zh" ? "复制分享链接" : locale === "ja" ? "共有リンクをコピー" : "Copy share link");
     return <section className={`${styles.assetPanel} ${panelExpanded ? styles.assetPanelExpanded : ""} ${panelFullscreen ? styles.assetPanelFullscreen : ""}`} aria-label={assetPanel}>
-      <header><span>{articleDocument?.title ?? (assetPanel === "blog" ? t.blogAsset : assetPanel === "profile" ? t.profileAsset : assetPanel === "friends" ? t.friendsAsset : t.socialAsset)}</span><div><button onClick={() => setPanelExpanded((value) => !value)} aria-label={panelExpanded ? "Restore" : "Maximize"} disabled={panelFullscreen}>{panelExpanded ? "❐" : "□"}</button><button className={styles.fullscreenButton} onClick={toggleAssetFullscreen} aria-label={fullscreenLabel} title={fullscreenLabel}>{panelFullscreen ? "↙" : "⛶"}</button><button onClick={closeAssetPanel} aria-label="Close">×</button></div></header>
+      <header><span>{articleDocument?.title ?? (assetPanel === "blog" ? t.blogAsset : assetPanel === "profile" ? t.profileAsset : assetPanel === "friends" ? t.friendsAsset : t.socialAsset)}</span><div><button className={styles.panelShareButton} type="button" onClick={copyPanelShareLink} aria-label={sharePanelLabel} title={sharePanelLabel}>⧉ {sharePanelLabel}</button><button onClick={() => setPanelExpanded((value) => !value)} aria-label={panelExpanded ? "Restore" : "Maximize"} disabled={panelFullscreen}>{panelExpanded ? "❐" : "□"}</button><button className={styles.fullscreenButton} onClick={toggleAssetFullscreen} aria-label={fullscreenLabel} title={fullscreenLabel}>{panelFullscreen ? "↙" : "⛶"}</button><button onClick={closeAssetPanel} aria-label="Close">×</button></div></header>
       {assetPanel === "blog" && <div className={styles.blogAsset}>
         {articleDocument ? <div className={styles.articlePreview}>
           <button className={styles.previewBack} onClick={() => setArticleDocument(null)}>← {t.blogAsset}</button>
@@ -1674,7 +1725,7 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
     </aside>}
 
     {bottomPanelVisible && <section className={styles.projectPanel} id="project">
-      <header><button className={projectTab === "project" ? styles.projectTabActive : ""} onClick={() => setProjectTab("project")}>{t.project}</button><button className={projectTab === "console" ? styles.projectTabActive : ""} onClick={() => setProjectTab("console")}>{t.console}</button><span>{projectFolder === "Website" ? "Website" : `Assets / ${projectFolder}`}</span><button className={styles.panelClose} onClick={() => setBottomPanelVisible(false)} title="Hide">×</button></header>
+      <header><button className={projectTab === "project" ? styles.projectTabActive : ""} onClick={() => setProjectTab("project")}>{t.project}</button><button className={projectTab === "console" ? styles.projectTabActive : ""} onClick={() => setProjectTab("console")}>{t.console}</button><button className={styles.panelClose} onClick={() => setBottomPanelVisible(false)} title="Hide">×</button></header>
       <aside>{projectFolders.map((folder, index) => <button className={projectFolder === folder ? styles.folderActive : ""} onClick={() => { setProjectFolder(folder); setProjectTab("project"); setProjectSearch(""); }} key={folder}>{projectFolder === folder ? "▾ " : "　"}{t.folders[index]}</button>)}</aside>
       <div className={styles.projectWorkspace}>
         {projectTab === "project" ? <>

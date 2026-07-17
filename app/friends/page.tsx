@@ -14,6 +14,7 @@ const friends = [
   { name: "玲雨兰夜", description: "诶嘿嘿……欢迎来到玲雨兰夜的个人站点。", href: "http://nhui.top/", host: "nhui.top", avatar: "/friends/nhui.jpg" },
   { name: "香菜", description: "香菜的博客，分享技术、生活和个人记录。", href: "https://mdzz.pro/", host: "mdzz.pro", avatar: "https://avatars.githubusercontent.com/u/85744569" },
   { name: "DokiDoki·大黄猫", description: "黄猫杂货店，一间有趣且持续更新的网络小店。", href: "https://www.iacg.moe/", host: "iacg.moe", avatar: "https://www.iacg.moe/upload/cat.png" },
+  { name: "Catherina", description: "是朋友，也是很好的同事", href: "https://catherina.moe/", host: "catherina.moe", avatar: "/friends/catherina.png" },
 ];
 
 export default function FriendsPage() {
@@ -37,7 +38,7 @@ export default function FriendsPage() {
         </div>
         <div className={styles.friendList}>
           {friends.map((friend, index) => (
-            <a href={friend.href} target="_blank" rel="noreferrer" key={friend.name}>
+            <a href={friend.href} target="_blank" rel="noopener noreferrer" key={friend.name}>
               <span className={styles.friendNumber}>F0{index + 1}</span>
               <div className={styles.friendAvatar}>
                 <Image
@@ -63,7 +64,7 @@ export default function FriendsPage() {
         <p className={styles.index}>02 / ADD A LINK</p>
         <h2>想交换友链？</h2>
         <p>把网站地址、名称、简介和头像发给我就行。我也会把自己的信息回给你。</p>
-        <a href="mailto:lee@mtftm.com?subject=交换友链">交换友链 ↗</a>
+        <a href="mailto:lee@mtftm.com?subject=交换友链" target="_blank" rel="noopener noreferrer">交换友链 ↗</a>
       </section>
       <StudioFooter />
     </main>

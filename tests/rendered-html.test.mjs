@@ -31,6 +31,9 @@ test("exports the interactive studio as the homepage", async () => {
   assert.match(html, /RISC-V 开发板/);
   assert.doesNotMatch(html, /RISC-V Dev Board/);
   assert.doesNotMatch(html, /BUILD CLOSE TO THE SYSTEM|返回原版|Original/);
+
+  const layout = await readFile(new URL("../app/layout.tsx", import.meta.url), "utf8");
+  assert.match(layout, /<html lang="zh-CN" suppressHydrationWarning>/);
 });
 
 test("exports every canonical content route", async () => {
@@ -97,17 +100,28 @@ test("keeps Unity interactions and project assets wired", async () => {
   assert.match(studio, /motionSettingsRef/);
   assert.match(studio, /playingRef\.current/);
   assert.match(studio, /onClick=\{\(\) => openProjectAsset\(asset\)\}/);
+  assert.match(studio, /copyPanelShareLink/);
+  assert.match(studio, /className=\{styles\.panelShareButton\}/);
+  assert.match(studio, /url\.searchParams\.set\("article", articleDocument\.href\)/);
+  assert.match(studio, /url\.searchParams\.set\("panel", assetPanel\)/);
+  assert.match(studio, /const articleHref = params\.get\("article"\)/);
+  assert.match(studio, /window\.history\.replaceState\(null, "", "\/"\)/);
   assert.doesNotMatch(studio, /onDoubleClick=\{\(\) => openProjectAsset\(asset\)\}/);
+  assert.match(studio, /name: "Catherina"/);
+  assert.match(studio, /avatar: "\/friends\/catherina\.png"/);
+  assert.doesNotMatch(studio, /<\/button><span>\{projectFolder === "Website"/);
   assert.doesNotMatch(studio, /toolMode\.toUpperCase\(\)/);
   assert.doesNotMatch(studio, /openLandmark|moduleDock/);
   assert.doesNotMatch(studio, /t\.ready|ready:\s*"|就绪|準備完了/);
   assert.match(studioCss, /grid-template-rows:\s*34px minmax\(0, 1fr\)/);
   assert.match(studioCss, /scroll-padding-bottom:\s*42px/);
   assert.match(studioCss, /assetPanelFullscreen\s*\{[^}]*inset:\s*42px 16px 16px/);
+  assert.match(studioCss, /panelShareButton/);
   assert.match(studio, /event\.key === "w"/);
   assert.doesNotMatch(studio, /模型已压缩|阴影关闭|Compressed models/);
   assert.match(contentHeader, /innerMenuBar/);
   assert.match(contentHeader, /Assets \/ Content/);
+  assert.doesNotMatch(contentHeader, /copyShareLink|复制分享链接|shareButton/);
 });
 
 test("exports article content for the in-editor preview", async () => {
@@ -116,6 +130,26 @@ test("exports article content for the in-editor preview", async () => {
   const article = await response.json();
   assert.equal(article.title, "打包修包指南");
   assert.match(article.html, /<h2/);
+
+  const linkedResponse = await render("/api/articles/tips/vrchat/avatar/import.json");
+  assert.equal(linkedResponse.status, 200);
+  const linkedArticle = await linkedResponse.json();
+  assert.match(linkedArticle.html, /<a target="_blank" rel="noopener noreferrer" href=/);
+});
+
+test("keeps subpage links safe and friend avatars local", async () => {
+  const [header, friends, resume] = await Promise.all([
+    readFile(new URL("../app/_studio/components/studio-header.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/friends/page.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/resume/page.tsx", import.meta.url), "utf8"),
+  ]);
+  assert.doesNotMatch(header, /复制分享链接|copyShareLink/);
+  assert.match(friends, /https:\/\/catherina\.moe\//);
+  assert.match(friends, /description: "是朋友，也是很好的同事"/);
+  assert.match(friends, /\/friends\/catherina\.png/);
+  assert.doesNotMatch(friends, /catherina\.moe\/logo\.png/);
+  assert.match(resume, /mailto:lee@mtftm\.com" target="_blank"/);
+  await access(new URL("../public/friends/catherina.png", import.meta.url));
 });
 
 test("keeps the renamed Crowdin-friendly article URL backward compatible", async () => {
