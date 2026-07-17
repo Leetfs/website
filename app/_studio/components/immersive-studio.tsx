@@ -66,6 +66,16 @@ type InspectorState = {
   roughness: number;
   metalness: number;
 };
+type MotionConfig = {
+  enabled: boolean;
+  speed: number;
+  amount: number;
+};
+type TransformSnapshot = {
+  position: THREE.Vector3;
+  rotation: THREE.Euler;
+  scale: THREE.Vector3;
+};
 type ArticleDocument = {
   number: string;
   title: string;
@@ -81,6 +91,17 @@ type ArticleDocument = {
 const LANGUAGE_STORAGE_KEY = "lee-studio-language";
 const SCENE_STORAGE_KEY = "lee-unity-scene";
 const builtinSceneObjects: BuiltinSceneObject[] = ["riscv", "terminal", "portal", "shark", "stage", "light", "mirror"];
+const initialMotionSettings: Record<string, MotionConfig> = {
+  riscv: { enabled: false, speed: 1.15, amount: 0.08 },
+  terminal: { enabled: false, speed: 0.75, amount: 0.1 },
+  portal: { enabled: true, speed: 1, amount: 0.16 },
+  shark: { enabled: false, speed: 0.9, amount: 0.14 },
+};
+const defaultMotionConfig = (id: SceneObject): MotionConfig => ({
+  enabled: id === "portal",
+  speed: 1,
+  amount: 0.12,
+});
 const projectFolders: ProjectFolder[] = ["Website", "Assets", "Scenes", "Models", "Content", "Images", "Materials"];
 const createCatalog: { id: CreateCategory; icon: string; items: { id: CreateKind; icon: string }[] }[] = [
   {
@@ -309,7 +330,9 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
   const gizmoDraggingRef = useRef(false);
   const playingRef = useRef(false);
   const qualityRef = useRef<"lite" | "balanced">("lite");
-  const motionSettingsRef = useRef({ speed: 1, amount: 0.16 });
+  const motionSettingsRef = useRef<Record<string, MotionConfig>>(initialMotionSettings);
+  const motionBaseTransformsRef = useRef(new Map<SceneObject, TransformSnapshot>());
+  const animatedObjectsRef = useRef(new Set<SceneObject>());
   const bottomPanelBeforeFullscreenRef = useRef(true);
   const deepLinkHandledRef = useRef(false);
   const assetPanelBodyRef = useRef<HTMLDivElement>(null);
@@ -334,8 +357,7 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
   const [wireframe, setWireframe] = useState(false);
   const [sceneView, setSceneView] = useState<"scene" | "game">("scene");
   const [quality, setQuality] = useState<"lite" | "balanced">("lite");
-  const [motionSpeed, setMotionSpeed] = useState(1);
-  const [motionAmount, setMotionAmount] = useState(0.16);
+  const [motionSettings, setMotionSettings] = useState<Record<string, MotionConfig>>(() => ({ ...initialMotionSettings }));
   const [inspector, setInspector] = useState<InspectorState>({ visible: true, hasLight: false, position: [-2.3, 1.1, 0], rotation: [0, 0, 0], scale: [1, 1, 1], intensity: 2.8, color: "#ffffff", roughness: 0.5, metalness: 0 });
   const [search, setSearch] = useState("");
   const [webglError, setWebglError] = useState("");
@@ -364,6 +386,7 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
   const objectLabel = useCallback((id: SceneObject) => {
     return (t.objects as Record<string, string>)[id] ?? customLabels[id] ?? id;
   }, [customLabels, t.objects]);
+  const selectedMotion = motionSettings[selected] ?? defaultMotionConfig(selected);
 
   useEffect(() => {
     const stored = window.localStorage.getItem(LANGUAGE_STORAGE_KEY);
@@ -379,8 +402,8 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
 
   useEffect(() => { playingRef.current = playing; }, [playing]);
   useEffect(() => {
-    motionSettingsRef.current = { speed: motionSpeed, amount: motionAmount };
-  }, [motionAmount, motionSpeed]);
+    motionSettingsRef.current = motionSettings;
+  }, [motionSettings]);
 
   const chooseLocale = (nextLocale: Locale) => {
     setLocale(nextLocale);
@@ -499,6 +522,14 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
     if (object && controlsRef.current) controlsRef.current.attach(object);
     queueMicrotask(syncInspector);
   }, [syncInspector]);
+
+  const updateSelectedMotion = useCallback((patch: Partial<MotionConfig>) => {
+    const id = selectedRef.current;
+    setMotionSettings((settings) => ({
+      ...settings,
+      [id]: { ...(settings[id] ?? defaultMotionConfig(id)), ...patch },
+    }));
+  }, []);
 
   const resetSelected = useCallback(() => {
     const object = objectsRef.current.get(selectedRef.current);
@@ -621,6 +652,7 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
     objectsRef.current.set(id, object);
     originalTransformsRef.current.set(id, { position: object.position.clone(), rotation: object.rotation.clone(), scale: object.scale.clone() });
     setSceneObjectIds((ids) => [...ids, id]);
+    setMotionSettings((settings) => ({ ...settings, [id]: defaultMotionConfig(id) }));
     const label = createLabels[locale].items[kind];
     setCustomLabels((labels) => ({ ...labels, [id]: label }));
     selectObject(id);
@@ -646,6 +678,10 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
     objectsRef.current.set(id, clone);
     originalTransformsRef.current.set(id, { position: clone.position.clone(), rotation: clone.rotation.clone(), scale: clone.scale.clone() });
     setSceneObjectIds((ids) => [...ids, id]);
+    setMotionSettings((settings) => ({
+      ...settings,
+      [id]: { ...(settings[sourceId] ?? defaultMotionConfig(sourceId)), enabled: false },
+    }));
     setCustomLabels((labels) => ({ ...labels, [id]: `${labels[sourceId] ?? objectLabel(sourceId)} Copy` }));
     selectObject(id);
     logAction(`Duplicated ${objectLabel(sourceId)}`);
@@ -665,7 +701,14 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
     sceneRef.current?.remove(object);
     objectsRef.current.delete(id);
     originalTransformsRef.current.delete(id);
+    motionBaseTransformsRef.current.delete(id);
+    animatedObjectsRef.current.delete(id);
     setSceneObjectIds((ids) => ids.filter((entry) => entry !== id));
+    setMotionSettings((settings) => {
+      const next = { ...settings };
+      delete next[id];
+      return next;
+    });
     setCustomLabels((labels) => {
       const next = { ...labels };
       delete next[id];
@@ -816,15 +859,19 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
   const saveScene = useCallback(() => {
     const transforms: Record<string, { visible: boolean; position: number[]; rotation: number[]; scale: number[] }> = {};
     objectsRef.current.forEach((object, id) => {
+      const motionBase = animatedObjectsRef.current.has(id) ? motionBaseTransformsRef.current.get(id) : null;
       transforms[id] = {
         visible: object.visible,
-        position: object.position.toArray(),
-        rotation: [object.rotation.x, object.rotation.y, object.rotation.z],
-        scale: object.scale.toArray(),
+        position: (motionBase?.position ?? object.position).toArray(),
+        rotation: motionBase
+          ? [motionBase.rotation.x, motionBase.rotation.y, motionBase.rotation.z]
+          : [object.rotation.x, object.rotation.y, object.rotation.z],
+        scale: (motionBase?.scale ?? object.scale).toArray(),
       };
     });
     window.localStorage.setItem(SCENE_STORAGE_KEY, JSON.stringify({
       transforms,
+      motionSettings,
       orbit: orbitRef.current,
       layout: {
         leftPanelVisible,
@@ -836,7 +883,7 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
       },
     }));
     logAction(t.commands.saved);
-  }, [bottomPanelHeight, bottomPanelVisible, leftPanelVisible, leftPanelWidth, logAction, rightPanelVisible, rightPanelWidth, t.commands.saved]);
+  }, [bottomPanelHeight, bottomPanelVisible, leftPanelVisible, leftPanelWidth, logAction, motionSettings, rightPanelVisible, rightPanelWidth, t.commands.saved]);
 
   const loadScene = useCallback(() => {
     const saved = window.localStorage.getItem(SCENE_STORAGE_KEY);
@@ -847,6 +894,7 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
     try {
       const data = JSON.parse(saved) as {
         transforms?: Record<string, { visible: boolean; position: number[]; rotation: number[]; scale: number[] }>;
+        motionSettings?: Record<string, Partial<MotionConfig>>;
         orbit?: { theta: number; phi: number; radius: number; target: { x: number; y: number; z: number } };
         layout?: { leftPanelVisible: boolean; rightPanelVisible: boolean; bottomPanelVisible: boolean; leftPanelWidth: number; rightPanelWidth: number; bottomPanelHeight: number };
       };
@@ -858,6 +906,17 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
         object.rotation.set(transform.rotation[0], transform.rotation[1], transform.rotation[2]);
         object.scale.fromArray(transform.scale);
       });
+      const restoredMotionSettings: Record<string, MotionConfig> = { ...initialMotionSettings };
+      Object.entries(data.motionSettings ?? {}).forEach(([id, config]) => {
+        const fallback = defaultMotionConfig(id as SceneObject);
+        restoredMotionSettings[id] = {
+          enabled: typeof config.enabled === "boolean" ? config.enabled : fallback.enabled,
+          speed: THREE.MathUtils.clamp(Number(config.speed) || fallback.speed, 0.25, 2.5),
+          amount: THREE.MathUtils.clamp(Number(config.amount) || fallback.amount, 0.04, 0.4),
+        };
+      });
+      setPlaying(false);
+      setMotionSettings(restoredMotionSettings);
       if (data.orbit) {
         orbitRef.current = {
           theta: data.orbit.theta,
@@ -940,6 +999,8 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
     if (!host) return;
     const sceneObjects = objectsRef.current;
     const originalTransforms = originalTransformsRef.current;
+    const motionBaseTransforms = motionBaseTransformsRef.current;
+    const animatedObjects = animatedObjectsRef.current;
 
     let renderer: THREE.WebGLRenderer;
     try {
@@ -1304,6 +1365,10 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
       sceneObjects.set(id, clone);
       originalTransforms.set(id, { position: clone.position.clone(), rotation: clone.rotation.clone(), scale: clone.scale.clone() });
       setSceneObjectIds((ids) => [...ids, id]);
+      setMotionSettings((settings) => ({
+        ...settings,
+        [id]: { ...(settings[sourceId] ?? defaultMotionConfig(sourceId)), enabled: false },
+      }));
       setCustomLabels((labels) => ({ ...labels, [id]: `${labels[sourceId] ?? sourceId} Copy` }));
       selectObject(id);
       logAction(`Instantiated ${sourceId}`);
@@ -1331,29 +1396,84 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
 
     const clock = new THREE.Clock();
     let frame = 0;
+    const restoreAnimatedObject = (id: SceneObject) => {
+      if (!animatedObjects.has(id)) return;
+      const object = sceneObjects.get(id);
+      const base = motionBaseTransforms.get(id);
+      if (object && base) {
+        object.position.copy(base.position);
+        object.rotation.copy(base.rotation);
+        object.scale.copy(base.scale);
+      }
+      animatedObjects.delete(id);
+      motionBaseTransforms.delete(id);
+    };
     const animate = () => {
       frame = requestAnimationFrame(animate);
       const elapsed = clock.getElapsedTime();
-      const { speed, amount } = motionSettingsRef.current;
-      if (playingRef.current) {
-        const phase = elapsed * speed;
-        portal.position.y = 0.28 + Math.sin(phase * 1.7) * amount;
-        portal.rotation.z = Math.sin(phase * 0.82) * amount * 0.18;
-        portalGlow.intensity = 2.1 + Math.sin(phase * 2.2) * 0.65;
-        (activityLed.material as THREE.MeshStandardMaterial).emissiveIntensity = 1.8 + Math.sin(phase * 3.1) * 0.7;
+      let portalPhase: number | null = null;
+      let portalAmount = 0;
+      let riscvPhase: number | null = null;
+
+      Object.entries(motionSettingsRef.current).forEach(([rawId, config]) => {
+        const id = rawId as SceneObject;
+        const object = sceneObjects.get(id);
+        const active = Boolean(object?.visible && playingRef.current && config.enabled);
+        if (!object || !active) {
+          restoreAnimatedObject(id);
+          return;
+        }
+        if (!animatedObjects.has(id)) {
+          motionBaseTransforms.set(id, {
+            position: object.position.clone(),
+            rotation: object.rotation.clone(),
+            scale: object.scale.clone(),
+          });
+          animatedObjects.add(id);
+        }
+        const base = motionBaseTransforms.get(id);
+        if (!base) return;
+        const phase = elapsed * config.speed;
+        object.position.copy(base.position);
+        object.rotation.copy(base.rotation);
+
+        if (id === "riscv") {
+          object.position.y += Math.sin(phase * 1.8) * config.amount * 0.45;
+          object.rotation.y += Math.sin(phase * 0.75) * config.amount * 0.22;
+          riscvPhase = phase;
+        } else if (id === "terminal") {
+          object.position.y += Math.sin(phase * 1.35) * config.amount * 0.65;
+          object.rotation.z += Math.sin(phase * 0.7) * config.amount * 0.12;
+        } else if (id === "portal") {
+          object.position.y += Math.sin(phase * 1.7) * config.amount;
+          object.rotation.z += Math.sin(phase * 0.82) * config.amount * 0.18;
+          portalPhase = phase;
+          portalAmount = config.amount;
+        } else if (id === "shark") {
+          object.position.x += Math.sin(phase * 0.72) * config.amount * 0.7;
+          object.position.y += Math.sin(phase * 1.45) * config.amount * 0.55;
+          object.rotation.z += Math.sin(phase * 1.1) * config.amount * 0.42;
+        } else {
+          object.position.y += Math.sin(phase * 1.5) * config.amount;
+          object.rotation.z += Math.sin(phase * 0.8) * config.amount * 0.2;
+        }
+      });
+
+      if (portalPhase !== null) {
+        portalGlow.intensity = 2.1 + Math.sin(portalPhase * 2.2) * THREE.MathUtils.clamp(portalAmount * 4, 0.2, 1.6);
         particleMaterial.opacity = qualityRef.current === "balanced" ? 0.82 : 0.48;
         const positions = particleGeometry.getAttribute("position") as THREE.BufferAttribute;
         for (let index = 0; index < positions.count; index += 1) {
-          positions.setY(index, 0.18 + ((index * 0.173 + phase * 0.08) % 1) * 2.1);
+          positions.setY(index, 0.18 + ((index * 0.173 + portalPhase * 0.08) % 1) * 2.1);
         }
         positions.needsUpdate = true;
       } else {
-        portal.position.y = 0.28;
-        portal.rotation.z = 0;
         portalGlow.intensity = 1.9;
-        (activityLed.material as THREE.MeshStandardMaterial).emissiveIntensity = 1.6;
         particleMaterial.opacity = 0;
       }
+      (activityLed.material as THREE.MeshStandardMaterial).emissiveIntensity = riscvPhase === null
+        ? 1.6
+        : 1.8 + Math.sin(riscvPhase * 3.1) * 0.7;
       renderer.render(scene, camera);
     };
     animate();
@@ -1383,6 +1503,8 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
       sceneRef.current = null;
       sceneObjects.clear();
       originalTransforms.clear();
+      motionBaseTransforms.clear();
+      animatedObjects.clear();
       keyLightRef.current = null;
       detailLightsRef.current = [];
       mirrorReflectorRef.current = null;
@@ -1739,11 +1861,11 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
         <label className={styles.sliderRow}><span>Metallic</span><input type="range" min="0" max="1" step="0.02" value={inspector.metalness} onChange={(event) => updateMaterial("metalness", Number(event.target.value))} /></label>
       </div>}
       <div className={styles.componentBlock}>
-        <header><span>⌄　{locale === "zh" ? "动态效果" : locale === "ja" ? "アニメーション" : "Animation"}</span><button className={playing ? styles.animationRunning : ""} onClick={() => setPlaying((value) => !value)} title={playing ? "Pause" : "Play"}>{playing ? "Ⅱ" : "▶"}</button></header>
-        <label className={styles.checkRow}><input type="checkbox" checked={playing} onChange={() => setPlaying((value) => !value)} /><span>{locale === "zh" ? "预览默认动态" : locale === "ja" ? "既定アニメーションをプレビュー" : "Preview default motion"}</span></label>
-        <label className={styles.sliderRow}><span>{locale === "zh" ? "速度" : locale === "ja" ? "速度" : "Speed"}</span><input type="range" min="0.25" max="2.5" step="0.05" value={motionSpeed} onChange={(event) => setMotionSpeed(Number(event.target.value))} /></label>
-        <label className={styles.sliderRow}><span>{locale === "zh" ? "幅度" : locale === "ja" ? "振幅" : "Amplitude"}</span><input type="range" min="0.04" max="0.4" step="0.01" value={motionAmount} onChange={(event) => setMotionAmount(Number(event.target.value))} /></label>
-        <p className={styles.animationHint}>{locale === "zh" ? "默认暂停；顶部播放键可运行传送门浮动与粒子效果。" : locale === "ja" ? "初期状態は停止。上部の再生ボタンでポータルと粒子を実行します。" : "Paused by default. The top Play button runs portal motion and particles."}</p>
+        <header><span>⌄　{locale === "zh" ? "动态效果" : locale === "ja" ? "アニメーション" : "Animation"}</span><button className={playing ? styles.animationRunning : ""} onClick={() => setPlaying((value) => !value)} title={playing ? "Pause all motion" : "Play enabled motion"}>{playing ? "Ⅱ" : "▶"}</button></header>
+        <label className={styles.checkRow}><input type="checkbox" checked={selectedMotion.enabled} onChange={(event) => updateSelectedMotion({ enabled: event.target.checked })} /><span>{locale === "zh" ? "启用所选对象动态" : locale === "ja" ? "選択中のオブジェクトで有効化" : "Enable for selected object"}</span></label>
+        <label className={styles.sliderRow}><span>{locale === "zh" ? "速度" : locale === "ja" ? "速度" : "Speed"}　{selectedMotion.speed.toFixed(2)}×</span><input type="range" min="0.25" max="2.5" step="0.05" value={selectedMotion.speed} onChange={(event) => updateSelectedMotion({ speed: Number(event.target.value) })} /></label>
+        <label className={styles.sliderRow}><span>{locale === "zh" ? "幅度" : locale === "ja" ? "振幅" : "Amplitude"}　{selectedMotion.amount.toFixed(2)}</span><input type="range" min="0.04" max="0.4" step="0.01" value={selectedMotion.amount} onChange={(event) => updateSelectedMotion({ amount: Number(event.target.value) })} /></label>
+        <p className={styles.animationHint}>{locale === "zh" ? `正在设置：${objectLabel(selected)}。顶部播放键会运行所有已启用对象。` : locale === "ja" ? `設定対象：${objectLabel(selected)}。上部の再生ボタンですべての有効な動きを実行します。` : `Editing: ${objectLabel(selected)}. The top Play button runs every enabled object.`}</p>
       </div>
     </aside>}
 

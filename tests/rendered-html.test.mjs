@@ -99,6 +99,15 @@ test("keeps Unity interactions and project assets wired", async () => {
   assert.match(studio, /renderer\.shadowMap\.enabled = balanced/);
   assert.match(studio, /motionSettingsRef/);
   assert.match(studio, /playingRef\.current/);
+  assert.match(studio, /Record<string, MotionConfig>/);
+  assert.match(studio, /const selectedMotion = motionSettings\[selected\]/);
+  assert.match(studio, /updateSelectedMotion\(\{ enabled: event\.target\.checked \}\)/);
+  assert.match(studio, /Object\.entries\(motionSettingsRef\.current\)/);
+  for (const model of ["riscv", "terminal", "portal", "shark"]) {
+    assert.match(studio, new RegExp(`id === "${model}"`));
+  }
+  assert.match(studio, /motionSettings,\s+orbit:/);
+  assert.match(studio, /setMotionSettings\(restoredMotionSettings\)/);
   assert.match(studio, /onClick=\{\(\) => openProjectAsset\(asset\)\}/);
   assert.match(studio, /copyPanelShareLink/);
   assert.match(studio, /className=\{styles\.panelShareButton\}/);
