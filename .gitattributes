@@ -1,2 +1,9 @@
-**/*.md -linguist-documentation
-**/*.md linguist-detectable
+* text=auto eol=lf
+*.glb binary
+*.ico binary
+*.jpg binary
+*.jpeg binary
+*.png binary
+*.webp binary
+*.md -linguist-documentation
+*.md linguist-detectable

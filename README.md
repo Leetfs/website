@@ -1,42 +1,33 @@
-# Lee's blog
+# Lee
 
-[中文](README.md) | [English](README_en.md) | [日本語](README_ja.md)
+Lee 的个人 Website。项目使用 Next.js 静态导出，首页是可交互的 Unity 风格 3D 工作区，博客、个人简介和友链作为同一套编辑器界面中的内容模块呈现。
 
-## 欢迎
+## 本地运行
 
-你好，欢迎来到我的博客。
-
-本站点基于 [vitepress](https://vitepress.dev/zh/), 使用 [VitePress Theme Project Trans](https://github.com/project-trans/vitepress-theme-project-trans) 主题。
-
-## 构建流程
-
-### 前置条件
-
-- 安装 [Node.js](https://nodejs.org/zh-cn)
-- 安装 pnpm `npm install -g pnpm`
-
-### 安装依赖
-
-执行 `pnpm install` 安装所有依赖。
-
-### 升级主题包版本
-
-本仓库始终使用 `VitePress Theme Project Trans` 的最新预览版本，而非使用仓库中 `package.json` 声明的版本，使用以下命令升级将 `VitePress Theme Project Trans` 升级至最新版本。
+需要 Node.js 22.13 或更新版本。
 
 ```bash
-pnpm update @project-trans/vitepress-theme-project-trans@prerelease
+npm ci
+npm run dev
 ```
 
-### 运行/构建
-
-启动预览页面。
+生产构建：
 
 ```bash
-pnpm dev
+npm run build
 ```
 
-构建站点。
+构建结果位于 `out/`，可以直接交给 Nginx 等静态文件服务器。
 
-```bash
-pnpm build
-```
+## 内容与翻译
+
+- 中文源文档：`content/blog/zh/**/*.md`
+- 英文翻译：`content/blog/en/**/*.md`
+- 日文翻译：`content/blog/ja/**/*.md`
+- Crowdin 规则：`crowdin.yml`
+
+构建时会读取 Git 历史，为文章生成最后修改日期与静态预览数据。正式 CI 使用完整 Git 历史，并在任何文章无法取得 Git 日期时终止部署。
+
+## 部署
+
+推送到 `main` 后，GitHub Actions 会执行检查、构建静态站点，并通过现有的 `SSH_HOST`、`SSH_USER`、`SSH_KEY` secrets 将 `out/` 同步到 `/var/www/blog/`。Crowdin 不在该工作流中运行；Crowdin 写回仓库的翻译提交会像普通内容提交一样触发部署。

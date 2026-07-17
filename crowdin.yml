@@ -1,13 +1,12 @@
+project_id_env: CROWDIN_PROJECT_ID
+api_token_env: CROWDIN_PERSONAL_TOKEN
+base_path: .
+preserve_hierarchy: true
+
 files:
-  - source: /docs/about/**/*.md
-    translation: /docs/%two_letters_code%/about/%original_file_name%
-  - source: /docs/friendly/**/*.md
-    translation: /docs/%two_letters_code%/friendly/%original_file_name%
-  - source: /docs/life/**/*.md
-    translation: /docs/%two_letters_code%/life/**/%original_file_name%
-  - source: /docs/*.md
-    translation: /docs/%two_letters_code%/%original_file_name%
-  - source: /docs/tips/**/*.md
-    translation: /docs/%two_letters_code%/tips/**/%original_file_name%
-  - source: /README.md
-    translation: /%file_name%_%two_letters_code%.md
+  - source: /content/blog/zh/**/*.md
+    translation: /content/blog/%two_letters_code%/**/%original_file_name%
+    export_languages:
+      - en
+      - ja
+    update_option: update_as_unapproved

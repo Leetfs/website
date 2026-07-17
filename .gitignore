@@ -1,42 +1,37 @@
-# Node modules
-node_modules/
+# Dependencies
+/node_modules/
 
-# Build files
-packages/*/lib/
-
-.cache/
-cache/
-.temp/
-dist/
-.yarn*
-yarn*
-
-# VitePress
-docs/.vitepress/dist
-docs/.vitepress/cache
-
-
-# VS Code Config file
-# .vscode/
-
-# Rollup Cache
-.rollup.cache/
-
-# Typescript build info
+# Build and generated output
+/.next/
+/out/
+/dist/
+/coverage/
+/app/generated/
+/public/api/articles/
 *.tsbuildinfo
+next-env.d.ts
 
-# Coverage Files
-coverage/
+# Local tooling and caches
+/.agents/
+/.openai/
+/.codex/
+/.wrangler/
+/.vinext/
+/.idea/
+/.vscode/
+/.cache/
+/.temp/
+/work/
 
-# macOS
+# Local configuration and logs
+.env*
+!.env.example
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
 .DS_Store
-
-# VSCode settings
-.vscode/settings.json
-
-# Wrangler temp files
-.wrangler
-
-.idea
-
-components.d.ts
+Thumbs.db
