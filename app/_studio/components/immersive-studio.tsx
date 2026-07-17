@@ -312,6 +312,8 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
   const motionSettingsRef = useRef({ speed: 1, amount: 0.16 });
   const bottomPanelBeforeFullscreenRef = useRef(true);
   const deepLinkHandledRef = useRef(false);
+  const assetPanelBodyRef = useRef<HTMLDivElement>(null);
+  const articleRequestRef = useRef(0);
   const orbitRef = useRef<Orbit>({ theta: 0.15, phi: 1.15, radius: 9.4, target: new THREE.Vector3(0, 1.15, 0) });
   const originalTransformsRef = useRef(new Map<SceneObject, { position: THREE.Vector3; rotation: THREE.Euler; scale: THREE.Vector3 }>());
 
@@ -730,29 +732,44 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
   }, [bottomPanelVisible, exitAssetFullscreen, panelFullscreen]);
 
   const closeAssetPanel = useCallback(() => {
+    articleRequestRef.current += 1;
     if (panelFullscreen) exitAssetFullscreen();
     setAssetPanel(null);
     setArticleDocument(null);
+    setArticleLoading(false);
     setPanelExpanded(false);
   }, [exitAssetFullscreen, panelFullscreen]);
 
   const openArticlePreview = useCallback(async (article: Article) => {
-    setAssetPanel("blog");
-    setPanelExpanded(true);
-    setArticleDocument(null);
+    const requestId = ++articleRequestRef.current;
     setArticleLoading(true);
     try {
       const slug = article.href.replace(/^\/blog\/?/, "").split("/").map(encodeURIComponent).join("/");
       const response = await fetch(`/api/articles/${slug}.json`);
       if (!response.ok) throw new Error("preview unavailable");
-      setArticleDocument(await response.json() as ArticleDocument);
+      const document = await response.json() as ArticleDocument;
+      if (requestId !== articleRequestRef.current) return;
+      if (assetPanelBodyRef.current) {
+        assetPanelBodyRef.current.scrollTop = 0;
+        assetPanelBodyRef.current.scrollLeft = 0;
+      }
+      setArticleDocument(document);
+      setAssetPanel("blog");
+      setPanelExpanded(true);
       logAction(`Opened ${article.title}`);
     } catch {
-      logAction(`Could not preview ${article.title}`);
+      if (requestId === articleRequestRef.current) logAction(`Could not preview ${article.title}`);
     } finally {
-      setArticleLoading(false);
+      if (requestId === articleRequestRef.current) setArticleLoading(false);
     }
   }, [logAction]);
+
+  useEffect(() => {
+    const body = assetPanelBodyRef.current;
+    if (!body) return;
+    body.scrollTop = 0;
+    body.scrollLeft = 0;
+  }, [assetPanel, articleDocument?.href]);
 
   useEffect(() => {
     if (deepLinkHandledRef.current) return;
@@ -888,6 +905,12 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
       return;
     }
     if (asset.panel) {
+      articleRequestRef.current += 1;
+      setArticleLoading(false);
+      if (assetPanelBodyRef.current) {
+        assetPanelBodyRef.current.scrollTop = 0;
+        assetPanelBodyRef.current.scrollLeft = 0;
+      }
       setArticleDocument(null);
       setShowAllBlog(false);
       setAssetPanel(asset.panel);
@@ -1579,9 +1602,9 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
         : (locale === "zh" ? "复制分享链接" : locale === "ja" ? "共有リンクをコピー" : "Copy share link");
     return <section className={`${styles.assetPanel} ${panelExpanded ? styles.assetPanelExpanded : ""} ${panelFullscreen ? styles.assetPanelFullscreen : ""}`} aria-label={assetPanel}>
       <header><span>{articleDocument?.title ?? (assetPanel === "blog" ? t.blogAsset : assetPanel === "profile" ? t.profileAsset : assetPanel === "friends" ? t.friendsAsset : t.socialAsset)}</span><div><button className={styles.panelShareButton} type="button" onClick={copyPanelShareLink} aria-label={sharePanelLabel} title={sharePanelLabel}>⧉ {sharePanelLabel}</button><button onClick={() => setPanelExpanded((value) => !value)} aria-label={panelExpanded ? "Restore" : "Maximize"} disabled={panelFullscreen}>{panelExpanded ? "❐" : "□"}</button><button className={styles.fullscreenButton} onClick={toggleAssetFullscreen} aria-label={fullscreenLabel} title={fullscreenLabel}>{panelFullscreen ? "↙" : "⛶"}</button><button onClick={closeAssetPanel} aria-label="Close">×</button></div></header>
-      {assetPanel === "blog" && <div className={styles.blogAsset}>
+      {assetPanel === "blog" && <div className={styles.blogAsset} ref={assetPanelBodyRef}>
         {articleDocument ? <div className={styles.articlePreview}>
-          <button className={styles.previewBack} onClick={() => setArticleDocument(null)}>← {t.blogAsset}</button>
+          <button className={styles.previewBack} onClick={() => { if (assetPanelBodyRef.current) assetPanelBodyRef.current.scrollTop = 0; setArticleDocument(null); }}>← {t.blogAsset}</button>
           <div className={styles.previewMeta}><span>{articleDocument.number}</span><span>{articleDocument.category}</span><span>{articleDocument.displayDate}</span><span>{articleDocument.readingMinutes} MIN</span></div>
           <h2>{articleDocument.title}</h2>
           <p>{articleDocument.description}</p>
@@ -1593,7 +1616,7 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
           <button className={styles.openAsset} onClick={() => { setShowAllBlog((value) => !value); setPanelExpanded(true); }}>{showAllBlog ? "显示最新五篇" : t.openBlog}</button>
         </>}
       </div>}
-      {assetPanel === "profile" && <div className={styles.profileAsset}>
+      {assetPanel === "profile" && <div className={styles.profileAsset} ref={assetPanelBodyRef}>
         <span>{t.profileKicker}</span><h2>{t.profileTitle}</h2><p>{t.profileText}</p>
         <dl><div><dt>{t.focus}</dt><dd>RISC-V / Linux / LLVM</dd></div><div><dt>{t.now}</dt><dd>openRuyi Linux</dd></div><div><dt>{t.values}</dt><dd>openRuyi / Project Trans / 开往</dd></div></dl>
         {panelExpanded && <div className={styles.profileDetails}>
@@ -1610,10 +1633,10 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
         </div>}
         <button className={styles.openAsset} onClick={() => setPanelExpanded((value) => !value)}>{panelExpanded ? "收起" : t.openResume}</button>
       </div>}
-      {assetPanel === "friends" && <div className={styles.friendsAsset}>
+      {assetPanel === "friends" && <div className={styles.friendsAsset} ref={assetPanelBodyRef}>
         {friends.map((friend) => <a href={friend.href} target="_blank" rel="noreferrer" key={friend.name}><Image src={friend.avatar} alt="" width={48} height={48} unoptimized /><span><strong>{friend.name}</strong><small>{friend.description[locale]}</small></span><b>↗</b></a>)}
       </div>}
-      {assetPanel === "social" && <div className={styles.socialAsset}>
+      {assetPanel === "social" && <div className={styles.socialAsset} ref={assetPanelBodyRef}>
         <div className={styles.socialIntro}><span>BLÅHAJ / LINKS</span><h2>{t.socialTitle}</h2><p>{t.socialText}</p></div>
         <div className={styles.socialGrid}>{personalLinks.map((link) => <a href={link.href} target="_blank" rel="noreferrer" key={link.label}><i>{link.monogram}</i><span><strong>{link.label}</strong><small>{link.detail}</small></span><b>↗</b></a>)}</div>
       </div>}

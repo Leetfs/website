@@ -106,6 +106,11 @@ test("keeps Unity interactions and project assets wired", async () => {
   assert.match(studio, /url\.searchParams\.set\("panel", assetPanel\)/);
   assert.match(studio, /const articleHref = params\.get\("article"\)/);
   assert.match(studio, /window\.history\.replaceState\(null, "", "\/"\)/);
+  assert.match(studio, /assetPanelBodyRef/);
+  assert.match(studio, /assetPanelBodyRef\.current\.scrollTop = 0/);
+  assert.match(studio, /const document = await response\.json\(\) as ArticleDocument;[\s\S]*setArticleDocument\(document\);[\s\S]*setAssetPanel\("blog"\)/);
+  assert.match(studio, /articleRequestRef/);
+  assert.match(studio, /requestId !== articleRequestRef\.current/);
   assert.doesNotMatch(studio, /onDoubleClick=\{\(\) => openProjectAsset\(asset\)\}/);
   assert.match(studio, /name: "Catherina"/);
   assert.match(studio, /avatar: "\/friends\/catherina\.png"/);
@@ -212,4 +217,24 @@ test("contains no retired starter or Cloudflare infrastructure", async () => {
   for (const model of ["portal-door.glb", "riscv-board.glb", "terminal.glb"]) {
     await assert.rejects(access(new URL(`../public/models/${model}`, import.meta.url)), model);
   }
+});
+
+test("configures safe Cloudflare Pages previews for pull requests", async () => {
+  const [build, publish] = await Promise.all([
+    readFile(new URL("../.github/workflows/pr-preview.yml", import.meta.url), "utf8"),
+    readFile(new URL("../.github/workflows/pr-preview-publish.yml", import.meta.url), "utf8"),
+  ]);
+  assert.match(build, /^\s*pull_request:/m);
+  assert.match(build, /actions\/upload-artifact@v4/);
+  assert.doesNotMatch(build, /CLOUDFLARE_PAGES_(?:TOKEN|ACCOUNT)|pull_request_target/);
+  assert.match(publish, /^\s*workflow_run:/m);
+  assert.match(publish, /actions\/download-artifact@v5/);
+  assert.match(publish, /ref: \$\{\{ github\.event\.repository\.default_branch \}\}/);
+  assert.match(publish, /secrets\.CLOUDFLARE_PAGES_TOKEN/);
+  assert.match(publish, /secrets\.CLOUDFLARE_PAGES_ACCOUNT/);
+  assert.match(publish, /pages deploy preview-output --project-name=blog --branch=pr-/);
+  assert.match(publish, /_worker\.js/);
+  assert.match(publish, /pull-requests: write/);
+  assert.match(publish, /createComment|updateComment/);
+  assert.doesNotMatch(publish, /pull_request_target|ref:\s*\$\{\{\s*github\.event\.workflow_run\.(?:head_sha|head_branch)/);
 });

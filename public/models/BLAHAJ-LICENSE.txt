@@ -1,8 +1,0 @@
-Asset: Shark Plush
-Creator: gkolesow
-Source: https://www.meshy.ai/3d-models/Shark-Plush-v2-0195facc-0265-7b90-95e1-40df4c22f40f
-License: CC0 1.0 Universal (Public Domain Dedication)
-License URL: https://creativecommons.org/publicdomain/zero/1.0/
-
-The asset is embedded in the main interactive scene as a low-overhead
-decorative plush shark. The project does not expose a download control.

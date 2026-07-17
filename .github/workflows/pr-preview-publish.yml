@@ -1,0 +1,152 @@
+name: Publish PR preview
+
+on:
+  workflow_run:
+    workflows: [PR preview build]
+    types: [completed]
+
+permissions:
+  actions: read
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: pr-preview-publish-${{ github.event.workflow_run.head_repository.full_name }}-${{ github.event.workflow_run.head_branch }}
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    if: github.event.workflow_run.event == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Resolve pull request
+        id: pr
+        uses: actions/github-script@v9
+        with:
+          result-encoding: string
+          script: |
+            const direct = context.payload.workflow_run.pull_requests?.[0]?.number;
+            if (direct) return direct;
+            const response = await github.rest.repos.listPullRequestsAssociatedWithCommit({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              commit_sha: context.payload.workflow_run.head_sha,
+            });
+            const pull = response.data.find((item) => item.state === "open") ?? response.data[0];
+            if (!pull) core.setFailed("Could not resolve the pull request for this workflow run.");
+            return pull?.number ?? "";
+
+      - name: Check out trusted deployment tooling
+        if: github.event.workflow_run.conclusion == 'success'
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          persist-credentials: false
+
+      - name: Download static preview artifact
+        if: github.event.workflow_run.conclusion == 'success'
+        uses: actions/download-artifact@v5
+        with:
+          name: pages-output
+          path: preview-output
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          run-id: ${{ github.event.workflow_run.id }}
+
+      - name: Validate untrusted static artifact
+        if: github.event.workflow_run.conclusion == 'success'
+        run: |
+          node - <<'NODE'
+          const fs = require("node:fs");
+          const path = require("node:path");
+          const root = path.resolve("preview-output");
+          const blocked = new Set(["_worker.js", "_routes.json", "functions", "wrangler.toml", "wrangler.json", "wrangler.jsonc"]);
+          if (!fs.existsSync(path.join(root, "index.html"))) throw new Error("Preview artifact has no index.html");
+          const visit = (directory) => {
+            for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+              const absolute = path.join(directory, entry.name);
+              const relative = path.relative(root, absolute).split(path.sep).join("/");
+              if (entry.isSymbolicLink()) throw new Error(`Symlinks are not allowed: ${relative}`);
+              if (blocked.has(entry.name)) throw new Error(`Executable Cloudflare Pages feature is not allowed: ${relative}`);
+              if (entry.isDirectory()) visit(absolute);
+            }
+          };
+          visit(root);
+          NODE
+
+      - name: Deploy Cloudflare Pages preview
+        if: github.event.workflow_run.conclusion == 'success'
+        id: deploy
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_PAGES_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_PAGES_ACCOUNT }}
+          wranglerVersion: "4"
+          command: pages deploy preview-output --project-name=blog --branch=pr-${{ steps.pr.outputs.result }}
+
+      - name: Add preview URL to the job summary
+        if: steps.deploy.outcome == 'success'
+        env:
+          PREVIEW_URL: ${{ steps.deploy.outputs.pages-deployment-alias-url || steps.deploy.outputs.deployment-url }}
+        run: |
+          printf '### Cloudflare Pages preview\n\n[%s](%s)\n' "$PREVIEW_URL" "$PREVIEW_URL" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Comment build and deployment result
+        if: always() && steps.pr.outputs.result != ''
+        uses: actions/github-script@v9
+        env:
+          PR_NUMBER: ${{ steps.pr.outputs.result }}
+          BUILD_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+          DEPLOY_OUTCOME: ${{ steps.deploy.outcome }}
+          PREVIEW_URL: ${{ steps.deploy.outputs.pages-deployment-alias-url || steps.deploy.outputs.deployment-url }}
+          RUN_URL: ${{ github.event.workflow_run.html_url }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+        with:
+          script: |
+            const marker = "<!-- cloudflare-pages-pr-preview -->";
+            const buildOk = process.env.BUILD_CONCLUSION === "success";
+            const deployOk = process.env.DEPLOY_OUTCOME === "success";
+            const buildResult = buildOk ? "✅ 通过" : `❌ ${process.env.BUILD_CONCLUSION}`;
+            const deployResult = !buildOk ? "⏭️ 未部署" : deployOk ? "✅ 已部署" : "❌ 部署失败";
+            const preview = deployOk && process.env.PREVIEW_URL
+              ? `\n\n**预览地址：** ${process.env.PREVIEW_URL}`
+              : "";
+            const body = `${marker}
+            ### Cloudflare Pages PR Preview
+
+            | 项目 | 结果 |
+            | --- | --- |
+            | 构建与测试 | ${buildResult} |
+            | Cloudflare Pages | ${deployResult} |
+
+            Commit: \`${process.env.HEAD_SHA.slice(0, 7)}\`${preview}
+
+            [查看完整构建日志](${process.env.RUN_URL})
+
+            > Fork PR 在无 Secrets 的工作流中构建；发布工作流只处理经过校验的静态产物，不检出或执行 Fork 代码。
+            > 预览页面本身仍来自 PR，请把它视为不受信任网页，不要在其中输入账号或敏感信息。`;
+            const issue_number = Number(process.env.PR_NUMBER);
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number,
+              per_page: 100,
+            });
+            const previous = comments.find((comment) => comment.user?.type === "Bot" && comment.body?.includes(marker));
+            if (previous) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: previous.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number,
+                body,
+              });
+            }
