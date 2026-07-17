@@ -6,12 +6,48 @@ import { promisify } from "node:util";
 import { marked } from "marked";
 
 const CONTENT_ROOT = fileURLToPath(new URL("../content/blog/", import.meta.url));
+const REPO_ROOT = fileURLToPath(new URL("../", import.meta.url));
 const INDEX_OUTPUT = new URL("../app/generated/blog-index.json", import.meta.url);
 const CONTENT_OUTPUT = new URL("../app/generated/blog-content.json", import.meta.url);
+const SOURCE_OUTPUT = new URL("../app/generated/source-files.json", import.meta.url);
 const PUBLIC_ARTICLE_ROOT = fileURLToPath(new URL("../public/api/articles/", import.meta.url));
 const LANGUAGE_ORDER = { zh: 0, en: 1, ja: 2 };
 const LANGUAGES = Object.keys(LANGUAGE_ORDER);
 const execFileAsync = promisify(execFile);
+const SOURCE_FILES = [
+  "app/_studio/components/immersive-studio.tsx",
+  "app/_studio/components/studio-blog-archive.tsx",
+  "app/_studio/components/studio-footer.tsx",
+  "app/_studio/components/studio-header.tsx",
+  "app/_studio/content.module.css",
+  "app/_studio/studio.module.css",
+  "app/blog/[...slug]/page.tsx",
+  "app/blog/page.tsx",
+  "app/friends/page.tsx",
+  "app/layout.tsx",
+  "app/page.tsx",
+  "app/resume/page.tsx",
+  "crowdin.yml",
+  "next.config.ts",
+  "package.json",
+  "README.md",
+  "scripts/sync-blog-articles.mjs",
+  "tests/rendered-html.test.mjs",
+];
+
+function sourceLanguage(relativePath) {
+  const extension = path.extname(relativePath).slice(1).toLocaleLowerCase();
+  return ({ tsx: "typescriptreact", ts: "typescript", mjs: "javascript", css: "css", json: "json", yml: "yaml", md: "markdown" })[extension] ?? "plaintext";
+}
+
+async function collectSourceFiles() {
+  return Promise.all(SOURCE_FILES.sort().map(async (relativePath) => ({
+    path: relativePath,
+    name: path.posix.basename(relativePath),
+    language: sourceLanguage(relativePath),
+    content: await readFile(path.join(REPO_ROOT, ...relativePath.split("/")), "utf8"),
+  })));
+}
 
 function parseFrontmatter(markdown) {
   const frontmatter = markdown.match(/^---\s*\n([\s\S]*?)\n---\s*\n/);
@@ -262,6 +298,7 @@ function gitDateFor(relative, gitDates) {
 }
 
 async function sync() {
+  const sourceFiles = await collectSourceFiles();
   const gitDates = await collectGitDates();
   const files = (await collectMarkdown(CONTENT_ROOT))
     .map((absolute) => ({
@@ -377,11 +414,16 @@ async function sync() {
       source: "content/blog/{locale}",
       articles: numbered,
     }, null, 2)}\n`, "utf8"),
+    writeFile(SOURCE_OUTPUT, `${JSON.stringify({
+      generatedAt,
+      source: "curated repository files",
+      files: sourceFiles,
+    }, null, 2)}\n`, "utf8"),
     ...publicArticles,
   ]);
 
   console.log(
-    `[blog-sync] ${documentCount} documents / ${numbered.length} translations (${numbered.length - missingGitDates.length} git-dated)`,
+    `[blog-sync] ${documentCount} documents / ${numbered.length} translations (${numbered.length - missingGitDates.length} git-dated) / ${sourceFiles.length} source files`,
   );
 }
 

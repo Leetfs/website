@@ -111,7 +111,7 @@ test("keeps Unity interactions and project assets wired", async () => {
   for (const mode of ["float", "rotate", "orbit", "sway", "bounce", "pulse"]) {
     assert.match(studio, new RegExp(`value="${mode}"`));
   }
-  assert.match(studio, /type ProjectTab = "project" \| "console" \| "animation"/);
+  assert.match(studio, /type ProjectTab = "project" \| "console" \| "animation" \| "code"/);
   assert.match(studio, /className=\{styles\.timelineScrubber\}/);
   assert.match(studio, /setTranslationSnap/);
   assert.match(studio, /setRotationSnap/);
@@ -151,6 +151,37 @@ test("keeps Unity interactions and project assets wired", async () => {
   assert.match(contentHeader, /innerMenuBar/);
   assert.match(contentHeader, /Assets \/ Content/);
   assert.doesNotMatch(contentHeader, /copyShareLink|复制分享链接|shareButton/);
+});
+
+test("exposes a curated read-only source viewer without a generic Assets folder", async () => {
+  const [studio, studioCss, rawSourceIndex, packageJson] = await Promise.all([
+    readFile(new URL("../app/_studio/components/immersive-studio.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/_studio/studio.module.css", import.meta.url), "utf8"),
+    readFile(new URL("../app/generated/source-files.json", import.meta.url), "utf8"),
+    readFile(new URL("../package.json", import.meta.url), "utf8"),
+  ]);
+  const sourceIndex = JSON.parse(rawSourceIndex);
+  const paths = sourceIndex.files.map((file) => file.path);
+
+  assert.match(studio, /type ProjectFolder = "Website" \| "Source" \| "Scenes"/);
+  assert.doesNotMatch(studio, /ProjectFolder = [^;]*"Assets"/);
+  assert.match(studio, /sourceFileData from "\.\.\/\.\.\/generated\/source-files\.json"/);
+  assert.match(studio, /setProjectTab\("code"\)/);
+  assert.match(studio, /Find in source file/);
+  assert.match(studio, /navigator\.clipboard\.writeText\(activeSourceFile\.content\)/);
+  assert.match(studio, /read-only source/);
+  assert.match(studioCss, /\.codeViewport/);
+  assert.match(studioCss, /grid-template-columns:\s*54px minmax\(0, 1fr\)/);
+  assert.ok(paths.includes("app/_studio/components/immersive-studio.tsx"));
+  assert.ok(paths.includes("scripts/sync-blog-articles.mjs"));
+  assert.ok(paths.includes("tests/rendered-html.test.mjs"));
+  assert.ok(paths.every((path) => !/(^|\/)(\.env|\.github|node_modules|public|app\/generated)(\/|$)/.test(path)));
+  assert.ok(sourceIndex.files.every((file) => typeof file.content === "string" && file.content.length > 0));
+
+  const scripts = JSON.parse(packageJson).scripts;
+  assert.equal(scripts.predev, "node scripts/sync-blog-articles.mjs");
+  assert.equal(scripts.prebuild, "node scripts/sync-blog-articles.mjs");
+  assert.match(scripts.test, /tests\/rendered-html\.test\.mjs/);
 });
 
 test("exports article content for the in-editor preview", async () => {

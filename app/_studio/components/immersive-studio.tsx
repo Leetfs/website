@@ -7,6 +7,7 @@ import * as THREE from "three";
 import { TransformControls } from "three/examples/jsm/controls/TransformControls.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { Reflector } from "three/examples/jsm/objects/Reflector.js";
+import sourceFileData from "../../generated/source-files.json";
 import styles from "../studio.module.css";
 
 type Article = {
@@ -33,8 +34,8 @@ type CreateKind =
   | "spawnPoint" | "waypoint" | "canvas";
 type ToolMode = "translate" | "rotate" | "scale";
 type AssetPanel = "blog" | "profile" | "friends" | "social" | null;
-type ProjectFolder = "Website" | "Assets" | "Scenes" | "Models" | "Content" | "Images" | "Materials";
-type ProjectTab = "project" | "console" | "animation";
+type ProjectFolder = "Website" | "Source" | "Scenes" | "Models" | "Content" | "Images" | "Materials";
+type ProjectTab = "project" | "console" | "animation" | "code";
 type MotionMode = "float" | "rotate" | "orbit" | "sway" | "bounce" | "pulse";
 type MotionAxis = "x" | "y" | "z";
 type MotionEasing = "linear" | "easeInOut" | "easeOut" | "bounce";
@@ -51,13 +52,14 @@ type VirtualAsset = {
   label: string;
   path: string;
   folder: ProjectFolder;
-  type: "folder" | "scene" | "model" | "content" | "image" | "material";
+  type: "scene" | "model" | "content" | "image" | "material" | "source";
   detail: string;
-  targetFolder?: ProjectFolder;
   panel?: Exclude<AssetPanel, null>;
   href?: string;
   sceneObject?: SceneObject;
+  sourcePath?: string;
 };
+type SourceFile = { path: string; name: string; language: string; content: string };
 type Orbit = { theta: number; phi: number; radius: number; target: THREE.Vector3 };
 type InspectorState = {
   visible: boolean;
@@ -116,7 +118,8 @@ const defaultMotionConfig = (id: SceneObject): MotionConfig => ({
   amount: 0.12,
   phase: 0,
 });
-const projectFolders: ProjectFolder[] = ["Website", "Assets", "Scenes", "Models", "Content", "Images", "Materials"];
+const sourceFiles = sourceFileData.files as SourceFile[];
+const projectFolders: ProjectFolder[] = ["Website", "Source", "Scenes", "Models", "Content", "Images", "Materials"];
 const createCatalog: { id: CreateCategory; icon: string; items: { id: CreateKind; icon: string }[] }[] = [
   {
     id: "threeD", icon: "◇", items: [
@@ -207,7 +210,7 @@ const messages = {
     gamePreview: "游戏预览", running: "运行中", paused: "已暂停",
     transform: "变换", position: "位置", rotation: "旋转", scale: "缩放", meshRenderer: "网格渲染器",
     enabled: "启用", globalScale: "统一缩放", intensity: "强度",
-    folders: ["站点", "资源", "场景", "模型", "内容", "图像", "材质"],
+    folders: ["站点", "源码", "场景", "模型", "内容", "图像", "材质"],
     blogAsset: "博客资源", profileAsset: "个人简介资源", friendsAsset: "友链资源", socialAsset: "个人链接",
     blogSearch: "搜索文章资源…", openBlog: "打开全部博客", openResume: "打开完整简历", openFriends: "打开全部友链",
     profileKicker: "LEE", profileTitle: "你好，我是 Lee。",
@@ -227,7 +230,7 @@ const messages = {
     gamePreview: "GAME PREVIEW", running: "RUNNING", paused: "PAUSED",
     transform: "Transform", position: "Position", rotation: "Rotation", scale: "Scale", meshRenderer: "Mesh Renderer",
     enabled: "Enabled", globalScale: "Global Scale", intensity: "Intensity",
-    folders: ["Website", "Assets", "Scenes", "Models", "Content", "Images", "Materials"],
+    folders: ["Website", "Source", "Scenes", "Models", "Content", "Images", "Materials"],
     blogAsset: "Blog asset", profileAsset: "Profile asset", friendsAsset: "Friends asset", socialAsset: "Personal links",
     blogSearch: "Search article assets…", openBlog: "VIEW ALL POSTS", openResume: "OPEN RESUME", openFriends: "OPEN FRIEND LINKS",
     profileKicker: "LEE", profileTitle: "Hi, I'm Lee.",
@@ -247,7 +250,7 @@ const messages = {
     gamePreview: "ゲームプレビュー", running: "実行中", paused: "一時停止",
     transform: "トランスフォーム", position: "位置", rotation: "回転", scale: "スケール", meshRenderer: "メッシュレンダラー",
     enabled: "有効", globalScale: "一括スケール", intensity: "強度",
-    folders: ["サイト", "アセット", "シーン", "モデル", "コンテンツ", "画像", "マテリアル"],
+    folders: ["サイト", "ソース", "シーン", "モデル", "コンテンツ", "画像", "マテリアル"],
     blogAsset: "ブログアセット", profileAsset: "プロフィール", friendsAsset: "リンクアセット", socialAsset: "個人リンク",
     blogSearch: "記事を検索…", openBlog: "すべてのブログを見る", openResume: "履歴書を開く", openFriends: "リンク一覧を開く",
     profileKicker: "LEE", profileTitle: "Lee です。",
@@ -392,6 +395,9 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
   const [projectSearch, setProjectSearch] = useState("");
   const [selectedAsset, setSelectedAsset] = useState<string | null>(null);
   const [assetView, setAssetView] = useState<"grid" | "list">("grid");
+  const [openSourcePath, setOpenSourcePath] = useState<string | null>(null);
+  const [sourceSearch, setSourceSearch] = useState("");
+  const [sourceLineWrap, setSourceLineWrap] = useState(false);
   const [activity, setActivity] = useState("Homepage.scene");
   const [consoleEntries, setConsoleEntries] = useState<string[]>([
     "Homepage.scene loaded",
@@ -469,15 +475,6 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
 
   const projectAssets = useMemo<VirtualAsset[]>(() => {
     const localizedArticles = articles.filter((article) => article.language.toLocaleLowerCase().split("-")[0] === locale);
-    const folders: VirtualAsset[] = projectFolders.filter((folder) => folder !== "Website" && folder !== "Assets").map((folder) => ({
-      id: `folder-${folder}`,
-      label: folder,
-      path: `Assets/${folder}`,
-      folder: "Assets",
-      type: "folder",
-      detail: "Folder",
-      targetFolder: folder,
-    }));
     const fixed: VirtualAsset[] = [
       { id: "website-blog", label: locale === "zh" ? "博客" : locale === "ja" ? "ブログ" : "Blog", path: "Website/Blog.asset", folder: "Website", type: "content", detail: `${localizedArticles.length} ${locale === "zh" ? "篇文档" : locale === "ja" ? "件の文書" : "Documents"}`, panel: "blog" },
       { id: "website-profile", label: locale === "zh" ? "个人简介" : locale === "ja" ? "プロフィール" : "Profile", path: "Website/Profile.asset", folder: "Website", type: "content", detail: "Profile / Resume", panel: "profile" },
@@ -506,17 +503,35 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
       detail: `${article.language.toUpperCase()} · ${article.category} · ${article.displayDate}`,
       href: article.href,
     }));
-    return [...folders, ...fixed, ...articleAssets];
+    const sourceAssets: VirtualAsset[] = sourceFiles.map((file) => ({
+      id: `source-${file.path}`,
+      label: file.name,
+      path: file.path,
+      folder: "Source",
+      type: "source",
+      detail: file.language,
+      sourcePath: file.path,
+    }));
+    return [...fixed, ...articleAssets, ...sourceAssets];
   }, [articles, locale]);
 
   const visibleProjectAssets = useMemo(() => {
     const needle = projectSearch.trim().toLocaleLowerCase();
     return projectAssets.filter((asset) => {
-      const inFolder = needle ? asset.type !== "folder" : asset.folder === projectFolder;
+      const inFolder = needle ? true : asset.folder === projectFolder;
       const matches = !needle || `${asset.label} ${asset.path} ${asset.detail}`.toLocaleLowerCase().includes(needle);
       return inFolder && matches;
     });
   }, [projectAssets, projectFolder, projectSearch]);
+
+  const activeSourceFile = useMemo(
+    () => sourceFiles.find((file) => file.path === openSourcePath) ?? null,
+    [openSourcePath],
+  );
+  const sourceLines = activeSourceFile?.content.split("\n") ?? [];
+  const sourceMatchCount = sourceSearch
+    ? sourceLines.filter((line) => line.toLocaleLowerCase().includes(sourceSearch.toLocaleLowerCase())).length
+    : 0;
 
   const updateCamera = useCallback(() => {
     const camera = cameraRef.current;
@@ -1025,10 +1040,13 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
 
   const openProjectAsset = useCallback((asset: VirtualAsset) => {
     setSelectedAsset(asset.id);
-    if (asset.targetFolder) {
-      setProjectFolder(asset.targetFolder);
-      setProjectSearch("");
-      logAction(`${asset.path}`);
+    if (asset.sourcePath) {
+      setOpenSourcePath(asset.sourcePath);
+      setSourceSearch("");
+      setProjectTab("code");
+      setBottomPanelVisible(true);
+      setBottomPanelHeight((height) => Math.max(height, 320));
+      logAction(`${t.commands.open}: ${asset.path}`);
       return;
     }
     if (asset.sceneObject) {
@@ -1738,7 +1756,7 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
       { id: "toggle", label: t.commands.toggle },
     ],
     [
-      { id: "assets", label: t.commands.project },
+      { id: "source", label: locale === "zh" ? "打开源码" : locale === "ja" ? "ソースを開く" : "Open Source" },
       { id: "content", label: t.commands.blog },
     ],
     [
@@ -1776,7 +1794,7 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
     if (id === "duplicate") duplicateSelected();
     if (id === "delete") deleteSelected();
     if (id === "toggle") toggleSelected();
-    if (id === "assets") { setProjectTab("project"); setProjectFolder("Assets"); }
+    if (id === "source") { setBottomPanelVisible(true); setProjectTab("project"); setProjectFolder("Source"); }
     if (id === "content") { setProjectTab("project"); setProjectFolder("Content"); }
     if (id === "open-selected") {
       frameSelected();
@@ -1996,13 +2014,17 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
     </aside>}
 
     {bottomPanelVisible && <section className={styles.projectPanel} id="project">
-      <header><button className={projectTab === "project" ? styles.projectTabActive : ""} onClick={() => setProjectTab("project")}>{t.project}</button><button className={projectTab === "console" ? styles.projectTabActive : ""} onClick={() => setProjectTab("console")}>{t.console}</button><button className={projectTab === "animation" ? styles.projectTabActive : ""} onClick={() => setProjectTab("animation")}>{locale === "zh" ? "动画" : locale === "ja" ? "アニメーション" : "Animation"}</button><button className={styles.panelClose} onClick={() => setBottomPanelVisible(false)} title="Hide">×</button></header>
-      <aside>{projectTab === "animation" ? sceneObjectIds.map((id) => <button className={selected === id ? styles.folderActive : ""} onClick={() => selectObject(id)} key={id}>{motionSettings[id]?.enabled ? "● " : "○ "}{objectLabel(id)}</button>) : projectFolders.map((folder, index) => <button className={projectFolder === folder ? styles.folderActive : ""} onClick={() => { setProjectFolder(folder); setProjectTab("project"); setProjectSearch(""); }} key={folder}>{projectFolder === folder ? "▾ " : "　"}{t.folders[index]}</button>)}</aside>
+      <header><button className={projectTab === "project" ? styles.projectTabActive : ""} onClick={() => setProjectTab("project")}>{t.project}</button><button className={projectTab === "console" ? styles.projectTabActive : ""} onClick={() => setProjectTab("console")}>{t.console}</button><button className={projectTab === "animation" ? styles.projectTabActive : ""} onClick={() => setProjectTab("animation")}>{locale === "zh" ? "动画" : locale === "ja" ? "アニメーション" : "Animation"}</button>{activeSourceFile && <button className={projectTab === "code" ? styles.projectTabActive : ""} onClick={() => setProjectTab("code")}>{locale === "zh" ? "代码" : locale === "ja" ? "コード" : "Code"} · {activeSourceFile.name}</button>}<button className={styles.panelClose} onClick={() => setBottomPanelVisible(false)} title="Hide">×</button></header>
+      <aside>{projectTab === "animation"
+        ? sceneObjectIds.map((id) => <button className={selected === id ? styles.folderActive : ""} onClick={() => selectObject(id)} key={id}>{motionSettings[id]?.enabled ? "● " : "○ "}{objectLabel(id)}</button>)
+        : projectTab === "code"
+          ? sourceFiles.map((file) => <button className={openSourcePath === file.path ? styles.folderActive : ""} onClick={() => { setOpenSourcePath(file.path); setSourceSearch(""); }} title={file.path} key={file.path}>{openSourcePath === file.path ? "▾ " : "　"}{file.path}</button>)
+          : projectFolders.map((folder, index) => <button className={projectFolder === folder ? styles.folderActive : ""} onClick={() => { setProjectFolder(folder); setProjectTab("project"); setProjectSearch(""); }} key={folder}>{projectFolder === folder ? "▾ " : "　"}{t.folders[index]}</button>)}</aside>
       <div className={styles.projectWorkspace}>
         {projectTab === "project" ? <>
           <div className={styles.projectTools}>
             <button onClick={() => setProjectFolder("Website")} title="Website">⌂</button>
-            <span>{projectFolder === "Website" ? "Website" : `Assets / ${projectFolder}`}</span>
+            <span>{projectFolder === "Website" ? "Website" : projectFolder === "Source" ? "Source" : `Assets / ${projectFolder}`}</span>
             <input value={projectSearch} onChange={(event) => setProjectSearch(event.target.value)} placeholder={t.commands.searchFiles} aria-label={t.commands.searchFiles} />
             <button className={assetView === "grid" ? styles.toolActive : ""} onClick={() => setAssetView("grid")} title="Grid">▦</button>
             <button className={assetView === "list" ? styles.toolActive : ""} onClick={() => setAssetView("list")} title="List">☷</button>
@@ -2017,12 +2039,28 @@ export default function ImmersiveStudio({ articles }: { articles: Article[] }) {
               onContextMenu={(event) => { event.preventDefault(); event.stopPropagation(); setSelectedAsset(asset.id); setContextMenu({ x: Math.min(event.clientX, window.innerWidth - 230), y: Math.min(event.clientY, window.innerHeight - 130), kind: "asset", assetId: asset.id }); }}
               title={asset.path}
               key={asset.id}
-            ><i className={asset.type === "model" ? styles.blueAsset : asset.type === "content" ? styles.limeAsset : asset.type === "image" ? styles.pinkAsset : ""}>{asset.id === "website-blog" ? "▤" : asset.id === "website-profile" ? "▦" : asset.id === "website-friends" ? "◯" : asset.id === "website-links" ? "≈" : asset.type === "folder" ? "▰" : asset.type === "scene" ? "◇" : asset.type === "model" ? "⬡" : asset.type === "content" ? "MD" : asset.type === "image" ? "▧" : "●"}</i><span>{asset.label}</span><small>{asset.detail}</small></button>)}
+            ><i className={asset.type === "model" ? styles.blueAsset : asset.type === "content" ? styles.limeAsset : asset.type === "image" ? styles.pinkAsset : asset.type === "source" ? styles.sourceAsset : ""}>{asset.id === "website-blog" ? "▤" : asset.id === "website-profile" ? "▦" : asset.id === "website-friends" ? "◯" : asset.id === "website-links" ? "≈" : asset.type === "scene" ? "◇" : asset.type === "model" ? "⬡" : asset.type === "content" ? "MD" : asset.type === "image" ? "▧" : asset.type === "source" ? "</>" : "●"}</i><span>{asset.label}</span><small>{asset.detail}</small></button>)}
             {!visibleProjectAssets.length && <div className={styles.emptyAssets}>{t.commands.empty}</div>}
           </div>
         </> : projectTab === "console" ? <div className={styles.consoleView}>
           <header><span>{consoleEntries.length} Messages</span><button onClick={() => setConsoleEntries([])}>Clear</button></header>
           {consoleEntries.map((entry, index) => <p key={`${entry}-${index}`}><i>●</i>{entry}</p>)}
+        </div> : projectTab === "code" && activeSourceFile ? <div className={styles.codeEditor}>
+          <header className={styles.codeToolbar}>
+            <button onClick={() => { setProjectTab("project"); setProjectFolder("Source"); }} title={locale === "zh" ? "返回源码" : locale === "ja" ? "ソースへ戻る" : "Back to source"}>←</button>
+            <strong title={activeSourceFile.path}>{activeSourceFile.path}</strong>
+            <label><span>⌕</span><input value={sourceSearch} onChange={(event) => setSourceSearch(event.target.value)} placeholder={locale === "zh" ? "在文件中查找…" : locale === "ja" ? "ファイル内を検索…" : "Find in file…"} aria-label="Find in source file" /></label>
+            {sourceSearch && <small>{sourceMatchCount} {locale === "zh" ? "处匹配" : locale === "ja" ? "件" : "matches"}</small>}
+            <button className={sourceLineWrap ? styles.toolActive : ""} onClick={() => setSourceLineWrap((value) => !value)} title="Toggle word wrap">↵</button>
+            <button onClick={async () => { try { await navigator.clipboard.writeText(activeSourceFile.content); logAction(locale === "zh" ? "源码已复制" : locale === "ja" ? "ソースをコピーしました" : "Source copied"); } catch { logAction(activeSourceFile.path); } }} title={locale === "zh" ? "复制源码" : locale === "ja" ? "ソースをコピー" : "Copy source"}>⧉</button>
+          </header>
+          <ol className={`${styles.codeViewport} ${sourceLineWrap ? styles.codeWrap : ""}`} aria-label={`${activeSourceFile.path} read-only source`}>
+            {sourceLines.map((line, index) => {
+              const matches = sourceSearch && line.toLocaleLowerCase().includes(sourceSearch.toLocaleLowerCase());
+              return <li className={matches ? styles.codeMatch : ""} key={index}><span>{index + 1}</span><code>{line || " "}</code></li>;
+            })}
+          </ol>
+          <footer><span>{locale === "zh" ? "只读" : locale === "ja" ? "読み取り専用" : "Read only"}</span><span>UTF-8</span><span>LF</span><span>{activeSourceFile.language}</span><span>{sourceLines.length} lines</span></footer>
         </div> : <div className={styles.animationWindow}>
           <header className={styles.animationToolbar}>
             <button onClick={() => seekMotion(Math.max(0, motionTime - 1 / 30))} title="Previous frame">◀|</button>

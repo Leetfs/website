@@ -473,8 +473,9 @@
 .projectPanel > header .projectTabActive { background: #383b40; color: #fff; box-shadow: inset 0 -2px #7cb0dc; }
 .projectPanel > header span { margin-left: 12px; color: #959ba4; font: 10px/1 Consolas, monospace; }
 .projectPanel > header .panelClose { width: 30px; min-width: 30px; margin-left: auto; padding: 0; color: #a5aab1; font-size: 15px; }
-.projectPanel > aside { grid-column: 1; grid-row: 2; padding: 5px 0; border-right: 1px solid #151619; background: #24262a; }
+.projectPanel > aside { grid-column: 1; grid-row: 2; min-width: 0; min-height: 0; padding: 5px 0; overflow: auto; border-right: 1px solid #151619; background: #24262a; }
 .projectPanel > aside button { width: 100%; min-height: 28px; padding: 0 10px; color: #afb3b9; font-size: 11px; text-align: left; }
+.projectPanel > aside button { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .projectPanel > aside button:hover,
 .projectPanel > aside .folderActive { background: #34373c; color: #fff; }
 .projectWorkspace {
@@ -552,6 +553,7 @@
 .assetGrid .blueAsset { border-radius: 5px; background: #4779a9; color: #dcefff; font-size: 24px; }
 .assetGrid .limeAsset { border-radius: 50%; background: #7aa24f; color: #e4f6cf; font-size: 18px; }
 .assetGrid .pinkAsset { border-radius: 6px; background: #9b537d; color: #ffe4f3; font-size: 19px; }
+.assetGrid .sourceAsset { border-radius: 5px; background: #3a5268; color: #c9e9ff; font: normal 13px/1 Consolas, monospace; }
 .assetGrid .sharkAsset { border-radius: 50% 55% 48% 52%; background: #5f8fae; color: #f4fbff; font-size: 25px; }
 .assetGrid span { width: 100%; overflow: hidden; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
 .assetGrid small { color: #969ca4; font: 10px/1 Consolas, monospace; }
@@ -589,6 +591,38 @@
 .consoleView > header button { padding: 4px 9px; border: 1px solid #454a51; border-radius: 3px; }
 .consoleView p { min-height: 28px; margin: 0; padding: 6px 10px; border-bottom: 1px solid #2a2d31; }
 .consoleView i { margin-right: 9px; color: #79bf84; font-style: normal; }
+
+.codeEditor {
+  grid-row: 1 / -1;
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: 34px minmax(0, 1fr) 22px;
+  overflow: hidden;
+  background: #191b1e;
+  color: #c9cdd2;
+  font: 11px/1.55 Consolas, "Cascadia Code", monospace;
+  user-select: text;
+}
+.codeToolbar { min-width: 0; padding: 4px 7px; display: flex; align-items: center; gap: 6px; border-bottom: 1px solid #101114; background: #292c30; }
+.codeToolbar > button { min-width: 27px; height: 25px; padding: 0 7px; border: 1px solid #454a50; border-radius: 3px; background: #303338; color: #b9bec5; }
+.codeToolbar > button:hover,
+.codeToolbar > .toolActive { border-color: #668eaf; background: #466b8d; color: #fff; }
+.codeToolbar > strong { min-width: 80px; overflow: hidden; color: #d6d9dd; font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
+.codeToolbar > label { width: min(270px, 30vw); height: 25px; margin-left: auto; padding: 0 7px; display: flex; align-items: center; gap: 5px; border: 1px solid #44484e; border-radius: 3px; background: #1c1e21; }
+.codeToolbar > label:focus-within { border-color: #6995bb; }
+.codeToolbar input { width: 100%; min-width: 0; outline: 0; border: 0; background: transparent; color: #d6d8dc; font: inherit; user-select: text; }
+.codeToolbar small { color: #8cb8d8; white-space: nowrap; }
+.codeViewport { min-width: 100%; min-height: 0; margin: 0; padding: 6px 0 18px; overflow: auto; list-style: none; counter-reset: source-line; tab-size: 2; }
+.codeViewport li { min-width: max-content; display: grid; grid-template-columns: 54px minmax(0, 1fr); }
+.codeViewport li > span { padding: 0 12px 0 6px; position: sticky; left: 0; border-right: 1px solid #30343a; background: #191b1e; color: #656c74; text-align: right; user-select: none; }
+.codeViewport code { padding: 0 18px 0 12px; color: #c7d2dc; font: inherit; white-space: pre; }
+.codeViewport .codeMatch { background: rgb(220 170 74 / 13%); box-shadow: inset 3px 0 #d4a950; }
+.codeViewport .codeMatch > span { color: #d7b56d; }
+.codeWrap li { min-width: 0; }
+.codeWrap code { white-space: pre-wrap; overflow-wrap: anywhere; }
+.codeEditor > footer { padding: 0 8px; display: flex; align-items: center; justify-content: flex-end; gap: 14px; border-top: 1px solid #30343a; background: #22252a; color: #828a93; font-size: 10px; user-select: none; }
+.codeEditor > footer span:first-child { margin-right: auto; color: #8eb9da; }
 
 .animationWindow {
   grid-row: 1 / -1;
