@@ -1,6 +1,6 @@
 ---
 title: Ubuntu 設定で蓋を閉じてもスリープしない
-author: リー
+author: Lee
 ---
 
 ## ファイルの編集
