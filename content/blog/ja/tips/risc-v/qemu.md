@@ -1,6 +1,6 @@
 ---
 title: QEMU を使用して RISC-V プログラムを実行する
-author: リー
+author: Lee
 ---
 
 ## インストール
