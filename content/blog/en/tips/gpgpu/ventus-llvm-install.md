@@ -6,8 +6,7 @@ author: Lee
 ## Introduction
 
 Ventus GPGPU is a **GPGPU architecture for RISC-V**.\
-This article references this repository: <https://github.com/THU-DSP-LAB/llvm-project>.\
-本文参考此仓库：<https://github.com/THU-DSP-LAB/llvm-project>。
+This article references this repository: <https://github.com/THU-DSP-LAB/llvm-project>.
 
 ## Install dependencies
 
@@ -31,13 +30,7 @@ Create a folder and clone all the repositories into this directory. In the follo
 ## Set environment variables
 
 ```bash
-export VENTUS_INSTALL_PREFIX=/root/J142/llvm-project/install
-export SPIKE_TARGET_DIR=${VENTUS_INSTALL_PREFIX}
-export LD_LIBRARY_PATH=${VENTUS_INSTALL_PREFIX}/lib
-export OCL_ICD_VENDORS=${VENTUS_INSTALL_PREFIX}/lib/libpocl.so
-export POCL_DEVICES="ventus"
-export PATH=/root/J142/llvm-project/build/bin:$PATH
-export BUILD_TYPE=Debug
+export VENTUS_INSTALL_PREFIX=/root/J142/llvm-project/install\nexport SPIKE_TARGET_DIR=${VENTUS_INSTALL_PREFIX}\nexport LD_LIBRARY_PATH=${VENTUS_INSTALL_PREFIX}/lib\nexport OCL_ICD_VENDORS=${VENTUS_INSTALL_PREFIX}/lib/libpocl.so\nexport POCL_DEVICES=\"ventus\"\nexport PATH=/root/J142/llvm-project/build/bin:$PATH\nexport BUILD_TYPE=Debug
 ```
 
 ## Build the compiler
