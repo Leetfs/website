@@ -62,4 +62,4 @@ author: Lee
 
 ## 補足
 
-Zvfhminは変換（`vfwcvt.f.f.v f16=>f32`, `vfncvt.f.f.w f32=>16`）のみサポートし、半精度ベクトル算術演算は直接サポートしません。算術演算にはzvfhが必要です。
+Zvfhminは変換（`vfwcvt.f.f.v f16=>f32`, `vfncvt.f.f.w f32=>16`）のみサポートし、半精度ベクトル算術演算は直接サポートしません。 算術演算にはzvfhが必要です。
