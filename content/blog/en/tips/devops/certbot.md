@@ -1,5 +1,5 @@
 ---
-title: Certbot Automatic SSL Certificate Acquisition
+title: Certbot Automatically Obtains SSL Certificates
 author: Lee
 ---
 
@@ -42,7 +42,7 @@ Taking Cloudflare as an example:
 
 1. Cloudflare management account > Account API Tokens > API Token Templates > Edit Zone DNS
 2. Install plugin `sudo apt install python3-certbot-dns-cloudflare`
-3. Create the file `/etc/letsencrypt/cloudflare.ini` and place the parameter inside: `dns_cloudflare_api_token = yourtoken`
+3. Create the file `/etc/letsencrypt/cloudflare.ini` and place the parameter inside: `dns_cloudflare_api_token = your token`
 4. Run `sudo certbot certonly -d yourdomain` and choose DNS authentication when prompted.
 
 > It is not recommended to remove `cloudflare.ini` after applying. Certbot needs this file for automatic renewal.
