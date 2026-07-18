@@ -1,6 +1,6 @@
 ---
 title: RISC-V GNU コンパイラツールチェーン
-author: リー
+author: Lee
 ---
 
 ## 前提条件
