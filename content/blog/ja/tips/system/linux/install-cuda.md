@@ -1,6 +1,6 @@
 ---
 title: CUDA Toolkit のインストール
-author: リー
+author: Lee
 ---
 
 ## インストール
