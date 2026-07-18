@@ -43,7 +43,7 @@ Open the etc/fstab file and add at the end:
 
 ### Change swap activation threshold
 
-Open etc/sysctl.conf and modify the value after `vm.swappiness=80`.If it does not exist, add a new line.
+Open etc/sysctl.conf and modify the value after `vm.swappiness=80`.If it does not exist, add a new line.如果没有自己加一条进去。
 
 ### Change swap size
 
