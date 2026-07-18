@@ -16,7 +16,7 @@ Jenkins セキュリティポリシー：
 - XHR/AJAX は許可されていません
 - など。
 
-デフォルトではサーバー内部のリソースのみが許可されており、インラインスタイルを許可するには、Manage Jenkins → Script console で以下のコードを実行してください。または、パイプライン + Groovy plugin を使用して処理内で実行できます。
+デフォルトではサーバー内部のリソースのみが許可されており、インラインスタイルを許可するには、Manage Jenkins → Script console で以下のコードを実行してください。 または、パイプライン + Groovy plugin を使用して処理内で実行できます。
 
 ```Groovy
 System.setProperty("hudson.model.DirectoryBrowserSupport.CSP", "sandbox allow-same-origin; default-src 'self'; style-src 'self' 'unsafe-inline';")
