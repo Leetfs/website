@@ -1,6 +1,6 @@
 ---
 title: Home Assistant リバースプロキシ＋アクセス許可IPリスト
-author: リー
+author: Lee
 ---
 
 ## インストール
