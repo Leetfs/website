@@ -1,6 +1,6 @@
 ---
 title: モデルのインポートと公開
-author: リー
+author: Lee
 ---
 
 ## VCCのインストール
