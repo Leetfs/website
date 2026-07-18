@@ -1,6 +1,6 @@
 ---
 title: sshキーを使ってサーバーにログインし、パスワードログインを無効にする
-author: Lee
+author: リー
 ---
 
 ## sshキー認証の設定
@@ -13,8 +13,7 @@ author: Lee
 /etc/ssh/sshd_config ファイルを編集し、以下のパラメータを変更します：
 
 ```text
-PubkeyAuthentication yes
-PasswordAuthentication no
+PubkeyAuthentication yes\nPasswordAuthentication no
 ```
 
 ## sshサービスの再起動
