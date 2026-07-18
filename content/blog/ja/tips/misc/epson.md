@@ -1,6 +1,6 @@
 ---
 title: EPSON社内ネットワークでの印刷速度低下の問題を解決する
-author: リー
+author: Lee
 ---
 
 ## 設定の確認
