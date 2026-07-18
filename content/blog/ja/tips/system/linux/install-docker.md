@@ -1,6 +1,6 @@
 ---
 title: Debian での Docker インストール
-author: Lee
+author: リー
 ---
 
 ## Docker のインストール
@@ -26,7 +26,7 @@ curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o 
 ### Docker公式APTリポジトリを追加
 
 ```bash
-echo \"deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian $(lsb_release -cs) stable\" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 ```
 
 ### インデックスを再度更新する
@@ -41,7 +41,7 @@ sudo apt update
 sudo apt install docker-ce docker-ce-cli containerd.io
 ```
 
-### 启动并设置为开机自启
+### Docker を起動し、自動起動を設定
 
 ```bash
 sudo systemctl start docker
@@ -58,7 +58,7 @@ sudo docker --version
 
 ## Docker Compose のインストール
 
-オプションです。 必要に応じてインストールしてください。
+オプションです。必要に応じてインストールしてください
 
 ```bash
 sudo apt install docker-compose
