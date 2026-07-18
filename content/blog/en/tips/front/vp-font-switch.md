@@ -169,4 +169,4 @@ export default {
 
 ## Conclusion
 
-If it does not work, use the console to check whether the css file access path is correct, whether the script runs properly, and whether the button content is correctly obtained (see comments).
+If it does not work, use the console to check whether the css file access path is correct, whether the script runs properly, and whether the button content is correctly obtained (see comments)
