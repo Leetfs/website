@@ -1,6 +1,6 @@
 ---
 title: Jenkins 宣言型パイプラインとスクリプト型パイプライン
-author: リー
+author: Lee
 ---
 
 ## 宣言型パイプライン
