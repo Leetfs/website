@@ -1,6 +1,6 @@
 ---
 title: Certbot 自動取得 SSL 証明書
-author: Lee
+author: リー
 ---
 
 ## インストール
