@@ -1,6 +1,6 @@
 ---
 title: Ventus GPGPU LLVM コンパイラのインストールメモ
-author: リー
+author: Lee
 ---
 
 ## 概要
