@@ -11,7 +11,7 @@ author: Lee
 
 ### ローカル設定の確認
 
-まずローカルのsshが正常に動作していることを確認してください。`ssh-add -l` コマンドで全てのsshキーを一覧表示でき、また `ssh -T` を実行して正しくアクセスできるかテストしてください。
+まずローカルのsshが正常に動作していることを確認してください。 `ssh-add -l` コマンドで全てのsshキーを一覧表示でき、また `ssh -T` を実行して正しくアクセスできるかテストしてください。
 
 ![](/tips/system/linux/pubilc/ssh-agent-1.png)
 
@@ -35,7 +35,7 @@ Host *
   ForwardAgent yes
 ```
 
-設定後、サーバー側で `ssh-add -l` を実行して全てのsshキーを表示できます。有効でない場合は、サーバー側の `etc/ssh/sshd_config` ファイル内の `AllowAgentForwarding` オプションが `yes` になっているかを確認してください。
+設定後、サーバー側で `ssh-add -l` を実行して全てのsshキーを表示できます。 有効でない場合は、サーバー側の `etc/ssh/sshd_config` ファイル内の `AllowAgentForwarding` オプションが `yes` になっているかを確認してください。
 
 ### セキュリティの注意
 
