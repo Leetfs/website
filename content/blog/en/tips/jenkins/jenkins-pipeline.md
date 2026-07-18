@@ -71,7 +71,7 @@ node('RVV') { // Specify node with RVV label
 }
 ```
 
-Simple and convenient, with no complicated `pipeline` framework, it uses node blocks to control node execution.Usage Example: <https://github.com/Leetfs/opencv-riscv-perf/blob/main/Jenkinsfile>
+简单，方便，没有复杂的 `pipeline` 框架，使用 node 块控制节点运行。Simple and convenient, with no complicated `pipeline` framework, it uses node blocks to control node execution.Usage Example: <https://github.com/Leetfs/opencv-riscv-perf/blob/main/Jenkinsfile>
 
 ### Features of Scripted Pipeline
 
