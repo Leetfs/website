@@ -1,6 +1,6 @@
 ---
 title: RISC-V Zvfh(min) 拡張サポート調査報告書（LLVM CodeGen段階）
-author: リー
+author: Lee
 ---
 
 ## 著作権声明
