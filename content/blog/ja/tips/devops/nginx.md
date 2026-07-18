@@ -1,6 +1,6 @@
 ---
 title: nginx リバースプロキシ入門
-author: リー
+author: Lee
 ---
 
 ## 概要
