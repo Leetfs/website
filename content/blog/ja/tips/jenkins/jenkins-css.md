@@ -1,6 +1,6 @@
 ---
 title: Jenkins はインライン css スタイルの読み込みを許可します
-author: リー
+author: Lee
 ---
 
 ## Groovy スクリプト
