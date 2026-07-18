@@ -1,6 +1,6 @@
 ---
 title: lit を使って LLVM IR ファイルをテストする
-author: Lee
+author: リー
 ---
 
 ## 用語マッチング
