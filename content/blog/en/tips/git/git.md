@@ -31,7 +31,7 @@ git config --global user.name "username" # Set username
 git config --global user.email useremail@qq.com # Set email
 ```
 
-### Checkout branch
+### 检出分支
 
 ```bash
 git branch # View current branches
@@ -54,7 +54,7 @@ Example: The URL of this repository is <https://github.com/Leetfs/blog>
 git clone https://github.com/Leetfs/blog ./lee-blog
 ```
 
-By default, the cloned repository is placed in the current working directory, and the folder name defaults to the repository name.This command means placing the Git-cloned repository into the 'lee-blog' folder in this directory.
+clone 的仓库默认放在当前工作路径下，默认文件夹名为仓库名。By default, the cloned repository is placed in the current working directory, and the folder name defaults to the repository name.This command means placing the Git-cloned repository into the 'lee-blog' folder in this directory.
 
 > Tips: A path starting with / means starting from the root directory, for example, /lee means 'lee' under the root directory, and ./lee means 'lee' under the current working directory.
 
