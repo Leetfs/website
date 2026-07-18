@@ -1,6 +1,6 @@
 ---
 title: DebianでBBR輻輳制御アルゴリズムを有効にする
-author: リー
+author: Lee
 ---
 
 ## マニュアルモード
