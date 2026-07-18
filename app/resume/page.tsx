@@ -1,12 +1,27 @@
-import type { Metadata } from "next";
+import JsonLd from "../_seo/json-ld";
 import StudioFooter from "../_studio/components/studio-footer";
 import StudioHeader from "../_studio/components/studio-header";
 import StudioPrintButton from "../_studio/components/studio-print-button";
 import styles from "../_studio/content.module.css";
+import { absoluteUrl, pageMetadata, SITE_URL } from "../seo";
 
-export const metadata: Metadata = {
-  title: "个人简介 — Lee",
-  description: "Lee 的个人简介、技术方向、项目经历和参与的开源社区。",
+const description = "Lee 的个人简介、技术方向、项目经历和参与的开源社区。";
+
+export const metadata = pageMetadata({
+  title: "个人简介",
+  description,
+  pathname: "/resume",
+});
+
+const profileGraph = {
+  "@context": "https://schema.org",
+  "@type": "ProfilePage",
+  "@id": `${absoluteUrl("/resume")}#profile`,
+  url: absoluteUrl("/resume"),
+  name: "Lee 的个人简介",
+  description,
+  inLanguage: "zh-CN",
+  mainEntity: { "@id": `${SITE_URL}/#person` },
 };
 
 const skills = [
@@ -59,6 +74,7 @@ const communities = [
 export default function ResumePage() {
   return (
     <main className={`${styles.page} ${styles.innerPage} ${styles.resumePage}`}>
+      <JsonLd data={profileGraph} />
       <StudioHeader compact />
       <header className={styles.resumeHero}>
         <div>

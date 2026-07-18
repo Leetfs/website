@@ -1,13 +1,17 @@
-import type { Metadata } from "next";
 import Image from "next/image";
+import JsonLd from "../_seo/json-ld";
 import StudioFooter from "../_studio/components/studio-footer";
 import StudioHeader from "../_studio/components/studio-header";
 import styles from "../_studio/content.module.css";
+import { absoluteUrl, pageMetadata } from "../seo";
 
-export const metadata: Metadata = {
-  title: "友链 — Lee",
-  description: "Lee 的友情链接。这里收录几位朋友的个人网站和主页。",
-};
+const description = "Lee 的友情链接。这里收录几位朋友的个人网站和主页。";
+
+export const metadata = pageMetadata({
+  title: "友链",
+  description,
+  pathname: "/friends",
+});
 
 const friends = [
   { name: "猫卷", description: "善良的猫卷，纯洁的猫卷，乖孩子猫卷。", href: "https://github.com/lumigj", host: "github.com/lumigj", avatar: "/friends/lumi.PNG" },
@@ -17,9 +21,28 @@ const friends = [
   { name: "Catherina", description: "是朋友，也是很好的同事", href: "https://catherina.moe/", host: "catherina.moe", avatar: "/friends/catherina.png" },
 ];
 
+const friendsGraph = {
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  url: absoluteUrl("/friends"),
+  name: "Lee 的友链",
+  description,
+  inLanguage: "zh-CN",
+  mainEntity: {
+    "@type": "ItemList",
+    itemListElement: friends.map((friend, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: friend.name,
+      url: friend.href,
+    })),
+  },
+};
+
 export default function FriendsPage() {
   return (
     <main className={`${styles.page} ${styles.innerPage}`}>
+      <JsonLd data={friendsGraph} />
       <StudioHeader compact />
       <header className={styles.friendsHero}>
         <p className={styles.index}>FRIENDS / LINKS</p>

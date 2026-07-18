@@ -15,6 +15,7 @@ const LANGUAGE_ORDER = { zh: 0, en: 1, ja: 2 };
 const LANGUAGES = Object.keys(LANGUAGE_ORDER);
 const execFileAsync = promisify(execFile);
 const SOURCE_FILES = [
+  "app/_seo/json-ld.tsx",
   "app/_studio/components/immersive-studio.tsx",
   "app/_studio/components/studio-blog-archive.tsx",
   "app/_studio/components/studio-footer.tsx",
@@ -26,6 +27,9 @@ const SOURCE_FILES = [
   "app/friends/page.tsx",
   "app/layout.tsx",
   "app/page.tsx",
+  "app/robots.ts",
+  "app/seo.ts",
+  "app/sitemap.ts",
   "app/resume/page.tsx",
   "crowdin.yml",
   "next.config.ts",
@@ -272,15 +276,21 @@ async function collectGitDates() {
       "-C", process.cwd(), "rev-parse", "--show-toplevel",
     ], { encoding: "utf8" }));
   } catch {
-    return { currentModified: new Map(), currentAdded: new Map(), legacy: new Map() };
+    return {
+      currentModified: new Map(),
+      currentAdded: new Map(),
+      legacy: new Map(),
+      legacyAdded: new Map(),
+    };
   }
   repoRoot = repoRoot.trim();
-  const [currentModified, currentAdded, legacy] = await Promise.all([
+  const [currentModified, currentAdded, legacy, legacyAdded] = await Promise.all([
     gitLogDates(repoRoot, "M", "content/blog"),
     gitLogDates(repoRoot, "A", "content/blog"),
     gitLogDates(repoRoot, "AM", "docs"),
+    gitLogDates(repoRoot, "A", "docs"),
   ]);
-  return { currentModified, currentAdded, legacy };
+  return { currentModified, currentAdded, legacy, legacyAdded };
 }
 
 function legacyGitPath(relative) {
@@ -293,6 +303,13 @@ function gitDateFor(relative, gitDates) {
   const currentPath = `content/blog/${relative}`;
   return gitDates.currentModified.get(currentPath)
     ?? gitDates.legacy.get(legacyGitPath(relative))
+    ?? gitDates.currentAdded.get(currentPath)
+    ?? null;
+}
+
+function gitPublishedDateFor(relative, gitDates) {
+  const currentPath = `content/blog/${relative}`;
+  return gitDates.legacyAdded.get(legacyGitPath(relative))
     ?? gitDates.currentAdded.get(currentPath)
     ?? null;
 }
@@ -322,7 +339,9 @@ async function sync() {
     const canonicalSlug = `/${parts.slice(1).join("/")}`;
     const fileStats = await stat(absolute);
     const gitUpdatedAt = gitDateFor(relative, gitDates);
+    const gitPublishedAt = gitPublishedDateFor(relative, gitDates);
     const updatedAt = gitUpdatedAt ?? fileStats.mtime.toISOString();
+    const publishedAt = gitPublishedAt ?? gitUpdatedAt ?? fileStats.birthtime.toISOString();
     const characterCount = plainText(body).replace(/\s/g, "").length;
     const rendered = renderMarkdown(body, slug, articleSlugs);
 
@@ -336,6 +355,7 @@ async function sync() {
       description: makeDescription(title, body),
       href: `/blog${slug}`,
       slug,
+      publishedAt,
       updatedAt,
       dateSource: gitUpdatedAt ? "git" : "filesystem",
       displayDate: formatDate(updatedAt),

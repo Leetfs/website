@@ -60,6 +60,41 @@ test("exports every canonical content route", async () => {
   await assert.rejects(access(new URL("../app/api", import.meta.url)));
 });
 
+test("exports complete crawl and social metadata", async () => {
+  const [homeResponse, blogResponse, articleResponse, robots, sitemap] = await Promise.all([
+    render("/"),
+    render("/blog"),
+    render("/blog/tips/system/linux/package"),
+    readFile(new URL("../out/robots.txt", import.meta.url), "utf8"),
+    readFile(new URL("../out/sitemap.xml", import.meta.url), "utf8"),
+  ]);
+  const [home, blog, article] = await Promise.all([
+    homeResponse.text(),
+    blogResponse.text(),
+    articleResponse.text(),
+  ]);
+
+  assert.match(home, /rel="canonical" href="https:\/\/leetfs\.com\/"/);
+  assert.match(home, /"@type":"WebSite"/);
+  assert.match(home, /"@type":"Person"/);
+  assert.match(blog, /rel="canonical" href="https:\/\/leetfs\.com\/blog\/"/);
+  assert.match(blog, /"@type":"Blog"/);
+  assert.match(article, /rel="canonical" href="https:\/\/leetfs\.com\/blog\/tips\/system\/linux\/package\/"/);
+  for (const language of ["zh", "en", "ja", "x-default"]) {
+    assert.match(article, new RegExp(`hrefLang="${language}"`, "i"));
+  }
+  assert.match(article, /"@type":"BlogPosting"/);
+  assert.match(article, /"datePublished":"[^"]+"/);
+  assert.match(article, /"dateModified":"[^"]+"/);
+  assert.match(article, /property="article:published_time"/);
+  assert.match(article, /property="article:modified_time"/);
+  assert.match(robots, /User-Agent: \*/i);
+  assert.match(robots, /Disallow: \/api\//i);
+  assert.match(robots, /Sitemap: https:\/\/leetfs\.com\/sitemap\.xml/i);
+  assert.match(sitemap, /https:\/\/leetfs\.com\/blog\/tips\/system\/linux\/package\//);
+  assert.match(sitemap, /hreflang="x-default"/);
+});
+
 test("keeps Unity interactions and project assets wired", async () => {
   const [studio, studioCss, archive, contentHeader] = await Promise.all([
     readFile(new URL("../app/_studio/components/immersive-studio.tsx", import.meta.url), "utf8"),
@@ -262,6 +297,7 @@ test("keeps blog sources locale-first and dates them from Git", async () => {
   assert.equal(blogIndex.total, canonicalSlugs.size);
   assert.equal(blogIndex.translationTotal, blogIndex.articles.length);
   assert.equal(markdown.length, blogIndex.translationTotal);
+  assert.ok(blogIndex.articles.every((article) => article.publishedAt && !Number.isNaN(Date.parse(article.publishedAt))));
   if (process.env.REQUIRE_GIT_DATES === "1") {
     assert.ok(blogIndex.articles.every((article) => article.dateSource === "git"));
   }
