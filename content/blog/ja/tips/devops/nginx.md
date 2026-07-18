@@ -1,13 +1,13 @@
 ---
 title: nginx リバースプロキシ入門
-author: Lee
+author: リー
 ---
 
 ## 概要
 
 本チュートリアルは Debian をベースに、nginx を使って稼働中の Docker コンテナへリバースプロキシする例を示します。
 
-### 为什么要反代？
+### なぜリバースプロキシを使うのか？
 
 以下はインターネットから調べたものです：
 
@@ -25,7 +25,7 @@ SSL通信の暗号化／復号。
 
 ### 例を挙げると
 
-例えば、サーバー上で a、b、c の3つのサイトを運用したいとします。 これらはどれも443番ポートが必要ですが、サーバーのIPは1つしかなく、443を3つに分けることはできません。
+例えば、サーバー上で a、b、c の3つのウェブサイトを実行したい場合、これらのウェブサイトはすべて443番ポートを使う必要がありますが、サーバーにはIPが1つしかなく、3つの443を分けられません.
 
 このときリバースプロキシnginxが443番ポートを一括管理し、a.leetfs.comでアクセスするユーザーはサイトaへ、b.leetfs.com経由のユーザーはサイトbへ、cも同じように振り分けます。
 
@@ -67,7 +67,7 @@ services:
 
 ## nginx 設定ファイルの編集
 
-サイト設定ディレクトリ `/etc/nginx/sites-available/` に移動し、新しい設定ファイルを作成します。 ここではファイル名を `weblate` とします。
+サイト設定ディレクトリ `/etc/nginx/sites-available/` に移動し、新しい設定ファイルを作成します。ここではファイル名を `weblate` とします
 
 設定ファイルの内容は以下のコードを参考にしてください：
 
@@ -114,7 +114,7 @@ sudo ln -s /etc/nginx/sites-available/weblate /etc/nginx/sites-enabled/
 
 ### 証明書の取得
 
-先ほどの `ssl_certificate` と `ssl_certificate_key` には証明書と秘密鍵パスを記入してください。 [Certbotによる自動SSL証明書取得](https://leetfs.com/tips/certbot) を参考にしてください。
+上記の `ssl_certificate` と `ssl_certificate_key` には証明書と秘密鍵のパスを記入し、[Certbot による SSL 証明書の自動取得](https://leetfs.com/tips/certbot) を参照してください
 
 ## サイト設定の無効化
 
@@ -128,19 +128,19 @@ sudo rm /etc/nginx/sites-enabled/ファイル名
 
 ## 同時接続/リクエストレート制限を追加
 
-放到 http 块下。
+httpブロックの下に配置します。
 
 ```bash
 # etc/nginx/nginx.conf
 
-# 同時接続制限（1IPあたりの同時接続数は20を超えない）
+# 同時接続数制限 (1 IP あたりの同時接続数が 20 を超えないようにする)
 limit_conn_zone $binary_remote_addr zone=per_ip_conn:10m;
 limit_conn per_ip_conn 20;
 
-# リクエストレート制限（1IPあたりのリクエストは秒間20回まで）
+# リクエストレート制限 (1 IP あたり 1 秒間に最大 20 リクエスト)
 limit_req_zone $binary_remote_addr zone=per_ip_req:10m rate=20r/s;
 
-# バーストパラメータ、ユーザーエクスペリエンスを向上（バーストアクセス時に即時制限しない）
+# バーストパラメータ、ユーザーエクスペリエンス向上 (バーストアクセス時にすぐに制限しない)
 limit_req zone=per_ip_req burst=40 nodelay;
 
 ```
