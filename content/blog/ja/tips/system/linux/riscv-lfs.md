@@ -1,6 +1,6 @@
 ---
 title: RISCV 64 glibc + systemd LFS 完全攻略
-author: リー
+author: Lee
 ---
 
 ## 依存関係のインストール
