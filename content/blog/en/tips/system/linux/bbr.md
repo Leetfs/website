@@ -3,7 +3,7 @@ title: Enable BBR Congestion Control Algorithm on Debian
 author: Lee
 ---
 
-## Manual Method
+## 手动挡
 
 Edit the `etc/sysctl.conf` file and add the following at the end:
 
@@ -14,7 +14,7 @@ net.ipv4.tcp_congestion_control=bbr
 
 Run `sysctl -p` to save and apply the changes
 
-## Automatic Method
+## 自动挡
 
 ```text
 echo -e "\nnet.core.default_qdisc=fq\nnet.ipv4.tcp_congestion_control=bbr" >> /etc/sysctl.conf && sysctl -p
