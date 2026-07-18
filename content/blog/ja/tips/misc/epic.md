@@ -1,6 +1,6 @@
 ---
 title: EpicGamesをプロフィールページに公開する
-author: リー
+author: Lee
 ---
 
 ## 用途
