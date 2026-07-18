@@ -57,7 +57,7 @@ On a GitHub repository page, pressing the `.` key switches to the web version of
 
 These are questions commonly encountered when teaching newcomers. This section is continuously updated.
 
-### What if I can't find my forked repository?
+### 找不到分叉出的仓库了怎么办？
 
 Click your avatar in the upper right corner, then select `Your repositories` from the sidebar that appears.
 
