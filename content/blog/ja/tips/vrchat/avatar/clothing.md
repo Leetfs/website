@@ -1,6 +1,6 @@
 ---
 title: 着替え
-author: リー
+author: Lee
 ---
 
 ## ボーン制御プラグイン lilycalInventory をインストール
