@@ -5,9 +5,9 @@ author: Lee
 
 ## Overview
 
-DN42 is a large dynamic virtual private network (VPN) that employs various internet technologies (such as BGP, whois database, DNS, etc.).Participants connect to each other via network tunnels (GRE, OpenVPN, WireGuard, Tinc, IPsec) and exchange routes with the help of the Border Gateway Protocol (BGP).参与者通过网络隧道（GRE、OpenVPN、WireGuard、Tinc、IPsec）相互连接，并借助边界网关协议（BGP）进行路由交换。
+DN42 is a large dynamic virtual private network (VPN) that employs various internet technologies (such as BGP, whois database, DNS, etc.).Participants connect to each other via network tunnels (GRE, OpenVPN, WireGuard, Tinc, IPsec) and exchange routes with the help of the Border Gateway Protocol (BGP).
 
-DN42 can be used to learn about networking and to connect private networks, such as hacker spaces or community networks.But most importantly, experimenting with routing in DN42 is a lot of fun!但最重要的是，在 DN42 中进行路由实验非常有趣！
+DN42 can be used to learn about networking and to connect private networks, such as hacker spaces or community networks.But most importantly, experimenting with routing in DN42 is a lot of fun!
 
 ## Install WireGuard
 
