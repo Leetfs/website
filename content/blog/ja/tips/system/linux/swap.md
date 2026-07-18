@@ -1,6 +1,6 @@
 ---
 title: debianのswap設定
-author: Lee
+author: リー
 ---
 
 ## 作成
