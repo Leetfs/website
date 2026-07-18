@@ -1,6 +1,6 @@
 ---
 title: Linux DNSの変更
-author: リー
+author: Lee
 ---
 
 ## DNS管理プログラムの確認
