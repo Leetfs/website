@@ -1,6 +1,6 @@
 ---
 title: 初心者のためのGitHub貢献ガイド
-author: リー
+author: Lee
 ---
 
 ### 必要なツール
