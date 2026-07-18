@@ -3,7 +3,7 @@ title: Automatically unlock LUKS encrypted disk using clevis + tpm2
 author: Lee
 ---
 
-## Introduction
+## 引言
 
 By default, you need to manually enter the password every time you boot. Use tpm2 to replace manual input and automatically authorize.
 
