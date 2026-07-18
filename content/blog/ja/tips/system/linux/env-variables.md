@@ -1,6 +1,6 @@
 ---
 title: 環境変数の永続化
-author: リー
+author: Lee
 ---
 
 ## 設定
