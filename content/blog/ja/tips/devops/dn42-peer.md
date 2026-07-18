@@ -1,6 +1,6 @@
 ---
 title: DN42ピアリングチュートリアル
-author: リー
+author: Lee
 ---
 
 ## 概要
