@@ -1,6 +1,6 @@
 ---
 title: WSLでWindows gpg4winをエレガントに呼び出してGit署名を行う
-author: リー
+author: Lee
 ---
 
 ## ファイルの変更/追加
