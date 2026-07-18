@@ -1,6 +1,6 @@
 ---
 title: RVRegisterClass、VGPR と RISCVReg VGPR
-author: Lee
+author: リー
 ---
 
 ## 例
