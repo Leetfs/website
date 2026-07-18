@@ -1,6 +1,6 @@
 ---
 title: Vitepress カスタムフォント
-author: リー
+author: Lee
 ---
 
 ## 手順
