@@ -1,5 +1,5 @@
 ---
-title: Persist environment variables
+title: Persisting Environment Variables
 author: Lee
 ---
 
@@ -18,5 +18,5 @@ export VENTUS_INSTALL_PREFIX=/root/J142/llvm-project/install
 export SPIKE_TARGET_DIR=${VENTUS_INSTALL_PREFIX}
 export LD_LIBRARY_PATH=${VENTUS_INSTALL_PREFIX}/lib
 export OCL_ICD_VENDORS=${VENTUS_INSTALL_PREFIX}/lib/libpocl.so
-export POCL_DEVICES="ventus"
+export POCL_DEVICES=\"ventus\"
 ```
