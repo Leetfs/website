@@ -3,7 +3,7 @@ title: Ubuntu 設定で蓋を閉じてもスリープしない
 author: リー
 ---
 
-## 変更ファイル
+## ファイルの編集
 
 ```bash
 sudo nano /etc/systemd/logind.conf
