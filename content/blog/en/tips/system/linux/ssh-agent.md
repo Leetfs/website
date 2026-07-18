@@ -5,7 +5,7 @@ author: Lee
 
 ## Use Cases
 
-During development, to use SSH keys more securely on remote servers, it is recommended to invoke local keys through SSH agent forwarding, instead of storing the keys directly on the server.This can effectively reduce the risk of key leakage and improve overall security.这可以有效避免密钥泄露风险，提高整体安全性。
+During development, to use SSH keys more securely on remote servers, it is recommended to invoke local keys through SSH agent forwarding, instead of storing the keys directly on the server.This can effectively reduce the risk of key leakage and improve overall security.
 
 ## Configuration
 
@@ -17,7 +17,7 @@ First, ensure that your local ssh is running correctly. You can use the `ssh-add
 
 ### Set up ssh agent forwarding
 
-Open the `User folder/.ssh/config` file and add `ForwardAgent yes` under the server configuration where you want to enable ssh agent forwarding.
+Open the `User folder/.ssh/config` file and add `ForwardAgent yes` under the server configuration where you want to enable ssh agent forwarding
 
 Example:
 
