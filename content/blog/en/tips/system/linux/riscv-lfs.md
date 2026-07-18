@@ -35,7 +35,7 @@ export PATH=$LFS/cross-tools/bin:$PATH
 
 ## Build RISC-V GNU Compiler Toolchain
 
-Initially considered downloading pre-built binaries, but thought it didn't align with the LFS philosophy, so decided to compile it myself
+开始想直接下载成品二进制，想了想好像和lfs精神不符，遂自行编译
 
 ```bash
 mkdir $LFS/cross-tools/riscv-gnu-toolchain
