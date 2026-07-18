@@ -5,7 +5,7 @@ author: Lee
 
 ## Configure OBS
 
-Omitted
+略
 
 ## Pull
 
