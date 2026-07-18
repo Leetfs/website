@@ -7,11 +7,11 @@ author: Lee
 
 公式ドキュメント参照: <https://www.home-assistant.io/installation>
 
-私はDocker composeでインストールしています。皆さんにもこの方法をおすすめします。[公式ドキュメント](https://www.home-assistant.io/installation/linux#docker-compose)
+私はDocker composeでインストールしています。 皆さんにもこの方法をおすすめします。[公式ドキュメント](https://www.home-assistant.io/installation/linux#docker-compose)
 
-## リバースプロキシ
+## 反代
 
-Home Assistantのセキュリティポリシーではリバースプロキシがデフォルトで禁止されています。`configuration.yaml` を変更します。
+Home Assistantのセキュリティポリシーではリバースプロキシがデフォルトで禁止されています。 `configuration.yaml` を変更します。
 
 ```yaml
 # configuration.yaml
@@ -34,7 +34,7 @@ http:
 
 ### WebSocket
 
-WebSocketを有効にする必要があります。有効でないと正常にアクセスできません。
+WebSocketを有効にする必要があります。 有効でないと正常にアクセスできません。
 
 ```
     # リバースプロキシ設定
