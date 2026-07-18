@@ -1,6 +1,6 @@
 ---
 title: RISC-V GNU コンパイラツールチェーン
-author: Lee
+author: リー
 ---
 
 ## 前提条件
@@ -22,7 +22,7 @@ rm /tmp/riscv64-toolchain.tar.xz # アーカイブを削除
 export PATH=/opt/riscv/bin:$PATH # 環境変数の設定
 ```
 
-以下のコマンドで正しくインストールされたかテストできます（以下は glibc ツールチェーン用。 他のバージョンは公式ドキュメントを参照してください）。
+以下のコマンドで正しくインストールされたかテストできます（以下は glibc ツールチェーン用。他のバージョンは公式ドキュメントを参照してください~）
 
 ```bash
 riscv64-unknown-linux-gnu-gcc --version
