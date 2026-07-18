@@ -1,6 +1,6 @@
 ---
 title: パッケージビルドと修正ガイド
-author: リー
+author: Lee
 ---
 
 ## obsの設定
