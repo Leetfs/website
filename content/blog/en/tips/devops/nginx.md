@@ -7,25 +7,25 @@ author: Lee
 
 This tutorial is based on Debian, using nginx as a reverse proxy example for Docker containers already running.
 
-### 为什么要反代？
+### Why use a reverse proxy?
 
 The following is information found online:
 
 A reverse proxy is a type of server that receives client requests, forwards them to web servers, and then returns the results to the client, as if the proxy server had directly handled the request itself.
 
-A reverse proxy proxies for servers, standing on the same side as the web servers.The real servers are invisible to clients.That is why it is called "reverse".其真实服务器对于客户端不可见。这就是它叫“反向”的原因。
+A reverse proxy proxies for servers, standing on the same side as the web servers.The real servers are invisible to clients.That is why it is called "reverse".
 
 Reverse proxy can be used for:
 
-保护服务器，隐藏服务器真实 IP。
-负载均衡，根据访问流量和服务器负载情况，将请求分发到不同服务器上。
-缓存静态内容以及部分短时间的大量动态请求。
-作为应用层防火墙提供防护。
-加密/解密 SSL 通信。
+Protecting servers by hiding their real IP addresses.
+Load balancing: distributing requests among different servers according to traffic and server load.
+Caching static content and handling large volumes of short-lived dynamic requests.
+Serving as an application layer firewall for protection.
+Encrypting/decrypting SSL communication.
 
 ### For example
 
-For example, if we need to run three websites (a, b, c) on a server, all needing port 443, but the server has only one IP and can’t allocate three 443 ports.
+For example, we need to run three websites a, b, and c on the server, all of which need to use port 443, but our server only has one ip and cannot separate out three 443 ports.
 
 At this point, reverse proxy appears: nginx takes over port 443, and routes users accessing a.leetfs.com to site a, users accessing b.leetfs.com to site b, and similarly for c.
 
@@ -34,7 +34,7 @@ At this point, reverse proxy appears: nginx takes over port 443, and routes user
 1. Update the system index: `sudo apt update`
 2. Install nginx: `sudo apt install nginx`
 
-After installation is complete, Nginx will automatically start and be set to launch on boot. You can check Nginx’s status with `sudo systemctl status nginx`.
+After installation is complete, Nginx will automatically start and be set to launch on boot. You can check Nginx's status with `sudo systemctl status nginx`.
 
 ## Configure nginx
 
@@ -46,7 +46,7 @@ Next, we will configure nginx by modifying files in the `/etc/nginx/sites-availa
 
 ## Reverse proxy to docker
 
-Our host runs the Weblate service via Docker. It would not be ideal for the container to directly take over the server's port 443, as this would restrict the port to only one service on the server.
+Our host runs the Weblate service via Docker. It would be inelegant for the container to directly take over the server's port 443 by default, as this would result in the server's port 443 only running this one service.
 
 > You need to have some understanding of docker to read this section.
 
@@ -67,7 +67,7 @@ First, we change port 443, the standard https port, to another unused port on th
 
 ## Modify nginx configuration file
 
-Switch to the website configuration directory: `/etc/nginx/sites-available/`. Create a new configuration file, named `weblate` in this example.
+Switch to the website configuration directory: `/etc/nginx/sites-available/`, create a new configuration file, which I'll name `weblate`
 
 Refer to the following code for the configuration file content:
 
@@ -103,7 +103,7 @@ server {
 
 ```
 
-After modifying the configuration file, create a symbolic link to enable it (remember to change 'weblate' to your own file name).
+After modifying the configuration file, create a symbolic link to enable it (remember to change weblate to your own file name)
 
 ```bash
 sudo ln -s /etc/nginx/sites-available/weblate /etc/nginx/sites-enabled/
@@ -114,7 +114,7 @@ sudo ln -s /etc/nginx/sites-available/weblate /etc/nginx/sites-enabled/
 
 ### Obtain the certificate
 
-For the `ssl_certificate` and `ssl_certificate_key` above, you need to fill in the certificate and private key paths. Refer to [Certbot: Automatically Obtain SSL Certificates](https://leetfs.com/tips/certbot).
+For the `ssl_certificate` and `ssl_certificate_key` above, you need to fill in the certificate and private key paths. Refer to [Certbot: Automatically Obtain SSL Certificates](https://leetfs.com/tips/certbot)
 
 ## Disable site configuration
 
