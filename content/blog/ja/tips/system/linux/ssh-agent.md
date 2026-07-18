@@ -1,6 +1,6 @@
 ---
 title: ssh エージェント転送
-author: リー
+author: Lee
 ---
 
 ## 使用シナリオ
