@@ -3,7 +3,7 @@ title: Fix GPG signature errors in terminal environments
 author: Lee
 ---
 
-## Troubleshooting
+## 排查问题
 
 When connecting to the server via terminal and using the GPG key within Yubikey to sign Git commits, an error appears. Brief troubleshooting steps:
 
@@ -47,4 +47,4 @@ Retest signing:
 
 ![](/tips/system/linux/pubilc/gpg-sign-img/gpg-sign-4.png)
 
-The verification prompt appears successfully, and the issue is resolved.
+成功弹出校验框，至此问题解决。
