@@ -1,6 +1,6 @@
 ---
 title: Linux DNSの変更
-author: Lee
+author: リー
 ---
 
 ## DNS管理プログラムの確認
@@ -51,7 +51,7 @@ resolv.confの再生成
 sudo resolvconf -u
 ```
 
-以下のコマンドを実行してDNS設定を確認します。
+以下のコマンドを実行してDNS設定を確認します
 
 ```bash
 cat /etc/resolv.conf
