@@ -1,6 +1,6 @@
 ---
 title: Debian での Docker インストール
-author: リー
+author: Lee
 ---
 
 ## Docker のインストール
