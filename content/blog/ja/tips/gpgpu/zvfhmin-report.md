@@ -1,6 +1,6 @@
 ---
 title: RISC-V Zvfh(min) 拡張サポート調査報告書（LLVM CodeGen段階）
-author: Lee
+author: リー
 ---
 
 ## 著作権声明
@@ -16,7 +16,7 @@ author: Lee
 ### 開発背景
 
 - Ventus 向けに半精度16ビットhalf浮動小数点データ型のサポート追加
-- 本プロジェクトはhalf型の段階的なサポート（スカラ型（Zhinx(min)）およびベクトル型（Zvfh(min)））を目標とします
+- プロジェクトの目標は、half型の段階的なサポートであり、スカラ（Zhinx(min)）とベクトル（Zvfh(min)）を含みます。
 - Zhinx(min)拡張は基本的に動作し、現在PRのレビューおよび修正中です
 
 ### ニーズ分析
