@@ -3,7 +3,7 @@ title: DebianでBBR輻輳制御アルゴリズムを有効にする
 author: Lee
 ---
 
-## マニュアルモード
+## 手动挡
 
 `etc/sysctl.conf` ファイルを編集し、末尾に以下を追加してください：
 
