@@ -3,11 +3,11 @@ title: パッケージビルドと修正ガイド
 author: リー
 ---
 
-## 配置obs
+## obsの設定
 
-略
+省略
 
-## 拉取
+## プル
 
 ```bash
 osc co home:Lee/xxx && cd $_
@@ -38,8 +38,8 @@ rpm -qp --queryformat '%{ARCH}\n' libraw-0.22.0-1.or.riscv64.rpm
 ## podmanコンテナ内でテスト実行する
 
 ```bash
-podman run --rm -it -v /你的/RPM/路径/:/mnt:z system:amd64 /bin/bash
-podman run --rm -it -v /你的/RPM/路径/:/mnt:z system:riscv64 /bin/bash
+podman run --rm -it -v /あなたの/RPM/パス/:/mnt:z system:amd64 /bin/bash
+podman run --rm -it -v /あなたの/RPM/パス/:/mnt:z system:riscv64 /bin/bash
 
 ls -F /mnt
 dnf install /mnt/*.rpm
@@ -53,12 +53,12 @@ sudo losetup -Pf --show system-virt_riscv64.raw
 
 # 一時マウントポイントを作成
 mkdir -p ./tmp_root
-# 2番目のパーティション（ルートパーティション）をマウント
+# 二番目のパーティション（ルートパーティション）をマウント
 sudo mount /dev/loop0p2 ./tmp_root
 # 古いイメージを削除
 podman rmi system:riscv64
 # ファイルを抽出してインポート
-# --numeric-ownerを追加して権限IDを元の状態に保証
+# --numeric-ownerを追加して権限IDを元の状態に保つ
 sudo tar -C ./tmp_root --numeric-owner -cf - . | podman import - system:riscv64
 
 # マウントをクリーンアップ
