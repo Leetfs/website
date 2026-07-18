@@ -1,6 +1,6 @@
 ---
 title: 着替え
-author: Lee
+author: リー
 ---
 
 ## ボーン制御プラグイン lilycalInventory をインストール
@@ -15,16 +15,16 @@ author: Lee
 
 モデルを右クリックし、`Prefab -> Unpack Completely`
 
-![clothing-unpack](/tips/vrchat/avatar/image/clothing-unpack.png)
+![衣類の展開](/tips/vrchat/avatar/image/clothing-unpack.png)
 
 ## 空のオブジェクトを作成
 
-![clothing-create-empty](/tips/vrchat/avatar/image/clothing-create-empty.png)
+![衣類の空オブジェクト作成](/tips/vrchat/avatar/image/clothing-create-empty.png)
 
 ## コンポーネントを追加
 
-![clothing-add-component](/tips/vrchat/avatar/image/clothing-add-component.png)
+![衣類のコンポーネント追加](/tips/vrchat/avatar/image/clothing-add-component.png)
 
 ## メニューを追加
 
-![clothing-add-menu](/tips/vrchat/avatar/image/clothing-add-menu.png)
+![衣類のメニュー追加](/tips/vrchat/avatar/image/clothing-add-menu.png)
