@@ -41,7 +41,7 @@ sudo apt update
 sudo apt install docker-ce docker-ce-cli containerd.io
 ```
 
-### Docker を起動し、自動起動を設定
+### 启动并设置为开机自启
 
 ```bash
 sudo systemctl start docker
@@ -58,7 +58,7 @@ sudo docker --version
 
 ## Docker Compose のインストール
 
-オプションです。必要に応じてインストールしてください。
+オプションです。 必要に応じてインストールしてください。
 
 ```bash
 sudo apt install docker-compose
