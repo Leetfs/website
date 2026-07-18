@@ -1,6 +1,6 @@
 ---
 title: Triton の使用体験とパフォーマンス分析
-author: リー
+author: Lee
 ---
 
 ## 概要
