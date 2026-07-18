@@ -1,6 +1,6 @@
 ---
 title: ssh エージェント転送
-author: Lee
+author: リー
 ---
 
 ## 使用シナリオ
@@ -17,7 +17,7 @@ author: Lee
 
 ### ssh エージェント転送の設定
 
-`ユーザーフォルダ/.ssh/config` ファイルを開き、sshエージェント転送を有効にしたいサーバー設定の下に `ForwardAgent yes` を追加してください。
+`ユーザーフォルダ/.ssh/config` ファイルを開き、sshエージェント転送を有効にしたいサーバー設定の下に `ForwardAgent yes` を追加してください
 
 例：
 
