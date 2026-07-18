@@ -1,13 +1,13 @@
 ---
 title: Vitepress カスタムフォント
-author: Lee
+author: リー
 ---
 
-## 方法
+## 手順
 
-フォントファイルを「pubilc」または「assets」フォルダに入れます。
+フォントファイルを `pubilc` または `assets` フォルダに入れます。
 
-「.vitepress/theme/style.css」を開き、末尾に次の内容を追加します：
+`.vitepress/theme/style.css` を編集し、末尾に追加します：
 
 ```css
 @font-face {
