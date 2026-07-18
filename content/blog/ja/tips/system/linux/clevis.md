@@ -1,6 +1,6 @@
 ---
 title: clevis + tpm2を使用してLUKS暗号化ディスクの自動ロック解除を行う
-author: リー
+author: Lee
 ---
 
 ## はじめに
