@@ -1,6 +1,6 @@
 ---
 title: 実用的なプラグインおすすめ
-author: リー
+author: Lee
 ---
 
 ## LocatorJS
