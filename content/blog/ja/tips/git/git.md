@@ -1,6 +1,6 @@
 ---
 title: Gitの簡単入門
-author: リー
+author: Lee
 ---
 
 ## インストール
