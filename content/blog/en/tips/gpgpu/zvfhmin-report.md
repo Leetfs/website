@@ -5,7 +5,7 @@ author: Lee
 
 ## Copyright Notice
 
-本文最初发表于 [xlinsist/llvm-project Issue #2](https://github.com/xlinsist/llvm-project/issues/2)，原作者为本人。This article was originally published at [xlinsist/llvm-project Issue #2](https://github.com/xlinsist/llvm-project/issues/2) by myself as the original author.Follows the original repository license [Apache License 2.0](https://github.com/xlinsist/llvm-project/blob/main/LICENSE.TXT).Based on this, it is reposted and slightly revised on this blog.在此基础上，转载并稍作整理发布于本博客。
+This article was originally published at [xlinsist/llvm-project Issue #2](https://github.com/xlinsist/llvm-project/issues/2) by myself as the original author.Follows the original repository license [Apache License 2.0](https://github.com/xlinsist/llvm-project/blob/main/LICENSE.TXT).Based on this, it is reposted and slightly revised on this blog.
 
 ## Overview
 
@@ -21,7 +21,7 @@ author: Lee
 
 ### Requirement Analysis
 
-- Half has lower precision and range, and offers smaller memory usage and higher throughput
+- half has lower precision and range, and offers smaller memory usage and higher throughput
 
 ## Official Zvfh(min) Patch Summary
 
@@ -58,7 +58,7 @@ author: Lee
 | Type                   | Purpose                                                            | Example                         |
 | ---------------------- | ------------------------------------------------------------------ | ------------------------------- |
 | Instruction Generation | Verify whether half-precision instructions are generated correctly | Rewrite `float.ll` to `half.ll` |
-| Type Conversion        | Conversion between half and float32                                | `vfwcvt.f.f.v`, `vfncvt.f.f.w`  |
+| Type Conversion        | conversion between half and float32                                | `vfwcvt.f.f.v`, `vfncvt.f.f.w`  |
 
 ## Supplement
 
