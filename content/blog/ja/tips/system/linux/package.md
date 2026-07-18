@@ -3,11 +3,11 @@ title: パッケージビルドと修正ガイド
 author: リー
 ---
 
-## OBSの設定
+## 配置obs
 
 略
 
-## チェックアウト
+## 拉取
 
 ```bash
 osc co home:Lee/xxx && cd $_
