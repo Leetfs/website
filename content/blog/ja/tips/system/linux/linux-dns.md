@@ -11,7 +11,7 @@ author: Lee
 
 DNSが引き継がれていない場合、または引き継がれていて一時的に変更したい場合に適用できます。
 
-`etc/resolv.conf` を開き、`nameserver` パラメータを編集します。例：
+`etc/resolv.conf` を開き、`nameserver` パラメータを編集します。 例：
 
 ```text
 nameserver 1.1.1.1
@@ -22,7 +22,7 @@ nameserver 2606:4700:4700::1001
 
 ## systemd-resolvedによる変更
 
-`etc/systemd/resolved.conf` を開き、`DNS=` パラメータを編集します。例：
+`etc/systemd/resolved.conf` を開き、`DNS=` パラメータを編集します。 例：
 
 ```text
 DNS= 1.1.1.1 1.0.0.1 2606:4700:4700::1111 2606:4700:4700::1001
