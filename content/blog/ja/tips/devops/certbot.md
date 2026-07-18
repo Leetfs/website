@@ -45,11 +45,11 @@ cloudflare を例に：
 3. 新しくファイル `/etc/letsencrypt/cloudflare.ini` を作成し、このパラメータ `dns_cloudflare_api_token = あなたのトークン` を記入します
 4. `sudo certbot certonly -d あなたのドメイン` を実行し、指示に従って dns 検証を選択してください。
 
-> 申請後は `cloudflare.ini` を削除しないことを推奨します。certbot により自動更新が必要です。
+> 申請後は `cloudflare.ini` を削除しないことを推奨します。 certbot により自動更新が必要です。
 
 ## 証明書の利用
 
-設定が成功すると、ターミナルに証明書と秘密鍵のパスが表示されます。そのパスを `ssl_certificate` および `ssl_certificate_key` に入力して利用できます。
+設定が成功すると、ターミナルに証明書と秘密鍵のパスが表示されます。 そのパスを `ssl_certificate` および `ssl_certificate_key` に入力して利用できます。
 
 その他の設定については [nginx リバースプロキシ入門](./nginx.md) を参照してください
 
@@ -67,4 +67,4 @@ sudo certbot delete --cert-name 証明書名
 
 ## 注意
 
-certbot は nginx の `etc/nginx/sites-available/default` ファイルに自動で関連設定を追加しますが、これはサイト設定ファイルと衝突する場合があります。`# managed by Certbot` のある行はコメントアウトしてください。
+certbot は nginx の `etc/nginx/sites-available/default` ファイルに自動で関連設定を追加しますが、これはサイト設定ファイルと衝突する場合があります。 `# managed by Certbot` のある行はコメントアウトしてください。

@@ -21,7 +21,7 @@ This article was originally published at [xlinsist/llvm-project Issue #2](https:
 
 ### Requirement Analysis
 
-- Half has lower precision and range, and offers smaller memory usage and higher throughput
+- half has lower precision and range, and offers smaller memory usage and higher throughput
 
 ## Official Zvfh(min) Patch Summary
 
@@ -58,7 +58,7 @@ This article was originally published at [xlinsist/llvm-project Issue #2](https:
 | Type                   | Purpose                                                            | Example                         |
 | ---------------------- | ------------------------------------------------------------------ | ------------------------------- |
 | Instruction Generation | Verify whether half-precision instructions are generated correctly | Rewrite `float.ll` to `half.ll` |
-| Type Conversion        | Conversion between half and float32                                | `vfwcvt.f.f.v`, `vfncvt.f.f.w`  |
+| Type Conversion        | conversion between half and float32                                | `vfwcvt.f.f.v`, `vfncvt.f.f.w`  |
 
 ## Supplement
 

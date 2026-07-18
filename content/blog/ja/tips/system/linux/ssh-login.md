@@ -13,8 +13,7 @@ author: Lee
 /etc/ssh/sshd_config ファイルを編集し、以下のパラメータを変更します：
 
 ```text
-PubkeyAuthentication yes
-PasswordAuthentication no
+PubkeyAuthentication yes\nPasswordAuthentication no
 ```
 
 ## sshサービスの再起動

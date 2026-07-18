@@ -1,5 +1,5 @@
 ---
-title: Debian Configure Swap
+title: Configure Swap on Debian
 author: Lee
 ---
 
@@ -43,7 +43,7 @@ Open the etc/fstab file and add at the end:
 
 ### Change swap activation threshold
 
-Open etc/sysctl.conf and modify the value after `vm.swappiness=80`.If it does not exist, add a new line.
+Open the etc/sysctl.conf file and modify the value after `vm.swappiness=80`.If it does not exist, add a new line.
 
 ### Change swap size
 

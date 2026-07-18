@@ -35,7 +35,7 @@ export PATH=$LFS/cross-tools/bin:$PATH
 
 ## Build RISC-V GNU Compiler Toolchain
 
-Initially considered downloading pre-built binaries, but thought it didn't align with the LFS philosophy, so decided to compile it myself
+initially considered downloading prebuilt binaries, but upon reflection, this seemed against the LFS spirit, so I compiled it myself
 
 ```bash
 mkdir $LFS/cross-tools/riscv-gnu-toolchain
@@ -497,7 +497,7 @@ sudo mkdir -p $LFS/rootfs/root
 cat << EOF | sudo tee $LFS/rootfs/root/.bash_profile
 echo "****************************************"
 echo "   Welcome to Lee's RISC-V LFS system!"
-echo "      System kernel:\$(uname -r)"
+echo "      System kernel:$(uname -r)"
 echo "****************************************"
 fastfetch
 

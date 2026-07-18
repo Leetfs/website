@@ -17,7 +17,7 @@ sudo apt install -y git build-essential clang cmake ninja-build ccache zlib1g-de
 ## ファイルのダウンロード
 
 :::tip
-フォルダを作成し、全てのリポジトリをそのディレクトリにクローンします。ここではファイル名を `J142` とします。
+フォルダを作成し、全てのリポジトリをそのディレクトリにクローンします。 ここではファイル名を `J142` とします。
 :::
 
 - llvm-ventus : `git clone https://github.com/THU-DSP-LAB/llvm-project.git`

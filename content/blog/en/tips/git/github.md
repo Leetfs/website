@@ -5,7 +5,7 @@ author: Lee
 
 ### Required Tools
 
-- VS Code (optional)
+- vscode (optional)
 - Git (optional)
 - A browser
 
@@ -49,21 +49,21 @@ Wait for the upstream repository maintainer to merge your pull request
 
 ### Tips
 
-On a GitHub repository page, pressing the `.` key switches to the web version of VS Code, where editing can sometimes be more convenient than the native editor.
+On a GitHub repository page, pressing the `.` key switches to the web version of vs code, where editing can sometimes be more convenient than the native editor.
 
 > You can practice with [this repository](https://github.com/Leetfs/blog); start by adding missing punctuation or correcting typos~
 
 ## FAQ
 
-These are questions commonly encountered when teaching newcomers. This section is continuously updated.
+Questions encountered when teaching newcomers, continuously updating
 
 ### What if I can't find my forked repository?
 
-Click your avatar in the upper right corner, then select `Your repositories` from the sidebar that appears.
+Click your avatar in the upper right corner, then select `Your repositories` from the sidebar that appears
 
 ![](/tips/git/github-img/image9.png)
 
-On the page, select the repository you want to switch to.
+On the page, select the repository you want to switch to
 
 ![](/tips/git/github-img/image10.png)
 
@@ -71,6 +71,6 @@ On the page, select the repository you want to switch to.
 
 > Clicking the `Forked from ...` below the repository name will jump to the upstream repository, but usually you can only push changes to upstream via PR (pull request) unless you have direct push access to the upstream repository.
 
-## About pushing with VS Code and Git
+## About pushing with vscode and git
 
 See other articles in this series

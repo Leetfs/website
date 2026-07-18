@@ -1,9 +1,9 @@
 ---
-title: Ubuntu settings to prevent sleep when lid is closed
+title: "Ubuntu: Disable Sleep on Lid Close"
 author: Lee
 ---
 
-## File modifications
+## Modify File
 
 ```bash
 sudo nano /etc/systemd/logind.conf
@@ -11,7 +11,7 @@ sudo nano /etc/systemd/logind.conf
 
 Find `#HandleLidSwitch=suspend` and change it to `HandleLidSwitch=ignore`
 
-## Restart service
+## Restart Service
 
 ```bash
 service systemd-logind restart

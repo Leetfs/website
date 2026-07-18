@@ -56,7 +56,7 @@ git clone https://github.com/Leetfs/blog ./lee-blog
 
 By default, the cloned repository is placed in the current working directory, and the folder name defaults to the repository name.This command means placing the Git-cloned repository into the 'lee-blog' folder in this directory.
 
-> Tips: A path starting with / means starting from the root directory, for example, /lee means 'lee' under the root directory, and ./lee means 'lee' under the current working directory.
+> tips: A path starting with / means starting from the root directory, for example, /lee means 'lee' under the root directory, and ./lee means 'lee' under the current working directory
 
 ### Remote repository
 

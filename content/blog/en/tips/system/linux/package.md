@@ -1,5 +1,5 @@
 ---
-title: Package Building and Repair Guide
+title: Packaging and Package Repair Guide
 author: Lee
 ---
 
@@ -29,23 +29,23 @@ osc build --no-verify --clean riscv64 riscv64
 rpm -qpl /var/tmp/build-root/..../.rpm
 ```
 
-## Confirm package architecture
+## Confirm Package Architecture
 
 ```bash
 rpm -qp --queryformat '%{ARCH}\n' libraw-0.22.0-1.or.riscv64.rpm
 ```
 
-## Test run inside podman container
+## Test Run Inside Podman Container
 
 ```bash
-podman run --rm -it -v /你的/RPM/路径/:/mnt:z system:amd64 /bin/bash
-podman run --rm -it -v /你的/RPM/路径/:/mnt:z system:riscv64 /bin/bash
+podman run --rm -it -v /your/RPM/path/:/mnt:z system:amd64 /bin/bash
+podman run --rm -it -v /your/RPM/path/:/mnt:z system:riscv64 /bin/bash
 
 ls -F /mnt
 dnf install /mnt/*.rpm
 ```
 
-## How to import a raw image into podman
+## How to Import a Raw Image into Podman
 
 ```bash
 # Associate image with Loop device

@@ -1,5 +1,5 @@
 ---
-title: Linux Change DNS
+title: Modify DNS on Linux
 author: Lee
 ---
 
@@ -9,7 +9,7 @@ Run `cat /etc/resolv.conf` and check the file output for comments like `# Genera
 
 ## Directly modify resolv.conf
 
-Suitable for cases where DNS is not taken over or when you want to temporarily modify it even if it is.
+Use when DNS is not managed, or for temporary changes when it is.
 
 Open `etc/resolv.conf` and modify the `nameserver` parameter, for example:
 
@@ -22,7 +22,7 @@ nameserver 2606:4700:4700::1001
 
 ## Modify via systemd-resolved
 
-Open `etc/systemd/resolved.conf` and edit the `DNS=` parameter, for example:
+Open `etc/systemd/resolved.conf`, modify the `DNS=` parameter, for example:
 
 ```text
 DNS= 1.1.1.1 1.0.0.1 2606:4700:4700::1111 2606:4700:4700::1001

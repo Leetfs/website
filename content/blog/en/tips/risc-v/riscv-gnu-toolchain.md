@@ -22,7 +22,7 @@ rm /tmp/riscv64-toolchain.tar.xz # Remove archive
 export PATH=/opt/riscv/bin:$PATH # Set environment variable
 ```
 
-You can use the following commands to test if the installation is correct (the following commands are for the glibc toolchain; refer to the documentation for other versions).
+You can use the following commands to test if the installation is correct (the following commands are for the glibc toolchain; refer to the documentation for other versions)
 
 ```bash
 riscv64-unknown-linux-gnu-gcc --version
@@ -50,7 +50,7 @@ ENV PATH=/opt/riscv/bin:$PATH
 
 You can use this toolchain with cmake to cross-compile RISC-V programs.
 
-- Create a `toolchain-riscv64.cmake` (or any name you prefer) file as the CMake cross-compilation configuration file.
+- create a `toolchain-riscv64.cmake` (or any name you prefer) file as the CMake cross-compilation configuration file.
 - Use `cmake -D CMAKE_TOOLCHAIN_FILE=path/to/toolchain-riscv64.cmake` to specify this file.
 - Run `make -j $(nproc)` to build the binary program.
 

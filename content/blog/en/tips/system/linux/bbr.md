@@ -5,14 +5,14 @@ author: Lee
 
 ## Manual Method
 
-Edit the `etc/sysctl.conf` file and add the following at the end:
+Edit `etc/sysctl.conf` and append at the end:
 
 ```text
 net.core.default_qdisc=fq
 net.ipv4.tcp_congestion_control=bbr
 ```
 
-Run `sysctl -p` to save and apply the changes
+Run `sysctl -p` to save and apply
 
 ## Automatic Method
 

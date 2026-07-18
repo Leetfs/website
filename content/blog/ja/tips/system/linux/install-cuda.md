@@ -1,5 +1,5 @@
 ---
-title: CUDA Toolkit をインストールする
+title: CUDA Toolkit のインストール
 author: Lee
 ---
 
@@ -22,7 +22,7 @@ export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:/usr/local/cuda-12.8/include
 nvcc --version
 ```
 
-### 戻る
+### 出力
 
 ```text
 nvcc: NVIDIA (R) Cuda compiler driver

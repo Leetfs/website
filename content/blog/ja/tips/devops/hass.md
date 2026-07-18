@@ -7,23 +7,23 @@ author: Lee
 
 公式ドキュメント参照: <https://www.home-assistant.io/installation>
 
-私はDocker composeでインストールしています。皆さんにもこの方法をおすすめします。[公式ドキュメント](https://www.home-assistant.io/installation/linux#docker-compose)
+私はDocker composeでインストールしています。 皆さんにもこの方法をおすすめします。[公式ドキュメント](https://www.home-assistant.io/installation/linux#docker-compose)
 
 ## リバースプロキシ
 
-Home Assistantのセキュリティポリシーではリバースプロキシがデフォルトで禁止されています。`configuration.yaml` を変更します。
+Home Assistantのセキュリティポリシーではデフォルトでリバースプロキシが禁止されているため、`configuration.yaml`を変更します
 
 ```yaml
 # configuration.yaml
 http:
-  # nginxでのみSSLを設定することを推奨。内部リバースプロキシでは2重SSLは不要
+  # nginxでのみSSLを設定することを推奨、内部リバースプロキシでは二重SSLは不要
   #ssl_certificate: [.crtファイル]
   #ssl_key: [.keyファイル]
   use_x_forwarded_for: true
-  trusted_proxies: #リバースプロキシの許可IPリスト。該当しない場合は変更してください
+  trusted_proxies: #リバースプロキシのホワイトリスト、このIPでない場合は適宜変更
     - 127.0.0.1
     - ::1
-  server_host: 127.0.0.1 #このIPからのみ接続を受け付ける設定（リバースプロキシ経由のみ許可、オプション）
+  server_host: 127.0.0.1 #このIPからのみリッスンし、リバースプロキシ経由のみ許可（オプション）
 ```
 
 ## nginx 設定
@@ -32,9 +32,9 @@ http:
 
 証明書の取得：[CertbotでのSSL証明書自動取得](https://leetfs.com/tips/certbot)
 
-### WebSocket
+### ウェブソケット
 
-WebSocketを有効にする必要があります。有効でないと正常にアクセスできません。
+WebSocketを有効にしないと正常にアクセスできません
 
 ```
     # リバースプロキシ設定

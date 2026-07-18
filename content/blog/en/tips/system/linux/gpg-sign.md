@@ -28,7 +28,7 @@ gpg --card-status
 Test signing directly with GPG:
 
 ```bash
-echo \"test\" | gpg --clearsign
+echo "test" | gpg --clearsign
 ```
 
 Receive the output:

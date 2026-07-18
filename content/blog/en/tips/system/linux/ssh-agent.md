@@ -17,7 +17,7 @@ First, ensure that your local ssh is running correctly. You can use the `ssh-add
 
 ### Set up ssh agent forwarding
 
-Open the `User folder/.ssh/config` file and add `ForwardAgent yes` under the server configuration where you want to enable ssh agent forwarding.
+Open the `User folder/.ssh/config` file and add `ForwardAgent yes` under the server configuration where you want to enable ssh agent forwarding
 
 Example:
 

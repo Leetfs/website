@@ -1,6 +1,6 @@
 ---
 title: RISCV 64 glibc + systemd LFS 完全攻略
-author: リー
+author: Lee
 ---
 
 ## 依存関係のインストール
@@ -35,7 +35,7 @@ export PATH=$LFS/cross-tools/bin:$PATH
 
 ## RISC-V GNU コンパイラツールチェーンの構築
 
-最初は完成品のバイナリを直接ダウンロードしようと考えましたが、LFSの精神に合わないと思い、自分でコンパイルすることにしました。
+最初は完成品のバイナリを直接ダウンロードしようと思いましたが、よく考えるとLFSの精神に反すると思い、自分でコンパイルすることにしました。
 
 ```bash
 mkdir $LFS/cross-tools/riscv-gnu-toolchain
@@ -55,7 +55,7 @@ riscv64-unknown-linux-gnu-g++ --version
 
 ## ルートファイルシステム
 
-ルートファイルシステムを補完する必要があります。そうしないとエラーが発生します。
+ルートファイルシステムを補完しないとエラーが発生します
 
 ```bash
 mount: /procへのnoneのマウントに失敗しました: そのようなファイルまたはディレクトリはありません

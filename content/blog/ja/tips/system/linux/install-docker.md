@@ -26,7 +26,7 @@ curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o 
 ### Docker公式APTリポジトリを追加
 
 ```bash
-echo \"deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian $(lsb_release -cs) stable\" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 ```
 
 ### インデックスを再度更新する
@@ -58,7 +58,7 @@ sudo docker --version
 
 ## Docker Compose のインストール
 
-オプションです。必要に応じてインストールしてください。
+オプションです。必要に応じてインストールしてください
 
 ```bash
 sudo apt install docker-compose

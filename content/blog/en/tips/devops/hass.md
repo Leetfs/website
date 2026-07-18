@@ -11,19 +11,19 @@ I installed using Docker Compose and recommend this method.[Official documentati
 
 ## Reverse Proxy
 
-Home Assistant's security policy disables reverse proxy by default. Modify `configuration.yaml`.
+Home Assistant's security policy disables reverse proxy by default. Modify `configuration.yaml`
 
 ```yaml
 # configuration.yaml
 http:
-  # It is recommended to configure SSL only in nginx; there is no need for two layers of SSL for internal reverse proxies
+  # It is recommended to only configure SSL in nginx; internal reverse proxy does not need two layers of SSL
   #ssl_certificate: [.crt file]
   #ssl_key: [.key file]
   use_x_forwarded_for: true
-  trusted_proxies: #Reverse proxy whitelist. If not this IP, change it accordingly.
+  trusted_proxies: # reverse proxy allowlist; change if your IP is not this one
     - 127.0.0.1
     - ::1
-  server_host: 127.0.0.1 #Listen only to access from this IP, optional: restrict access to only via reverse proxy
+  server_host: 127.0.0.1 # listen only to access from this IP, used to restrict access only via reverse proxy (optional)
 ```
 
 ## nginx Configuration
