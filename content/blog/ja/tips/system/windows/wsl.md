@@ -1,6 +1,6 @@
 ---
 title: WSL のよく使うコマンド
-author: Lee
+author: リー
 ---
 
 ## デフォルトユーザーの設定
