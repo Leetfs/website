@@ -7,21 +7,21 @@ author: Lee
 
 This tutorial is based on Debian, using nginx as a reverse proxy example for Docker containers already running.
 
-### Why use a reverse proxy?
+### 为什么要反代？
 
 The following is information found online:
 
 A reverse proxy is a type of server that receives client requests, forwards them to web servers, and then returns the results to the client, as if the proxy server had directly handled the request itself.
 
-A reverse proxy proxies for servers, standing on the same side as the web servers.The real servers are invisible to clients.That is why it is called "reverse".
+A reverse proxy proxies for servers, standing on the same side as the web servers.The real servers are invisible to clients.That is why it is called "reverse".其真实服务器对于客户端不可见。这就是它叫“反向”的原因。
 
 Reverse proxy can be used for:
 
-Protecting servers by hiding their real IP addresses.
-Load balancing: distributing requests among different servers according to traffic and server load.
-Caching static content and handling large volumes of short-lived dynamic requests.
-Serving as an application layer firewall for protection.
-Encrypting/decrypting SSL communication.
+保护服务器，隐藏服务器真实 IP。
+负载均衡，根据访问流量和服务器负载情况，将请求分发到不同服务器上。
+缓存静态内容以及部分短时间的大量动态请求。
+作为应用层防火墙提供防护。
+加密/解密 SSL 通信。
 
 ### For example
 
