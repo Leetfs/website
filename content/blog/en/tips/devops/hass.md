@@ -7,9 +7,9 @@ author: Lee
 
 Refer to the official documentation: <https://www.home-assistant.io/installation>
 
-I installed using Docker Compose and recommend this method.[Official documentation](https://www.home-assistant.io/installation/linux#docker-compose)
+我使用 Docker compose 安装，推荐大家也使用此方案。I installed using Docker Compose and recommend this method.[Official documentation](https://www.home-assistant.io/installation/linux#docker-compose)
 
-## Reverse Proxy
+## 反代
 
 Home Assistant's security policy disables reverse proxy by default. Modify `configuration.yaml`.
 
