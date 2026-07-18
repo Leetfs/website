@@ -3,7 +3,7 @@ title: Install Docker on Debian
 author: Lee
 ---
 
-## Install docker
+## Install Docker
 
 ### Update package index
 
