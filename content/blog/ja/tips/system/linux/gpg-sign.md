@@ -1,6 +1,6 @@
 ---
 title: ターミナル環境でのGPG署名エラーの修正
-author: Lee
+author: リー
 ---
 
 ## 問題の調査
@@ -28,7 +28,7 @@ gpg --card-status
 GPGを直接使って署名テスト：
 
 ```bash
-echo \"test\" | gpg --clearsign
+echo "test" | gpg --clearsign
 ```
 
 出力結果：
@@ -52,4 +52,4 @@ export GPG_TTY=$(tty)
 
 ![](/tips/system/linux/pubilc/gpg-sign-img/gpg-sign-4.png)
 
-成功弹出校验框，至此问题解决。
+認証ダイアログが正常に表示され、これで問題が解決されました。
