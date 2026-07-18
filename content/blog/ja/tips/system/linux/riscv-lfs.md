@@ -35,7 +35,7 @@ export PATH=$LFS/cross-tools/bin:$PATH
 
 ## RISC-V GNU コンパイラツールチェーンの構築
 
-开始想直接下载成品二进制，想了想好像和lfs精神不符，遂自行编译
+最初は完成品のバイナリを直接ダウンロードしようと思いましたが、よく考えるとLFSの精神に反すると思い、自分でコンパイルすることにしました。
 
 ```bash
 mkdir $LFS/cross-tools/riscv-gnu-toolchain
@@ -55,7 +55,7 @@ riscv64-unknown-linux-gnu-g++ --version
 
 ## ルートファイルシステム
 
-ルートファイルシステムを補完する必要があります。 そうしないとエラーが発生します。
+ルートファイルシステムを補完しないとエラーが発生します
 
 ```bash
 mount: /procへのnoneのマウントに失敗しました: そのようなファイルまたはディレクトリはありません
