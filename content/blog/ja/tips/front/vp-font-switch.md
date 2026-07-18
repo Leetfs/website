@@ -1,6 +1,6 @@
 ---
 title: Vitepress ナビゲーションバーのフォント切り替え
-author: リー
+author: Lee
 ---
 
 ## 実現原理
