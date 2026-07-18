@@ -1,9 +1,9 @@
 ---
-title: Log in to the server using SSH keys and disable password login
+title: Use SSH Key to Log In to the Server and Disable Password Login
 author: Lee
 ---
 
-## Configure SSH key login
+## Configure SSH Key Login
 
 - Generate a key pair using the command `ssh-keygen` or use an existing key pair
 - Copy the corresponding public key to the `root/.ssh/authorized_keys` file.
@@ -17,7 +17,7 @@ PubkeyAuthentication yes
 PasswordAuthentication no
 ```
 
-## Restart the SSH service
+## Restart the SSH Service
 
 ```bash
 sudo systemctl restart sshd
