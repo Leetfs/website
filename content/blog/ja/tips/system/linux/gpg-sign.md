@@ -1,6 +1,6 @@
 ---
 title: ターミナル環境でのGPG署名エラーの修正
-author: リー
+author: Lee
 ---
 
 ## 問題の調査
