@@ -1,6 +1,6 @@
 ---
 title: Numba
-author: リー
+author: Lee
 ---
 
 ## 概要
