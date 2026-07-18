@@ -1,6 +1,6 @@
 ---
 title: uv パッケージマネージャー
-author: Lee
+author: リー
 ---
 
 ## 概要
