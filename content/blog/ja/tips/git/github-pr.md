@@ -1,6 +1,6 @@
 ---
 title: GitHub PR よくある質問
-author: リー
+author: Lee
 ---
 
 ## 概要
