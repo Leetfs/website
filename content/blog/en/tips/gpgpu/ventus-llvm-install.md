@@ -6,7 +6,8 @@ author: Lee
 ## Introduction
 
 Ventus GPGPU is a **GPGPU architecture for RISC-V**.\
-This article references this repository: <https://github.com/THU-DSP-LAB/llvm-project>.
+This article references this repository: <https://github.com/THU-DSP-LAB/llvm-project>.\
+本文参考此仓库：<https://github.com/THU-DSP-LAB/llvm-project>。
 
 ## Install dependencies
 
