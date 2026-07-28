@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "marked": "^18.0.6",
-    "next": "16.2.6",
+    "next": "16.2.11",
     "react": "19.2.6",
     "react-dom": "19.2.6",
     "three": "^0.185.1"
