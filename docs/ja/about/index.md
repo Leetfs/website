@@ -1,5 +1,5 @@
 ---
-title: 概要
+title: 关于
 icon: creative
 author: Lee
 category:
@@ -7,39 +7,39 @@ category:
 index: false
 ---
 
-## こんにちは、私はLeeです👋
+## 你好，我是 Lee 👋
 
-**オープンソース、技術、平等を愛しています。**
+**热爱开源、技术与平等。**
 
-現在大学生で、中国科学院ソフトウェア研究所でインターン中です。主にRISC-V、基盤ソフトウェアとシステムの方向に注目しています。Project Trans、開往 travellings、aboutTransなどのオープンソースプロジェクトで活躍しています。
+一名在读大学生，目前在中国科学院软件研究所实习，主要关注 RISC-V、基础软件与系统方向。活跃于 Project Trans、开往 travellings 和 aboutTrans 等开源项目。
 
-私の[履歴書](./resume)をご覧になり、私についてもっと知ってください。
+欢迎查看我的 [简历](./resume)，了解更多我的信息。
 
 ---
 
-### 📫 連絡先
+### 📫 联系我
 
-- 📧 メール: <lee@mtftm.com>
-- 🔑 PGPキー: [`49DB D365 E8D1 8E4F B84F BC3F A997 7131 DCD8 593F`](https://keyserver.ubuntu.com/pks/lookup?search=49DBD365E8D18E4FB84FBC3FA9977131DCD8593F&fingerprint=on&op=index)
+- 📧 邮箱: <lee@mtftm.com>
+- 🔑 PGP 密钥: [`49DB D365 E8D1 8E4F B84F BC3F A997 7131 DCD8 593F`](https://keyserver.ubuntu.com/pks/lookup?search=49DBD365E8D18E4FB84FBC3FA9977131DCD8593F&fingerprint=on&op=index)
 - [GitHub](https://github.com/Leetfs) · [X](https://x.com/leetfs1) · [Telegram](https://t.me/leetfs) · [VRChat · Leetfs](https://vrchat.com/home/user/usr_cb43b2cb-6c62-422a-9d47-3b6237fc8048) · [Steam](https://steamcommunity.com/profiles/76561199643388304/)
 
 ---
 
-### 🕹️ 最近プレイしたゲーム
+### 🕹️ 最近玩过的游戏
 
 ![](https://raw.githubusercontent.com/Leetfs/Leetfs/main/metrics.plugin.steam.svg)
 
 ---
 
-### 📊 GitHub統計
+### 📊 GitHub 统计
 
-| [![LeetfsのGitHub統計](https://github-readme-stats-neon-nine-18.vercel.app/api?username=Leetfs&show_icons=true&include_all_commits=true&theme=buefy&hide_border=true)](https://github.com/Leetfs) | [![トップ言語](https://github-readme-stats-neon-nine-18.vercel.app/api/top-langs/?username=Leetfs&layout=compact&theme=buefy&hide_border=true)](https://github.com/Leetfs) |
-| :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+| [![Leetfs's GitHub stats](https://github-readme-stats-neon-nine-18.vercel.app/api?username=Leetfs&show_icons=true&include_all_commits=true&theme=buefy&hide_border=true)](https://github.com/Leetfs) | [![Top Langs](https://github-readme-stats-neon-nine-18.vercel.app/api/top-langs/?username=Leetfs&layout=compact&theme=buefy&hide_border=true)](https://github.com/Leetfs) |
+| :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
 
 ---
 
-### 🚀 技術スタック
+### 🚀 技术栈
 
-[![私のスキル](https://skillicons.dev/icons?i=vscode,unity,ae,au,ai,ps,pr,blender,c,cs,cpp,cloudflare,html,css,debian,docker,git,github,githubactions,react,linux,md,npm,pnpm,ubuntu,vue,vite,electron)](https://skillicons.dev)
+[![我的技能](https://skillicons.dev/icons?i=vscode,unity,ae,au,ai,ps,pr,blender,c,cs,cpp,cloudflare,html,css,debian,docker,git,github,githubactions,react,linux,md,npm,pnpm,ubuntu,vue,vite,electron)](https://skillicons.dev)
 
 ---
