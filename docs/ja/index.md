@@ -3,24 +3,24 @@
 layout: home
 
 hero:
-  name: "Leeのブログ"
-  text: "私のブログへようこそ~"
-  tagline: "時々の雑談と少しの経験"
+  name: "Lee's blog"
+  text: "欢迎来到我的 blog~"
+  tagline: "\n偶尔的废话和些许经验"
   image:
     src: /logo.png
-    alt: Leeのブログ
+    alt: Lee's blog
     style: "margin-top: 2%;"
   actions:
     - theme: brand
-      text: について
-      link: /ja/about/
+      text: 关于
+      link: /about/
     - theme: alt
-      text: いくつかの経験
-      link: /ja/tips/
+      text: 一些经验
+      link: /tips/
     - theme: alt
-      text: 日常の雑事
-      link: /ja/life/
+      text: 生活琐事
+      link: /life/
     - theme: alt
-      text: 友達のリンク
-      link: /ja/friendly/
+      text: 友情链接
+      link: /friendly/
 ---
