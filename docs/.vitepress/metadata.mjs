@@ -3,7 +3,7 @@ const author = { '@type': 'Person', '@id': origin + '/#person', name: 'Lee', url
 const languages = [['zh', ''], ['en', '/en'], ['ja', '/ja']]
 
 function route(file) {
-  return '/' + file.replace(/(^|\/)index\.md$/, '$1').replace(/\.md$/, '')
+  return '/' + file.replace(/(^|\/)index\.md$/, '$1').replace(/\.md$/, '.html')
 }
 
 function alternates(path, available) {
@@ -18,7 +18,7 @@ export function sitemapItems(items, dates) {
   const paths = new Set(items.map(item => new URL(item.url, origin).pathname))
   return items.map(item => {
     const path = new URL(item.url, origin).pathname
-    const file = (path.endsWith('/') ? path + 'index' : path).slice(1) + '.md'
+    const file = (path.endsWith('/') ? path + 'index' : path.replace(/\.html$/, '')).slice(1) + '.md'
     return { ...item, lastmod: dates.get(file)?.modified ?? item.lastmod, links: alternates(path, paths) }
   })
 }

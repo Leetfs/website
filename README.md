@@ -21,6 +21,6 @@ npm run dev
 
 ## 部署
 
-`npm run build` 将静态站点输出到 `out/`。生产与 PR 预览工作流共用这一目录。推送至 `main` 后，GitHub Actions 运行检查和全站构建，再将产物同步至 `/var/www/blog/`。静态服务器应将无扩展名的文章地址解析到对应的 `.html` 文件。
+`npm run build` 将静态站点输出到 `out/`。生产与 PR 预览工作流共用这一目录。推送至 `main` 后，GitHub Actions 运行检查和全站构建，再将产物同步至 `/var/www/blog/`。文章的公开网址直接指向生成的 HTML 文件。
 
 PR 构建使用只读权限上传静态产物。独立的发布工作流校验产物后，将预览发布到 Cloudflare Pages，并更新 PR 评论。

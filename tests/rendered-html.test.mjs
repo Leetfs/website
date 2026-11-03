@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { access, readFile, readdir } from 'node:fs/promises'
+import { access, readFile, readdir, stat } from 'node:fs/promises'
 import path from 'node:path'
 import test from 'node:test'
 import { fileURLToPath } from 'node:url'
@@ -21,7 +21,7 @@ test('renders the original home, sections, profile and five friends in each lang
       assert.ok(home.includes(`href="/${prefix}${section}/"`))
     assert.ok(home.includes('https://github.com/Leetfs/website'))
     const category = await html(prefix + 'tips/git/index.html')
-    assert.ok(category.includes(`href="/${prefix}tips/git/github"`))
+    assert.ok(category.includes(`href="/${prefix}tips/git/github.html"`))
     const profile = await html(prefix + 'about/index.html')
     assert.ok(profile.includes('https://steamcommunity.com/profiles/76561199643388304/'))
     assert.ok((await html(prefix + 'about/resume.html')).includes('openRuyi'))
@@ -31,26 +31,29 @@ test('renders the original home, sections, profile and five friends in each lang
   }
 })
 
-test('builds every Markdown document and serves its local images', async () => {
+test('serves every document, internal link and local image on a plain static host', async () => {
   const pages = (await readdir(docs, { recursive: true })).map(file => file.split(path.sep).join('/'))
     .filter(file => !file.startsWith('.') && file.endsWith('.md'))
   assert.ok(pages.length > 0)
-  const images = new Set()
+  const targets = new Set()
   for (const file of pages) {
     const route = file.replace(/\.md$/, '.html')
     const page = await html(route)
     assert.match(page, /<div id="app">.+?<\/div>/s, file)
-    for (const [, src] of page.matchAll(/<img\b[^>]*?\bsrc="([^"]+)"/g)) {
-      const url = new URL(src, 'https://local.test/' + route)
-      if (url.origin === 'https://local.test') images.add(decodeURIComponent(url.pathname))
+    for (const [, ref] of page.matchAll(/<(?:a|img)\b[^>]*?\b(?:href|src)="([^"]+)"/g)) {
+      const url = new URL(ref, 'https://leetfs.com/' + route)
+      if (url.origin === 'https://leetfs.com') targets.add(decodeURIComponent(url.pathname))
     }
   }
-  for (const image of images) await access(path.join(out, image))
+  for (const target of targets) {
+    const file = path.join(out, target)
+    if ((await stat(file)).isDirectory()) await access(path.join(file, 'index.html'))
+  }
 })
 
 test('exposes native canonical URLs, translations and article history to crawlers', async () => {
   const article = await html('tips/system/linux/package.html')
-  assert.match(article, /rel="canonical" href="https:\/\/leetfs\.com\/tips\/system\/linux\/package"/)
+  assert.match(article, /rel="canonical" href="https:\/\/leetfs\.com\/tips\/system\/linux\/package\.html"/)
   for (const lang of ['zh', 'en', 'ja', 'x-default']) assert.ok(article.includes(`hreflang="${lang}"`))
   const graphs = [...article.matchAll(/<script type="application\/ld\+json">([^<]+)<\/script>/g)]
     .map(([, json]) => JSON.parse(json))
@@ -59,7 +62,7 @@ test('exposes native canonical URLs, translations and article history to crawler
   assert.ok((await html('index.html')).includes('"@type":"WebSite"'))
   assert.ok((await html('robots.txt')).includes('Sitemap: https://leetfs.com/sitemap.xml'))
   const sitemap = await html('sitemap.xml')
-  assert.ok(sitemap.includes('https://leetfs.com/ja/tips/system/linux/package'))
+  assert.ok(sitemap.includes('https://leetfs.com/ja/tips/system/linux/package.html'))
   assert.ok(sitemap.includes('hreflang="x-default"'))
 })
 

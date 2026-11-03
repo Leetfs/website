@@ -49,6 +49,7 @@ const dates = readHistory()
 export default defineConfig({
   ...site,
   description: '偶尔的废话和些许经验',
+  cleanUrls: false,
   outDir: '../out',
   head: [
     ['link', { rel: 'icon', href: '/favicon-32x32.png', type: 'image/png' }],
