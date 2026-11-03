@@ -1,15 +1,15 @@
 ---
-title: Fix GPG signature errors in terminal environments
+title: 修复终端环境使用 GPG 签名报错
 author: Lee
 ---
 
-## Troubleshooting
+## 排查问题
 
-When connecting to the server via terminal and using the GPG key within Yubikey to sign Git commits, an error appears. Brief troubleshooting steps:
+使用终端连接服务器，调 yubikey 内的 GPG 密钥签 Git 提交时提示错误，简要排查：
 
 ![](/tips/system/linux/pubilc/gpg-sign-img/gpg-sign-1.png)
 
-Verify if there is a valid private key:
+验证是否有有效私钥：
 
 ```bash
 gpg --list-secret-keys --keyid-format LONG
@@ -17,7 +17,7 @@ gpg --list-secret-keys --keyid-format LONG
 
 ![](/tips/system/linux/pubilc/gpg-sign-img/gpg-sign-2.png)
 
-Test whether the smart card can be read correctly:
+测试是否正确读取智能卡：
 
 ```bash
 gpg --card-status
@@ -25,26 +25,31 @@ gpg --card-status
 
 ![](/tips/system/linux/pubilc/gpg-sign-img/gpg-sign-3.png)
 
-Test signing directly with GPG:
+直接使用 GPG 测试签名：
 
 ```bash
 echo "test" | gpg --clearsign
 ```
 
-Receive the output:
+获得输出：
 
 ```bash
------BEGIN PGP SIGNED MESSAGE-----\nHash: SHA256\n\ntest\ngpg: signing failed: Inappropriate ioctl for device\ngpg: [stdin]: clear-sign failed: Inappropriate ioctl for device
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+test
+gpg: signing failed: Inappropriate ioctl for device
+gpg: [stdin]: clear-sign failed: Inappropriate ioctl for device
 ```
 
-Observing the error, it is found that in multi-terminal environments, GPG cannot automatically recognize the current terminal device in use, resulting in the inability to correctly prompt the user for PIN input. Try to fix by configuring the GPG_TTY environment variable:
+观察报错发现，多终端环境下 GPG 无法自动识别当前正在使用的终端设备，导致不能正确的将 PIN 码输入提示传递给用户，配置 GPG_TTY 环境变量尝试修复：
 
 ```bash
 export GPG_TTY=$(tty)
 ```
 
-Retest signing:
+重新测试签名：
 
 ![](/tips/system/linux/pubilc/gpg-sign-img/gpg-sign-4.png)
 
-The verification prompt appears successfully, and the issue is resolved.
+成功弹出校验框，至此问题解决。
