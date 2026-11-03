@@ -1,25 +1,25 @@
 ---
-title: Jenkins はインライン css スタイルの読み込みを許可します
+title: Jenkins 允许加载内联 css 样式
 author: Lee
 ---
 
-## Groovy スクリプト
+## Groovy Script
 
-Jenkins セキュリティポリシー：
+Jenkins 安全策略:
 
-- JavaScript の使用は一切許可されていません
-- プラグイン（object/embed）は許可されていません
-- インライン CSS や他サイトの CSS は許可されていません
-- 他サイトからの画像は許可されていません
-- フレームの使用は許可されていません
-- ウェブフォントは許可されていません
-- XHR/AJAX は許可されていません
-- など.
+- No JavaScript allowed at all
+- No plugins (object/embed) allowed
+- No inline CSS, or CSS from other sites allowed
+- No images from other sites allowed
+- No frames allowed
+- No web fonts allowed
+- No XHR/AJAX allowed
+- etc.
 
-デフォルトではサーバー内部のリソースのみが許可されており、インラインスタイルを許可するには、Manage Jenkins → Script console で以下のコードを実行してください。 または、パイプライン + Groovy plugin を使用して処理内で実行できます。
+默认仅放行服务器内部资源，放行内联样式可在 Manage Jenkins -> Script console 执行以下代码，也可使用流水线 + Groovy plugin 插件在流程内执行。
 
 ```Groovy
 System.setProperty("hudson.model.DirectoryBrowserSupport.CSP", "sandbox allow-same-origin; default-src 'self'; style-src 'self' 'unsafe-inline';")
 ```
 
-詳細については、[公式ドキュメント](https://www.jenkins.io/doc/book/security/configuring-content-security-policy/) をご覧ください
+更多细节请查阅[官方文档](https://www.jenkins.io/doc/book/security/configuring-content-security-policy/)
