@@ -1,17 +1,17 @@
 ---
-title: "Ubuntu: Disable Sleep on Lid Close"
+title: Ubuntu 设置合盖不休眠
 author: Lee
 ---
 
-## Modify File
+## 修改文件
 
 ```bash
 sudo nano /etc/systemd/logind.conf
 ```
 
-Find `#HandleLidSwitch=suspend` and change it to `HandleLidSwitch=ignore`
+找到 `#HandleLidSwitch=suspend`，改为 `HandleLidSwitch=ignore`
 
-## Restart Service
+## 重启服务
 
 ```bash
 service systemd-logind restart
