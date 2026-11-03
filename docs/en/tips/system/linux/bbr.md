@@ -1,20 +1,20 @@
 ---
-title: Enable BBR Congestion Control Algorithm on Debian
+title: Debian 开启 BBR 拥塞控制算法
 author: Lee
 ---
 
-## Manual Method
+## 手动挡
 
-Edit `etc/sysctl.conf` and append at the end:
+编辑 `etc/sysctl.conf` 文件，在末尾加入：
 
 ```text
 net.core.default_qdisc=fq
 net.ipv4.tcp_congestion_control=bbr
 ```
 
-Run `sysctl -p` to save and apply
+执行 `sysctl -p` 保存并生效
 
-## Automatic Method
+## 自动挡
 
 ```text
 echo -e "\nnet.core.default_qdisc=fq\nnet.ipv4.tcp_congestion_control=bbr" >> /etc/sysctl.conf && sysctl -p
