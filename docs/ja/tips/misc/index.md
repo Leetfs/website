@@ -1,8 +1,8 @@
 ---
-title: その他
+title: 杂项
 author: Lee
 ---
 
-## 目次
+## 目录
 
 <ArticlesMenu />
