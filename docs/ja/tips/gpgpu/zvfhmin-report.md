@@ -1,32 +1,32 @@
 ---
-title: RISC-V Zvfh(min) 拡張サポート調査報告書（LLVM CodeGen段階）
+title: RISC-V Zvfh(min) 扩展支持调研报告（LLVM CodeGen阶段）
 author: Lee
 ---
 
-## 著作権声明
+## 版权声明
 
-本記事は元々 [xlinsist/llvm-project Issue #2](https://github.com/xlinsist/llvm-project/issues/2) に掲載され、原作者は私自身です。元リポジトリのライセンス [Apache License 2.0](https://github.com/xlinsist/llvm-project/blob/main/LICENSE.TXT) に従っています。この内容をもとに、再編集して当ブログで公開します。
+本文最初发表于 [xlinsist/llvm-project Issue #2](https://github.com/xlinsist/llvm-project/issues/2)，原作者为本人。遵循原仓库许可证 [Apache License 2.0](https://github.com/xlinsist/llvm-project/blob/main/LICENSE.TXT)。在此基础上，转载并稍作整理发布于本博客。
 
-## 概要
+## 概述
 
-### 調査目標
+### 调研目标
 
-- ventus-llvmにZvfh(min)拡張サポートを追加する
+- 在 ventus-llvm 中添加对 Zvfh(min) 扩展的支持
 
-### 開発背景
+### 开发背景
 
-- Ventus 向けに半精度16ビットhalf浮動小数点データ型のサポート追加
-- プロジェクトの目標は、half型の段階的なサポートであり、スカラ（Zhinx(min)）とベクトル（Zvfh(min)）を含みます。
-- Zhinx(min)拡張は基本的に動作し、現在PRのレビューおよび修正中です
+- 为承影添加对半精度16位half浮点数据类型的支持
+- 项目目标是逐步支持 half 类型，包括标量（Zhinx(min)）和向量（Zvfh(min)
+- Zhinx(min)扩展已初步打通，正在PR review和修改阶段
 
-### ニーズ分析
+### 需求分析
 
-- half型はより低い精度と範囲を持ち、メモリ消費が少なくスループットが高いです
+- half 具有更低的精度和范围，具备更小的内存占用和更高的吞吐率
 
-## 公式Zvfh(min)パッチまとめ
+## 官方 Zvfh(min) Patch 总结
 
-- パッチ先：[D151414](https://reviews.llvm.org/D151414)
-- 対象ファイル：
+- Patch 地址：[D151414](https://reviews.llvm.org/D151414)
+- 涉及文件：
   - `RISCVISAInfo.cpp`
   - `RISCVFeatures.td`
   - `RISCVISelLowering.cpp`
@@ -35,31 +35,31 @@ author: Lee
   - `RISCVInstrInfoVVLPatterns.td`
   - `RISCVSubtarget.h`
   - `**.ll`
-- 主な変更点：
-  - zvfhminの登録
-  - f16用の型・命令の合法化処理を追加
-  - f16に対する`vfwcvt.f.f.v` `vfncvt.f.f.w`命令の処理
-  - 現在のデバイスがf16ベクトル命令に対応しているか判定
-  - f16関連のSDNodeと機械命令のマッピング追加
-  - テストケースの追加
+- 主要修改内容：
+  - 注册 zvfhmin
+  - 为 f16 添加类型/指令合法化处理
+  - 处理 f16 下 `vfwcvt.f.f.v` `vfncvt.f.f.w` 指令
+  - 判断当前设备是否支持 f16 向量指令
+  - 添加与 f16 相关的 SDNode 与机器指令映射
+  - 添加测试用例
 
-## 変更ファイル
+## 修改文件
 
-| ファイルパス                                                                           | 変更内容                                                                                                                 |
-| -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| `llvm/lib/Support/RISCVISAInfo.cpp`                                              | zvfhmin命令セット拡張を拡張テーブルに登録                                                                                             |
-| `llvm/lib/Target/RISCV/RISCV.td`                                                 | zvfhmin機能を追加し、依存zve32f `[FeatureStdExtZve32f]` をマッチ                                                                  |
-| `llvm/lib/Target/RISCV/RISCVInstrInfoVPseudos.td & RISCVInstrInfoVSDPatterns.td` | Zvfh(min)命令とパターンの追加                                                                               |
-| `llvm/lib/Target/RISCV/RISCVISelLowering.cpp`                                    | MVT::f16型と操作サポートを導入し、Zvfhminが有効な場合のみMVT::f16ベクトル型を許可 |
-| `llvm/test/CodeGen/RISCV/VentusGPGPU/half.ll`                                    | テストケースの追加                                                                                                            |
+| 文件路径                                                                             | 修改目标                                                                                                                   |
+| -------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `llvm/lib/Support/RISCVISAInfo.cpp`                                              | 把 zvfhmin 指令集扩展注册进扩展表                                                                                                  |
+| `llvm/lib/Target/RISCV/RISCV.td`                                                 | 添加 zvfhmin 特性并匹配依赖 zve32f `[FeatureStdExtZve32f]`                                                                      |
+| `llvm/lib/Target/RISCV/RISCVInstrInfoVPseudos.td & RISCVInstrInfoVSDPatterns.td` | 添加 Zvfh(min) 指令及匹配 Pattern                                                                          |
+| `llvm/lib/Target/RISCV/RISCVISelLowering.cpp`                                    | 引入 MVT::f16 类型及操作支持，确保只有启用 Zvfhmin 时才允许 MVT::f16 向量类型​ |
+| `llvm/test/CodeGen/RISCV/VentusGPGPU/half.ll`                                    | 添加测试用例                                                                                                                 |
 
-## テストケース
+## 测试用例
 
-| 種類   | 目的                | 例                              |
-| ---- | ----------------- | ------------------------------ |
-| 命令生成 | 半精度命令が正しく生成されるか検証 | `float.ll` を `half.ll` に書き換え   |
-| 型変換  | halfとfloat32の変換   | `vfwcvt.f.f.v`, `vfncvt.f.f.w` |
+| 类型   | 目的                 | 示例                             |
+| ---- | ------------------ | ------------------------------ |
+| 指令生成 | 验证半精度指令是否被正确生成     | 改写 `float.ll` 为 `half.ll`      |
+| 类型转换 | half 与 float32 的转换 | `vfwcvt.f.f.v`, `vfncvt.f.f.w` |
 
-## 補足
+## 补充
 
-Zvfhminは変換（`vfwcvt.f.f.v f16=>f32`, `vfncvt.f.f.w f32=>16`）のみサポートし、半精度ベクトル算術演算は直接サポートしません。 算術演算にはzvfhが必要です。
+Zvfhmin 只支持转换(`vfwcvt.f.f.v f16=>f32`, `vfncvt.f.f.w f32=>16`)，不能直接进行半精度的向量算术操作，如需算术运算，需使用zvfh。
