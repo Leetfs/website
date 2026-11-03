@@ -1,27 +1,27 @@
 ---
-title: Common WSL Commands
+title: WSL 常用指令
 author: Lee
 ---
 
-## Set Default User
+## 设置默认用户
 
 ```bash
 Debian config --default-user root
 ```
 
-## Destroy System
+## 销毁系统
 
 ```bash
 wsl --unregister Debian
 ```
 
-## Create System
+## 建立系统
 
 ```bash
 wsl --install -d Debian
 ```
 
-## Shut Down System
+## 关闭系统
 
 ```bash
 wsl --shutdown
