@@ -3,10 +3,10 @@ title: VRChat
 author: Lee
 ---
 
-## 概要
+## 概述
 
-VRChatでのつぶやきや面白い日常、いつの間にか思い出になっていました。
+VRChat 里的碎碎念和有趣日常，不小心就变成回忆啦。
 
-## 目次
+## 目录
 
 <ArticlesMenu />
