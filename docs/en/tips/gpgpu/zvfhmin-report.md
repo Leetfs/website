@@ -1,32 +1,32 @@
 ---
-title: RISC-V Zvfh(min) Extension Support Research Report (LLVM CodeGen Phase)
+title: RISC-V Zvfh(min) 扩展支持调研报告（LLVM CodeGen阶段）
 author: Lee
 ---
 
-## Copyright Notice
+## 版权声明
 
-This article was originally published at [xlinsist/llvm-project Issue #2](https://github.com/xlinsist/llvm-project/issues/2) by myself as the original author.Follows the original repository license [Apache License 2.0](https://github.com/xlinsist/llvm-project/blob/main/LICENSE.TXT).Based on this, it is reposted and slightly revised on this blog.
+本文最初发表于 [xlinsist/llvm-project Issue #2](https://github.com/xlinsist/llvm-project/issues/2)，原作者为本人。遵循原仓库许可证 [Apache License 2.0](https://github.com/xlinsist/llvm-project/blob/main/LICENSE.TXT)。在此基础上，转载并稍作整理发布于本博客。
 
-## Overview
+## 概述
 
-### Research Goals
+### 调研目标
 
-- Add support for the Zvfh(min) extension in ventus-llvm
+- 在 ventus-llvm 中添加对 Zvfh(min) 扩展的支持
 
-### Development Background
+### 开发背景
 
-- Add support for 16-bit half-precision floating-point data type to Chengying
-- The project goal is to gradually support the half type, including scalar (Zhinx(min)) and vector (Zvfh(min))
-- The Zhinx(min) extension has completed initial integration and is under PR review and revision stages
+- 为承影添加对半精度16位half浮点数据类型的支持
+- 项目目标是逐步支持 half 类型，包括标量（Zhinx(min)）和向量（Zvfh(min)
+- Zhinx(min)扩展已初步打通，正在PR review和修改阶段
 
-### Requirement Analysis
+### 需求分析
 
-- half has lower precision and range, and offers smaller memory usage and higher throughput
+- half 具有更低的精度和范围，具备更小的内存占用和更高的吞吐率
 
-## Official Zvfh(min) Patch Summary
+## 官方 Zvfh(min) Patch 总结
 
-- Patch address: [D151414](https://reviews.llvm.org/D151414)
-- Related files:
+- Patch 地址：[D151414](https://reviews.llvm.org/D151414)
+- 涉及文件：
   - `RISCVISAInfo.cpp`
   - `RISCVFeatures.td`
   - `RISCVISelLowering.cpp`
@@ -35,31 +35,31 @@ This article was originally published at [xlinsist/llvm-project Issue #2](https:
   - `RISCVInstrInfoVVLPatterns.td`
   - `RISCVSubtarget.h`
   - `**.ll`
-- Main modifications:
-  - Register zvfhmin
-  - Add type/instruction legalization for f16
-  - Handle `vfwcvt.f.f.v` and `vfncvt.f.f.w` instructions for f16
-  - Determine whether the current device supports f16 vector instructions
-  - Add SDNode and machine instruction mapping related to f16
-  - Add test cases
+- 主要修改内容：
+  - 注册 zvfhmin
+  - 为 f16 添加类型/指令合法化处理
+  - 处理 f16 下 `vfwcvt.f.f.v` `vfncvt.f.f.w` 指令
+  - 判断当前设备是否支持 f16 向量指令
+  - 添加与 f16 相关的 SDNode 与机器指令映射
+  - 添加测试用例
 
-## File modifications
+## 修改文件
 
-| File Path                                                                        | Modification Target                                                                                                                                                                       |
-| -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `llvm/lib/Support/RISCVISAInfo.cpp`                                              | Register the zvfhmin instruction set extension into the extension table                                                                                                                   |
-| `llvm/lib/Target/RISCV/RISCV.td`                                                 | Add the zvfhmin feature and match dependency zve32f `[FeatureStdExtZve32f]`                                                                                                               |
-| `llvm/lib/Target/RISCV/RISCVInstrInfoVPseudos.td & RISCVInstrInfoVSDPatterns.td` | Add Zvfh(min) instructions and matching Patterns                                                                                                                       |
-| `llvm/lib/Target/RISCV/RISCVISelLowering.cpp`                                    | Introduce MVT::f16 type and operation support, ensure that MVT::f16 vector types are only allowed when Zvfhmin is enabled |
-| `llvm/test/CodeGen/RISCV/VentusGPGPU/half.ll`                                    | Add test cases                                                                                                                                                                            |
+| 文件路径                                                                             | 修改目标                                                                                                                   |
+| -------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `llvm/lib/Support/RISCVISAInfo.cpp`                                              | 把 zvfhmin 指令集扩展注册进扩展表                                                                                                  |
+| `llvm/lib/Target/RISCV/RISCV.td`                                                 | 添加 zvfhmin 特性并匹配依赖 zve32f `[FeatureStdExtZve32f]`                                                                      |
+| `llvm/lib/Target/RISCV/RISCVInstrInfoVPseudos.td & RISCVInstrInfoVSDPatterns.td` | 添加 Zvfh(min) 指令及匹配 Pattern                                                                          |
+| `llvm/lib/Target/RISCV/RISCVISelLowering.cpp`                                    | 引入 MVT::f16 类型及操作支持，确保只有启用 Zvfhmin 时才允许 MVT::f16 向量类型​ |
+| `llvm/test/CodeGen/RISCV/VentusGPGPU/half.ll`                                    | 添加测试用例                                                                                                                 |
 
-## Test Cases
+## 测试用例
 
-| Type                   | Purpose                                                            | Example                         |
-| ---------------------- | ------------------------------------------------------------------ | ------------------------------- |
-| Instruction Generation | Verify whether half-precision instructions are generated correctly | Rewrite `float.ll` to `half.ll` |
-| Type Conversion        | conversion between half and float32                                | `vfwcvt.f.f.v`, `vfncvt.f.f.w`  |
+| 类型   | 目的                 | 示例                             |
+| ---- | ------------------ | ------------------------------ |
+| 指令生成 | 验证半精度指令是否被正确生成     | 改写 `float.ll` 为 `half.ll`      |
+| 类型转换 | half 与 float32 的转换 | `vfwcvt.f.f.v`, `vfncvt.f.f.w` |
 
-## Supplement
+## 补充
 
-Zvfhmin only supports conversion (`vfwcvt.f.f.v f16=>f32`, `vfncvt.f.f.w f32=>16`) and does not support direct half-precision vector arithmetic operations. For arithmetic operations, zvfh is required.
+Zvfhmin 只支持转换(`vfwcvt.f.f.v f16=>f32`, `vfncvt.f.f.w f32=>16`)，不能直接进行半精度的向量算术操作，如需算术运算，需使用zvfh。
