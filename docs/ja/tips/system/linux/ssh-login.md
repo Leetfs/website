@@ -1,25 +1,26 @@
 ---
-title: sshキーを使ってサーバーにログインし、パスワードログインを無効にする
+title: 使用 ssh 密钥登陆服务器并禁用密码登陆
 author: Lee
 ---
 
-## sshキー認証の設定
+## 配置 ssh 密钥登陆
 
-- コマンド「ssh-keygen」で鍵を生成するか、既存の鍵を使用します
-- 対応する公開鍵を「root/.ssh/authorized_keys」ファイルにコピーします。
+- 使用指令 `ssh-keygen` 生成密钥，或使用已有密钥
+- 将对应公钥拷贝到 `root/.ssh/authorized_keys` 文件内。
 
-## パスワードログインを無効化
+## 禁用密码登陆
 
-/etc/ssh/sshd_config ファイルを編集し、以下のパラメータを変更します：
+编辑 /etc/ssh/sshd_config 文件，修改以下参数：
 
 ```text
-PubkeyAuthentication yes\nPasswordAuthentication no
+PubkeyAuthentication yes
+PasswordAuthentication no
 ```
 
-## sshサービスの再起動
+## 重启 ssh 服务
 
 ```bash
 sudo systemctl restart sshd
 ```
 
-反映されない場合は、「etc/ssh/sshd_config.d」内の全ファイルを削除してください。
+如不生效，删除 `etc/ssh/sshd_config.d` 内的所有文件。
