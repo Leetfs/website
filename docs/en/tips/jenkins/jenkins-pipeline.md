@@ -1,18 +1,18 @@
 ---
-title: Jenkins Declarative Pipeline and Scripted Pipeline
+title: Jenkins 声明式流水线与脚本式流水线
 author: Lee
 ---
 
-## Declarative Pipeline
+## 声明式流水线
 
 _Jenkinsfile (Declarative Pipeline)_
 
 ```groovy
 pipeline {
-    agent any // Allows running on any node; can also use none to not specify a global agent.
+    agent any // 允许在任意节点运行；也可用 none，不指定全局 agent。
     stages {
         stage('Build') {
-          agent { // Specify agent node
+          agent { //指定代理节点
               label 'master'
             }
             steps {
@@ -33,26 +33,26 @@ pipeline {
 }
 ```
 
-Each stage can only have one steps block, and the execution node for the stage can be specified with `agent { label 'master' }`.
+每个 stage 里只能有一个 steps，可通过 `agent { label 'master' }` 指定该 stage 的运行节点。
 
-### Features of Declarative Pipeline
+### 声明式流水线的特性
 
-1. When different stages use the same label, the execution node may not be the same. Jenkins will randomly assign an available node with that label.
-2. When managing Jenkinsfile with a version control system, the Declarative Pipeline will check out the entire repository to the root directory for every stage, so git must be installed on the agent nodes.
-3. Within the same steps block, the context is inherited from previous steps. For example, if the first line is `sh 'cd nya'`, the next line will have its working path inside nya.
+1. 不同 stage 使用同一 label 时，运行节点不一定相同，Jenkins 会随机分配一个该 label 下的可用节点。
+2. 使用版本控制系统管理 Jenkinsfile 时，声明式流水线会在每个阶段都检出整个仓库至根目录，因此须在子节点安装 git。
+3. 同一 steps 块内会继承上文，例如第一行为 `sh 'cd nya'`,第二行的工作路径则在 nya 内。
 
-### Solution for Feature 1
+### 特性 1 的解决方案
 
-When first calling the node, assign `env.NODE_NAME` to a global variable, and add the defined variable to the label tag where this node is needed.
+首次调用节点时将 `env.NODE_NAME` 传入全局变量，将定义出的变量放入需使用此节点的 label 标签。
 
-`env.NODE_NAME` is a built-in Jenkins variable. Its value is the name of the node running the current stage.
+`env.NODE_NAME` 为 Jenkins 内置变量，该变量的值是运行当前阶段的节点名。
 
-## Scripted Pipeline
+## 脚本式流水线
 
 _Jenkinsfile (Scripted Pipeline)_
 
 ```groovy
-node('master') { // Specify node with master label
+node('master') { //指定使用 master 标签的节点
     stage('Build') {
         //
     }
@@ -60,22 +60,22 @@ node('master') { // Specify node with master label
         //
     }
 }
-node('RVV') { // Specify node with RVV label
+node('RVV') { //指定使用 RVV 标签的节点
     stage('Build') {
         //
     }
     stage('Test') {
-      sh 'meow'
-      sh 'meow'
+      sh '喵'
+      sh '喵'
     }
 }
 ```
 
-Simple and convenient, with no complicated `pipeline` framework, it uses node blocks to control node execution.Usage Example: <https://github.com/Leetfs/opencv-riscv-perf/blob/main/Jenkinsfile>
+简单，方便，没有复杂的 `pipeline` 框架，使用 node 块控制节点运行。使用样例：<https://github.com/Leetfs/opencv-riscv-perf/blob/main/Jenkinsfile>
 
-### Features of Scripted Pipeline
+### 脚本式流水线的特性
 
-1. A pipeline can have multiple nodes. A node can be specified for multiple stages at once, and stages in the same node block will run on the same node.
-2. When managing Jenkinsfile with a version control system, the Scripted Pipeline will not check out the entire repository to the node, it only reads the Jenkinsfile. If you want to use the repository, you need to clone it manually.
-3. Within the same steps block, the context is not inherited from previous steps. For example, if the first line is `sh 'cd nya'`, the second line's working directory is still the default workspace path, not nya.
-   - This does not apply to multi-line scripts like `sh ''' I am the content ''' `, since all commands inside the multi-line block run in a single sh context.
+1. 一条流水线里可以有多个 node，一个 node 可以同时为多个 stage 指定节点，同一个 node 块里的阶段运行时使用同一节点。
+2. 使用版本控制系统管理 Jenkinsfile 时，脚本式流水线不会检出整个仓库至节点，仅读取 Jenkinsfile，想使用仓库需自行 clone。
+3. 同一 steps 块内不会继承上文，例如第一行为 `sh 'cd nya'`,第二行的工作路径还在默认工作区路径，而不是 nya。
+   - 多行脚本 `sh ''' 我是内容 ''' ` 不受此限，因为多行命令均在一个 sh 块内。
