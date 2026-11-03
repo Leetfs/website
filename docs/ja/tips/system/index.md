@@ -1,8 +1,8 @@
 ---
-title: システム
+title: System
 author: Lee
 ---
 
-## 目次
+## 目录
 
 <ArticlesMenu />

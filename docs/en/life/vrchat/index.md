@@ -3,10 +3,10 @@ title: VRChat
 author: Lee
 ---
 
-## Overview
+## 概述
 
-Random thoughts and interesting daily life in VRChat, accidentally turning into memories.
+VRChat 里的碎碎念和有趣日常，不小心就变成回忆啦。
 
-## Contents
+## 目录
 
 <ArticlesMenu />

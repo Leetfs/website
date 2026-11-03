@@ -1,12 +1,12 @@
 ---
-title: いくつかの経験
-icon: クリエイティブ
+title: 一些经验
+icon: creative
 author: Lee
 category:
-  - いくつかの経験
+  - 一些经验
 index: false
 ---
 
-## 目次
+## 目录
 
 <ArticlesMenu />

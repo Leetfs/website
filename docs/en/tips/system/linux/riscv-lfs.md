@@ -1,9 +1,9 @@
 ---
-title: RISCV 64 glibc + systemd LFS Walkthrough
+title: RISCV 64 glibc + systemd LFS 通关攻略
 author: Lee
 ---
 
-## Install dependencies
+## 安装依赖
 
 ```bash
 sudo apt update
@@ -25,7 +25,7 @@ sudo apt install -y \
     meson ninja-build
 ```
 
-## Create workspace directory
+## 建立工作目录
 
 ```bash
 export LFS=/home/lee/lfs
@@ -33,9 +33,9 @@ mkdir -pv $LFS/{sources,rootfs,cross-tools}
 export PATH=$LFS/cross-tools/bin:$PATH
 ```
 
-## Build RISC-V GNU Compiler Toolchain
+## 构建 RISC-V GNU 编译器工具链
 
-initially considered downloading prebuilt binaries, but upon reflection, this seemed against the LFS spirit, so I compiled it myself
+开始想直接下载成品二进制，想了想好像和lfs精神不符，遂自行编译
 
 ```bash
 mkdir $LFS/cross-tools/riscv-gnu-toolchain
@@ -44,38 +44,38 @@ git clone https://github.com/riscv-collab/riscv-gnu-toolchain.git
 cd riscv-gnu-toolchain
 ./configure --prefix=$LFS/cross-tools/riscv-gnu-toolchain
 make linux
-export PATH=$LFS/cross-tools/riscv-gnu-toolchain/bin:$PATH # Set environment variable
+export PATH=$LFS/cross-tools/riscv-gnu-toolchain/bin:$PATH # 设置环境变量
 ```
 
 ```bash
-# Verify installation
+# 验证安装
 riscv64-unknown-linux-gnu-gcc --version
 riscv64-unknown-linux-gnu-g++ --version
 ```
 
-## Root filesystem
+## 根文件系统
 
-The root filesystem needs to be completed, otherwise errors will occur
+需补齐根文件系统，否则会报错
 
 ```bash
 mount: mounting none on /proc failed: No such file or directory
 mount: mounting none on /sys failed: No such file or directory
 ```
 
-Solution:
+解决方案：
 
 ```bash
-# Create actual directories under usr and other system directories
+# 创建 usr 下的真实目录和其他系统目录
 mkdir -pv $LFS/rootfs/{usr/bin,usr/sbin,usr/lib,etc/systemd/system,var/log/journal,run,proc,sys,dev,tmp,root}
 
-# Create Usr-Merge symlinks
+# 建立 Usr-Merge 软链接
 ln -sv usr/bin $LFS/rootfs/bin
 ln -sv usr/sbin $LFS/rootfs/sbin
 ln -sv usr/lib $LFS/rootfs/lib
 ln -sv usr/lib $LFS/rootfs/lib64
 ```
 
-## Handle dynamic libraries
+## 处理动态链接库
 
 ```bash
 sudo cp -a $LFS/cross-tools/riscv-gnu-toolchain/sysroot/lib/* $LFS/rootfs/usr/lib/
@@ -83,7 +83,7 @@ sudo cp -a $LFS/cross-tools/riscv-gnu-toolchain/sysroot/lib/* $LFS/rootfs/usr/li
 
 ## libxcrypt
 
-Old version: `crypt()` is in **glibc**, new version `crypt()` has been moved to **libxcrypt**, requiring manual installation
+旧版：`crypt()` 在 **glibc**，新版`crypt()` 被拆到 **libxcrypt**，需要手动安装
 
 ```bash
 cd $LFS/sources
@@ -116,7 +116,7 @@ cd bash-5.3
 make -j$(nproc)
 make DESTDIR=$LFS/rootfs install
 
-# Ensure sh points to bash
+# 确保 sh 指向 bash
 ln -sfv bash $LFS/rootfs/usr/bin/sh
 ```
 
@@ -128,7 +128,7 @@ wget https://ftp.gnu.org/gnu/coreutils/coreutils-9.6.tar.xz
 tar -xf coreutils-9.6.tar.xz
 cd coreutils-9.6
 
-# Cross-compilation fix parameters
+# 交叉编译修正参数
 ./configure --host=riscv64-unknown-linux-gnu \
             --prefix=/usr \
             --enable-no-install-program=kill,uptime
@@ -139,7 +139,7 @@ make DESTDIR=$LFS/rootfs install
 
 ## util-linux
 
-Systemd requires some components of util-linux
+Systemd需要util-linux的部分组件
 
 ```bash
 cd $LFS/sources
@@ -197,13 +197,13 @@ EOF
 ```bash
 cd $LFS/sources/systemd
 
-# Many of Systemd's tests cannot be disabled; supporting them individually leads to a dependency chain where a depends on b, b depends on c, c depends on d, ad infinitum. Therefore, let's trick the build system.
+# Systemd的许多测试关不掉，逐个支持会a依赖b b依赖c c又依赖d，无穷尽也，故让我们骗过构建系统。
 
 cat << 'EOF' >> src/basic/log.c
 
 /* ====== LFS Cross-Compile Dummy Patch ====== */
 
-/* --- 1. Prototypes (Declare first to bypass -Wmissing-prototypes check) --- */
+/* --- 1. Prototypes (先声明，绕过 -Wmissing-prototypes 检查) --- */
 void test_prepare(void);
 void log_test_failed_internal(void);
 int run_test_table(void);
@@ -220,34 +220,34 @@ int ci_environment(void);
 const char* get_catalog_dir(void);
 int write_tmpfile(void);
 
-/* --- 2. Definitions (Define later to bypass ld linker's undefined reference) --- */
+/* --- 2. Definitions (后定义，绕过 ld 链接器的 undefined reference) --- */
 
-/* Basic test environment */
+/* 基础测试环境 */
 void test_prepare(void) {}
 void log_test_failed_internal(void) {}
 int run_test_table(void) { return 0; }
 void test_setup_logging(void) {}
 
-/* Network, logging, and path tests */
+/* 网络、日志与路径测试 */
 const char* get_testdata_dir(void) { return "/tmp"; }
 const char* get_catalog_dir(void) { return "/tmp"; }
 
-/* Signal and slow test configuration */
+/* 信号与慢速测试配置 */
 void assert_signal_internal(void) {}
-int slow_tests_enabled(void) { return 0; } /* Tell it slow tests are not enabled */
+int slow_tests_enabled(void) { return 0; } /* 告诉它没开启慢速测试 */
 
-/* Container, permission, and namespace tests */
+/* 容器、权限与命名空间测试 */
 int enter_cgroup_subroot(void) { return 0; }
 int setup_fake_runtime_dir(void) { return 0; }
-int userns_has_single_user(void) { return 0; } /* Default return false */
+int userns_has_single_user(void) { return 0; } /* 默认返回假 */
 int have_namespaces(void) { return 0; }
 
-/* BPF firewall and CI environment tests */
+/* BPF 防火墙与 CI 环境测试 */
 int can_memlock(void) { return 0; }
 int ci_environment(void) { return 0; }
 
-/* Environment variable and file operation tests */
-int write_tmpfile(void) { return -1; } /* Directly return -1 to indicate write failure, letting the test program skip subsequent logic */
+/* 环境变量与文件操作测试 */
+int write_tmpfile(void) { return -1; } /* 直接返回-1表示写入失败，让测试程序跳过后续逻辑 */
 
 /* ========================================================== */
 EOF
@@ -307,38 +307,38 @@ ninja -j$(nproc)
 DESTDIR=$LFS/rootfs ninja install
 ```
 
-## Login Configuration
+## 登录配置
 
 ```bash
-# Simple login script
+# 简易登录脚本
 cat << 'EOF' | sudo tee $LFS/rootfs/usr/bin/lfs-login
 #!/bin/sh
-# 1. Force set basic environment variables (because /bin/login is skipped)
+# 1. 强制设置基础环境变量 (因为跳过了 /bin/login)
 export PATH=/usr/bin:/usr/sbin
 export HOME=/root
 export USER=root
 export TERM=xterm-256color
 
-# 2. Print welcome message
+# 2. 打印欢迎信息
 echo -e "\033[1;32mStarting LFS for RISC-V...\033[0m"
 
-# 3. Start the real Bash and force it into login mode (read .bash_profile)
-# This way the root string will be ignored as $0 and won't cause "Is a directory" error
+# 3. 启动真正的 Bash，并强制进入登录模式 (读取 .bash_profile)
+# 这样 root 字符串会被当做 $0 忽略，不会报错 "Is a directory"
 exec /bin/bash --login
 EOF
 
 sudo chmod +x $LFS/rootfs/usr/bin/lfs-login
 
-# Create configuration override directory
+# 创建配置覆盖目录
 sudo mkdir -p $LFS/rootfs/etc/systemd/system/serial-getty@ttyS0.service.d
 
-# Write auto-login configuration
+# 写入自动登录配置
 sudo cat << 'EOF' | sudo tee $LFS/rootfs/etc/systemd/system/serial-getty@ttyS0.service.d/override.conf
 [Service]
 ExecStart=
-# -n: Do not invoke the login program
-# -l: Specify our trampoline script
-# %I: Pass terminal name (ttyS0)
+# -n: 不调用 login 程序
+# -l: 指定我们的跳板脚本
+# %I: 传递终端名称 (ttyS0)
 ExecStart=-/usr/sbin/agetty --autologin root --noclear -n -l /usr/bin/lfs-login %I $TERM
 EOF
 
@@ -346,12 +346,12 @@ systemd-machine-id-setup --root=$LFS/rootfs
 ```
 
 ```bash
-# Create passwd file, define root user (UID 0, GID 0, home directory /root, Shell as bash)
+# 创建 passwd 文件，定义 root 用户（UID 0, GID 0, 根目录 /root, Shell 为 bash）
 cat << EOF | sudo tee $LFS/rootfs/etc/passwd
 root:x:0:0:root:/root:/bin/bash
 EOF
 
-# Create group file, define root group
+# 创建 group 文件，定义 root 组
 cat << EOF | sudo tee $LFS/rootfs/etc/group
 root:x:0:
 bin:x:1:
@@ -367,7 +367,7 @@ wheel:x:10:
 EOF
 ```
 
-## Kernel build
+## 内核构建
 
 ```bash
 cd $LFS/sources
@@ -378,19 +378,19 @@ cd linux-6.6.10
 make ARCH=riscv CROSS_COMPILE=riscv64-unknown-linux-gnu- defconfig
 ```
 
-### Key configuration additions
+### 关键配置追加
 
 ```bash
 cat >> .config << 'EOF'
-CONFIG_VIRTIO_BLK=y          # Disk
-CONFIG_VIRTIO_NET=y          # Network card
-CONFIG_VIRTIO_CONSOLE=y      # Console
-CONFIG_HVC_RISCV_SBI=y       # SBI console interface
-CONFIG_SERIAL_8250=y         # Serial port
-CONFIG_SERIAL_8250_CONSOLE=y # Serial console
-CONFIG_EXT4_FS=y             # Root filesystem
-CONFIG_PCI=y                 # PCI bus
-CONFIG_VIRTIO_PCI=y          # VirtIO PCI device
+CONFIG_VIRTIO_BLK=y          # 磁盘
+CONFIG_VIRTIO_NET=y          # 网卡
+CONFIG_VIRTIO_CONSOLE=y      # 控制台
+CONFIG_HVC_RISCV_SBI=y       # SBI 控制台接口
+CONFIG_SERIAL_8250=y         # 串口
+CONFIG_SERIAL_8250_CONSOLE=y # 串口控制台
+CONFIG_EXT4_FS=y             # 根文件系统
+CONFIG_PCI=y                 # PCI 总线
+CONFIG_VIRTIO_PCI=y          # VirtIO PCI 设备
 
 CONFIG_DEVTMPFS=y
 CONFIG_TMPFS=y
@@ -417,15 +417,15 @@ CONFIG_USER_NS=y
 EOF
 ```
 
-### Compilation
+### 编译
 
 ```bash
 make ARCH=riscv CROSS_COMPILE=riscv64-unknown-linux-gnu- -j$(nproc) Image
 ```
 
-## Install fastfetch
+## 安装fastfetch
 
-Host cross-compilation
+宿主机交叉编译
 
 ```bash
 cd $LFS/sources
@@ -448,7 +448,7 @@ make -j$(nproc)
 sudo install -Dm755 fastfetch $LFS/rootfs/usr/bin/fastfetch
 ```
 
-Custom color scheme
+自定义配色
 
 ```bash
 sudo mkdir -p $LFS/rootfs/usr/share/fastfetch
@@ -463,7 +463,7 @@ echo -e "\033[38;5;81m╭──────────────────�
 \033[38;5;81m╰────────────────────────────────────────╯\033[0m" | sudo tee $LFS/rootfs/usr/share/fastfetch/lee.txt
 ```
 
-Modify configuration file
+修改配置文件
 
 ```bash
 sudo mkdir -p $LFS/rootfs/etc/fastfetch
@@ -487,28 +487,28 @@ sudo tee $LFS/rootfs/etc/fastfetch/config.jsonc <<EOF
 EOF
 ```
 
-## Boot on startup
+## 开机自启
 
 ```bash
-# Create root directory
+# 创建 root 目录
 sudo mkdir -p $LFS/rootfs/root
 
-# Write login configuration
+# 写入登录配置
 cat << EOF | sudo tee $LFS/rootfs/root/.bash_profile
 echo "****************************************"
 echo "   Welcome to Lee's RISC-V LFS system!"
-echo "      System kernel:$(uname -r)"
+echo "      System kernel:\$(uname -r)"
 echo "****************************************"
 fastfetch
 
 export PS1='[\u@lfs \W]\$ '
 EOF
 
-# Soft link .bashrc
+# 软链接 .bashrc
 sudo ln -sfv .bash_profile $LFS/rootfs/root/.bashrc
 ```
 
-## Image creation
+## 镜像制作
 
 ```bash
 cd $LFS
@@ -523,7 +523,7 @@ sync
 sudo umount /mnt/tmp-boot
 ```
 
-## Boot
+## 启动
 
 ```bash
 qemu-system-riscv64 \

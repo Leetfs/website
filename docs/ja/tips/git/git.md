@@ -1,92 +1,93 @@
 ---
-title: Gitの簡単入門
+title: Git 的简单入门
 author: Lee
 ---
 
-## インストール
+## 安装
 
-### Windows / macOS
+### Windows / macos
 
 <https://git-scm.com/downloads>
 
 ### Linux
 
 ```bash
-sudo apt update\nsudo apt install git
+sudo apt update
+sudo apt install git
 ```
 
-## 使用方法
+## 使用
 
-インストール後、任意のターミナルで Git 関連のコマンドを実行できます。 また、vscode のように Git プラグインが組み込まれているエディタを使って、Git を視覚的に管理することも可能です。
+安装后可在任意终端执行 Git 相关命令，也可使用 vscode 这样的自带 Git 插件的编辑器可视化管理 Git。
 
-Git を使用する際は、[作業ディレクトリ](https://ja.wikipedia.org/wiki/%E3%83%AF%E3%83%BC%E3%82%AF%E3%83%87%E3%82%A3%E3%83%AC%E3%82%AF%E3%83%88%E3%83%AA)の概念を理解しておく必要があります。 作業ディレクトリは現在ターミナルやウィンドウが位置している場所であり、一部のコマンドが作用する場所です。
+使用 Git 时我们需要明白[工作路径](https://zh.wikipedia.org/wiki/%E5%B7%A5%E4%BD%9C%E7%9B%AE%E9%8C%84)的概念，工作路径为当前终端/窗口所在的位置，也是部分命令操作所工作的位置。
 
-たとえば、`cd lee` を使って現在のフォルダー内の `lee` フォルダーに移動すると、この状態で `git clone` を実行すると、`blog` リポジトリが `lee` フォルダーにクローンされます。
+例如我们可以使用 `cd lee` 切换到当前文件夹下的 `lee` 文件夹，此时运行 `git clone` 会将 `blog` 仓库克隆到 `lee` 文件夹中。
 
-### ユーザー名とメールアドレスの設定
+### 设置用户名和邮箱
 
 ```bash
-git config --global user.name "username" # ユーザー名を設定
-git config --global user.email useremail@qq.com # メールアドレスを設定
+git config --global user.name "username" # 设置用户名
+git config --global user.email useremail@qq.com # 设置邮箱
 ```
 
-### ブランチをチェックアウト
+### 检出分支
 
 ```bash
-git branch # 現在のブランチを表示
-git checkout ブランチ名 # ブランチをチェックアウト
+git branch # 查看当前有哪些分支
+git checkout 分支名 # 检出分支
 ```
 
-### リポジトリのクローン
+### 克隆仓库
 
 ```bash
-git clone リポジトリURL
+git clone 仓库url
 ```
 
 ```bash
 git clone https://github.com/Leetfs/blog
 ```
 
-例：本リポジトリのURLは <https://github.com/Leetfs/blog> です
+例：本仓库的 url 为 <https://github.com/Leetfs/blog>
 
 ```bash
 git clone https://github.com/Leetfs/blog ./lee-blog
 ```
 
-clone したリポジトリはデフォルトで現在の作業ディレクトリに配置され、デフォルトのフォルダー名はリポジトリ名になります。このコマンドの意味は、Git でクローンしたリポジトリをこのディレクトリ内の lee-blog フォルダーに保存するということです。
+clone 的仓库默认放在当前工作路径下，默认文件夹名为仓库名。此命令的含义为将 Git clone 下来的仓库存放在本目录下的 lee-blog 文件夹。
 
-> ヒント: / で始まるパスはルートディレクトリから始まり、たとえば /lee はルート直下のlee、./lee は現在の作業ディレクトリ内のleeを示します
+> tips: / 开头的路径表示从根目录开始，例如 /lee 代表根目录下的lee，./lee 代表当前工作路径下的lee
 
-### リモートリポジトリ
+### 远程仓库
 
 ```bash
-git remote add カスタムリモートリポジトリ名 https://github.com/example/source.git # リモートリポジトリを追加
-git fetch リモートリポジトリ名 # リモートリポジトリをローカルにプル
-git branch -a # すべてのブランチをリスト
-git checkout -b 新しいブランチ名 リモートリポジトリ名/リモートブランチ名 # リモートブランチに基づいて新しいローカルブランチをチェックアウト
-git switch feature # リモートブランチに基づいて新しいローカルブランチをチェックアウト（簡略化された操作）
+git remote add 自定义远程仓库名 https://github.com/example/source.git # 添加远程仓库
+git fetch 远程仓库名 # 把远程仓库拉到本地
+git branch -a # 列出所有分支
+git checkout -b 新分支名 远程仓库名/远程分支名 # 基于远程分支检出一个本地新分支
+git switch feature # 基于远程分支检出一个本地新分支（简化操作）
 ```
 
 ### cherry-pick
 
-`git cherry-pick`を使用すると、他のブランチ/リポジトリから1つ以上のコミットを選択し、これらのコミットを現在のブランチに「コピー」して、新しいコミットを作成できます。
+使用 `git cherry-pick` 可从其他分支/仓库挑选一个或多个提交，把这些提交“复制”到当前分支，产生新的提交。
 
 ```bash
-git checkout ターゲットブランチ
-git cherry-pick <開始ハッシュ>^..<終了ハッシュ>
-git cherry-pick --skip # 現在の衝突コミットをスキップ
-git cherry-pick --abort # cherry-pickを放棄（以前の状態に戻る）
+git checkout 目标分支
+git cherry-pick <起始哈希>^..<结束哈希>
+git cherry-pick --skip # 跳过当前冲突的提交
+git cherry-pick --abort # 放弃 cherry-pick（回退到之前状态）
 ```
 
-### ステージ／プッシュ／プル
+### 缓存/推/拉
 
-一般的な作業フロー：
+一个常见的工作流程：
 
 ```bash
-git pull # 最新バージョンを取得
-git add . # フォルダー内のすべてのファイルをステージ
-git commit -m "ここにコミットメッセージ。何を変更したか簡単に説明、日本語も可。（必須）" # ステージした変更をコミット
-git push # リモートにプッシュ
+git pull # 拉取最新版本
+git add . # 暂存文件夹下所有文件
+git commit -m "这里放提交消息，简要描述你改了什么，不限制语言。（必填）" # 提交暂存的修改
+git push #推送到远程
 ```
 
-この後はまだ書いていません。続く。
+后面没写，未完待续。

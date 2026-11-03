@@ -1,76 +1,76 @@
 ---
-title: A Beginner's Guide to Contributing on GitHub
+title: 给新手的 GitHub 贡献指南
 author: Lee
 ---
 
-### Required Tools
+### 所需工具
 
-- vscode (optional)
-- Git (optional)
-- A browser
+- vscode（可选）
+- Git（可选）
+- 一个浏览器
 
 ## GitHub
 
-### Getting Started with GitHub
+### 初识 GitHub
 
-GitHub is a large open-source community where you can freely contribute to projects you like.
+GitHub 是一个大型开源社区，您可以自由的为您喜欢的项目做出贡献。
 
-GitHub Official Website: <https://github.com/>
+GitHub 官网: <https://github.com/>
 
-### How do I contribute?
+### 我该如何做贡献？
 
-Register an account (details omitted here)
+注册账号（此处略）
 
-Go to the homepage and use the search bar to find the repository you want to contribute to, or jump directly via a repository link.
+打开首页，通过搜索栏找到想要做出贡献的仓库，也可以通过仓库链接直接跳转。
 
 ![](/tips/git/github-img/image.png)
 
-On the repository code page (homepage), click Fork to copy the repository to your account.
+在仓库代码页（首页），点击 Fork，复制仓库到你的账号下。
 
 ![](/tips/git/github-img/image1.png) ![](/tips/git/github-img/image2.png)
 
-Go to your forked repository
+进入你分叉出的仓库
 
 ![](/tips/git/github-img/image3.png)
 
-Find the file you want to edit, make your changes, and then click Save in the upper right corner.
+找到想要编辑的文件进行编辑，编辑后点击右上角保存。
 
 ![](/tips/git/github-img/image4.png) ![](/tips/git/github-img/image5.png)
 
-After all files have been modified, return to the repository homepage and initiate a pull request.
+所有文件修改完毕后，返回仓库主页，并发起一个拉取请求。
 
 ![](/tips/git/github-img/image6.png) ![](/tips/git/github-img/image7.png)
 
-Enter your title (required) and description (optional), then click Send.
+填写你的标题（必选）和 简介（可选），点击发送。
 
 ![](/tips/git/github-img/image8.png)
 
-Wait for the upstream repository maintainer to merge your pull request
+等待上游仓库管理员合并你的拉取请求
 
-### Tips
+### 小技巧
 
-On a GitHub repository page, pressing the `.` key switches to the web version of vs code, where editing can sometimes be more convenient than the native editor.
+在 GitHub 仓库页按下 `.` 键可以切换到网页版 vs code，在这个编辑器内编辑有时比原生的编辑器更好用。
 
-> You can practice with [this repository](https://github.com/Leetfs/blog); start by adding missing punctuation or correcting typos~
+> 您可以使用[此仓库](https://github.com/Leetfs/blog)练习，从补全缺失的标点符号/修复错别字开始吧~
 
-## FAQ
+## 常见问题
 
-Questions encountered when teaching newcomers, continuously updating
+此处为教新人时遇到过的问题，持续更新ing
 
-### What if I can't find my forked repository?
+### 找不到分叉出的仓库了怎么办？
 
-Click your avatar in the upper right corner, then select `Your repositories` from the sidebar that appears
+点击右上角你的头像，在弹出的侧边栏内选择 `Your repositories`
 
 ![](/tips/git/github-img/image9.png)
 
-On the page, select the repository you want to switch to
+在页面内选择你想切换到的仓库
 
 ![](/tips/git/github-img/image10.png)
 
-**Note:**
+**注意：**
 
-> Clicking the `Forked from ...` below the repository name will jump to the upstream repository, but usually you can only push changes to upstream via PR (pull request) unless you have direct push access to the upstream repository.
+> 点击仓库名下方的 `Forked from ...` 可跳转到上游仓库，但通常情况下您只可以通过 PR（拉取请求）的形式将更改推送到上游，除非您拥有对上游仓库的直接推送权限。
 
-## About pushing with vscode and git
+## 关于使用 vscode 和 git 进行推送
 
-See other articles in this series
+见本系列内的其他文章

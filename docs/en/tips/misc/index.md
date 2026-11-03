@@ -1,8 +1,8 @@
 ---
-title: Miscellaneous
+title: 杂项
 author: Lee
 ---
 
-## Table of Contents
+## 目录
 
 <ArticlesMenu />

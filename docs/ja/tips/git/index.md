@@ -1,12 +1,12 @@
 ---
-title: Git ＆ GitHub
+title: Git & GitHub
 author: Lee
 ---
 
-## 概要
+## 简介
 
-ここは初心者向けのGitとGitHubのチュートリアルです〜
+这里是给初学者的 Git 和 GitHub 教程~
 
-## 目次
+## 目录
 
 <ArticlesMenu />

@@ -3,6 +3,6 @@ title: System
 author: Lee
 ---
 
-## Contents
+## 目录
 
 <ArticlesMenu />

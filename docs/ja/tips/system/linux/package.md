@@ -1,13 +1,13 @@
 ---
-title: パッケージビルドと修正ガイド
+title: 打包修包指南
 author: Lee
 ---
 
-## obsの設定
+## 配置obs
 
-省略
+略
 
-## プル
+## 拉取
 
 ```bash
 osc co home:Lee/xxx && cd $_
@@ -16,56 +16,56 @@ osc up -S
 rm -f _service;for file in `ls`;do new_file=${file##*:};mv $file $new_file;done
 ```
 
-## ビルド
+## 构建
 
 ```bash
 osc build --no-verify --clean amd64 x86_64
 osc build --no-verify --clean riscv64 riscv64
 ```
 
-## パッケージ内容の確認
+## 查看包内内容
 
 ```bash
 rpm -qpl /var/tmp/build-root/..../.rpm
 ```
 
-## パッケージのアーキテクチャを確認する
+## 确认包的架构
 
 ```bash
 rpm -qp --queryformat '%{ARCH}\n' libraw-0.22.0-1.or.riscv64.rpm
 ```
 
-## podmanコンテナ内でテスト実行する
+## 在 podman 容器内测试运行
 
 ```bash
-podman run --rm -it -v /あなたの/RPM/パス/:/mnt:z system:amd64 /bin/bash
-podman run --rm -it -v /あなたの/RPM/パス/:/mnt:z system:riscv64 /bin/bash
+podman run --rm -it -v /你的/RPM/路径/:/mnt:z system:amd64 /bin/bash
+podman run --rm -it -v /你的/RPM/路径/:/mnt:z system:riscv64 /bin/bash
 
 ls -F /mnt
 dnf install /mnt/*.rpm
 ```
 
-## rawイメージをpodmanにインポートする方法
+## 如何将 raw 镜像导入 podman
 
 ```bash
-# イメージをループデバイスに関連付ける
+# 关联镜像到 Loop 设备
 sudo losetup -Pf --show system-virt_riscv64.raw
 
-# 一時マウントポイントを作成
+# 创建临时挂载点
 mkdir -p ./tmp_root
-# 二番目のパーティション（ルートパーティション）をマウント
+# 挂载第二个分区 (根分区)
 sudo mount /dev/loop0p2 ./tmp_root
-# 古いイメージを削除
+# 清理旧镜像
 podman rmi system:riscv64
-# ファイルを抽出してインポート
-# --numeric-ownerを追加して権限IDを元の状態に保つ
+# 提取文件并导入
+# 加 --numeric-owner 确保权限 ID 保持原始状态
 sudo tar -C ./tmp_root --numeric-owner -cf - . | podman import - system:riscv64
 
-# マウントをクリーンアップ
+# 清理挂载
 sudo umount ./tmp_root
 sudo losetup -d /dev/loop0
 rmdir ./tmp_root
 
-# 起動テスト
+# 启动测试
 podman run -it --rm system:riscv64 /bin/sh
 ```

@@ -1,22 +1,22 @@
 ---
-title: EpicGamesをプロフィールページに公開する
+title: 将 EpicGames 公开到个人资料页
 author: Lee
 ---
 
-## 用途
+## 用处
 
-EpicGamesの組織メンバーは多数いるため、メンバーページで自分が検索できず、ステータスを設定できない場合があります。
+EpicGames 组织人数众多，可能无法在成员页搜索到自己，导致无法设置状态。
 
-任意の端末で以下のコードを実行できます。
+可使用任意终端执行以下代码。
 
-## 公開
+## 公开
 
 ```shell
-Invoke-RestMethod -Uri "https://api.github.com/orgs/EpicGames/public_members/あなたのユーザー名" -Method Put -Headers @{"Accept"="application/vnd.github.v3+json"; "Authorization"="token あなたのPATキー"}
+Invoke-RestMethod -Uri "https://api.github.com/orgs/EpicGames/public_members/你的用户名" -Method Put -Headers @{"Accept"="application/vnd.github.v3+json"; "Authorization"="token 你的PAT密钥"}
 ```
 
-## 非公開
+## 隐藏
 
 ```shell
-Invoke-RestMethod -Uri "https://api.github.com/orgs/EpicGames/public_members/あなたのユーザー名" -Method Delete -Headers @{"Authorization"="token あなたのPATキー"}
+Invoke-RestMethod -Uri "https://api.github.com/orgs/EpicGames/public_members/你的用户名" -Method Delete -Headers @{"Authorization"="token 你的PAT密钥"}
 ```

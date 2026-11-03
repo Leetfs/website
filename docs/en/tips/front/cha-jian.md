@@ -1,11 +1,11 @@
 ---
-title: Recommended Practical Plugins
+title: 实用插件推荐
 author: Lee
 ---
 
 ## LocatorJS
 
-Click on a component to go to its code, compatible with Vue, React, and more.
+单击组件即可转到其代码，兼容 vue 、React 等。
 
-Official Site: <https://www.locatorjs.com/>\
-GitHub: <https://github.com/infi-pc/locatorjs>
+官网：<https://www.locatorjs.com/>\
+GitHub：<https://github.com/infi-pc/locatorjs>

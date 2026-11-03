@@ -1,30 +1,30 @@
 ---
-title: 着替え
+title: 穿衣
 author: Lee
 ---
 
-## ボーン制御プラグイン lilycalInventory をインストール
+## 安装绑骨插件 lilycalInventory
 
-[lilycalInventory](https://lilxyzw.github.io/lilycalInventory/) のドキュメントを参照してください。
+参考 [lilycalInventory](https://lilxyzw.github.io/lilycalInventory/) 文档。
 
-## モデルと衣服をインポート
+## 导入模型和衣服
 
-[モデルのインポートと公開](./import.md) を参照
+见 [模型的导入与发布](./import.md)
 
-## モデルと衣服を解凍
+## 解压模型和衣服
 
-モデルを右クリックし、`Prefab -> Unpack Completely`
+右击模型，`Prefab -> Unpack Completely`
 
-![衣類の展開](/tips/vrchat/avatar/image/clothing-unpack.png)
+![clothing-unpack](/tips/vrchat/avatar/image/clothing-unpack.png)
 
-## 空のオブジェクトを作成
+## 建立空对象
 
-![衣類の空オブジェクト作成](/tips/vrchat/avatar/image/clothing-create-empty.png)
+![clothing-create-empty](/tips/vrchat/avatar/image/clothing-create-empty.png)
 
-## コンポーネントを追加
+## 添加组件
 
-![衣類のコンポーネント追加](/tips/vrchat/avatar/image/clothing-add-component.png)
+![clothing-add-component](/tips/vrchat/avatar/image/clothing-add-component.png)
 
-## メニューを追加
+## 添加菜单
 
-![衣類のメニュー追加](/tips/vrchat/avatar/image/clothing-add-menu.png)
+![clothing-add-menu](/tips/vrchat/avatar/image/clothing-add-menu.png)

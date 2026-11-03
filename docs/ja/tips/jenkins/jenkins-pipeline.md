@@ -1,18 +1,18 @@
 ---
-title: Jenkins 宣言型パイプラインとスクリプト型パイプライン
+title: Jenkins 声明式流水线与脚本式流水线
 author: Lee
 ---
 
-## 宣言型パイプライン
+## 声明式流水线
 
-_Jenkinsfile（宣言型パイプライン）_
+_Jenkinsfile (Declarative Pipeline)_
 
 ```groovy
 pipeline {
-    agent any // 任意のノードで実行可能；noneを指定し、グローバルagentなしにもできる。
+    agent any // 允许在任意节点运行；也可用 none，不指定全局 agent。
     stages {
         stage('Build') {
-          agent { // 実行ノード指定
+          agent { //指定代理节点
               label 'master'
             }
             steps {
@@ -33,26 +33,26 @@ pipeline {
 }
 ```
 
-各stageにはstepsは一つだけ配置でき、`agent { label 'master' }` でそのstageの実行ノードを指定できます。
+每个 stage 里只能有一个 steps，可通过 `agent { label 'master' }` 指定该 stage 的运行节点。
 
-### 宣言型パイプラインの特徴
+### 声明式流水线的特性
 
-1. 異なるstageで同じlabelを指定しても、実行ノードが必ずしも同じとは限らず、Jenkinsはそのlabelに紐づく使用可能なノードをランダムで割り当てます。
-2. バージョン管理システムでJenkinsfileを管理する場合、宣言型パイプラインは各ステージごとにリポジトリ全体をルートディレクトリにチェックアウトするため、サブノードにもgitのインストールが必要です。
-3. 同じstepsブロック内では前のコマンドの状態を継承します。例えば、最初の行が `sh 'cd nya'` の場合、二行目は nya ディレクトリ内で実行されます。
+1. 不同 stage 使用同一 label 时，运行节点不一定相同，Jenkins 会随机分配一个该 label 下的可用节点。
+2. 使用版本控制系统管理 Jenkinsfile 时，声明式流水线会在每个阶段都检出整个仓库至根目录，因此须在子节点安装 git。
+3. 同一 steps 块内会继承上文，例如第一行为 `sh 'cd nya'`,第二行的工作路径则在 nya 内。
 
-### 特徴1への対応策
+### 特性 1 的解决方案
 
-最初にノードを呼び出す際に `env.NODE_NAME` をグローバル変数に渡し、その変数を使いたいノードのlabelタグに格納します。
+首次调用节点时将 `env.NODE_NAME` 传入全局变量，将定义出的变量放入需使用此节点的 label 标签。
 
-`env.NODE_NAME` はJenkinsの組み込み変数で、現在のステージが動作するノード名を示します。
+`env.NODE_NAME` 为 Jenkins 内置变量，该变量的值是运行当前阶段的节点名。
 
-## スクリプト型パイプライン
+## 脚本式流水线
 
-_Jenkinsfile（スクリプト型パイプライン）_
+_Jenkinsfile (Scripted Pipeline)_
 
 ```groovy
-node('master') { // masterラベルのノードを指定
+node('master') { //指定使用 master 标签的节点
     stage('Build') {
         //
     }
@@ -60,22 +60,22 @@ node('master') { // masterラベルのノードを指定
         //
     }
 }
-node('RVV') { // RVVラベルのノードを指定
+node('RVV') { //指定使用 RVV 标签的节点
     stage('Build') {
         //
     }
     stage('Test') {
-      sh 'にゃー'
-      sh 'にゃー'
+      sh '喵'
+      sh '喵'
     }
 }
 ```
 
-シンプルで便利、`pipeline` フレームワークなしで、nodeブロックでノード実行をコントロールできます。使用例：<https://github.com/Leetfs/opencv-riscv-perf/blob/main/Jenkinsfile>
+简单，方便，没有复杂的 `pipeline` 框架，使用 node 块控制节点运行。使用样例：<https://github.com/Leetfs/opencv-riscv-perf/blob/main/Jenkinsfile>
 
-### スクリプト型パイプラインの特徴
+### 脚本式流水线的特性
 
-1. 一つのパイプライン内で複数のnodeが使え、一つのnodeで複数のstageが指定可能。同じnodeブロック内の各stageは同一ノードで動作します。
-2. バージョン管理でJenkinsfileを管理しても、スクリプト型パイプラインはJenkinsfileだけをノードで読み込み、リポジトリ全体は取得しません。 リポジトリ内容が必要な場合は自分でcloneしてください。
-3. 同じstepsブロック内でも前のコマンド状態は継承されません。例えば一行目が `sh 'cd nya'` なら、二行目の作業ディレクトリは依然としてデフォルトの作業領域で、nyaではありません。
-   - 複数行スクリプト `sh ''' 内容 ''' ` はこの制限を受けません。 なぜなら複数行コマンドはひとつのshブロック内で処理されるためです。
+1. 一条流水线里可以有多个 node，一个 node 可以同时为多个 stage 指定节点，同一个 node 块里的阶段运行时使用同一节点。
+2. 使用版本控制系统管理 Jenkinsfile 时，脚本式流水线不会检出整个仓库至节点，仅读取 Jenkinsfile，想使用仓库需自行 clone。
+3. 同一 steps 块内不会继承上文，例如第一行为 `sh 'cd nya'`,第二行的工作路径还在默认工作区路径，而不是 nya。
+   - 多行脚本 `sh ''' 我是内容 ''' ` 不受此限，因为多行命令均在一个 sh 块内。

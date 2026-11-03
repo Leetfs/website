@@ -1,27 +1,27 @@
 ---
-title: WSL のよく使うコマンド
+title: WSL 常用指令
 author: Lee
 ---
 
-## デフォルトユーザーの設定
+## 设置默认用户
 
 ```bash
 Debian config --default-user root
 ```
 
-## システムの破棄
+## 销毁系统
 
 ```bash
 wsl --unregister Debian
 ```
 
-## システムの作成
+## 建立系统
 
 ```bash
 wsl --install -d Debian
 ```
 
-## システムをシャットダウン
+## 关闭系统
 
 ```bash
 wsl --shutdown

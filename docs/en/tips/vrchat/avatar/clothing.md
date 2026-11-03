@@ -1,30 +1,30 @@
 ---
-title: Dressing
+title: 穿衣
 author: Lee
 ---
 
-## Install the bone binding plugin lilycalInventory
+## 安装绑骨插件 lilycalInventory
 
-Refer to the [lilycalInventory](https://lilxyzw.github.io/lilycalInventory/) documentation.
+参考 [lilycalInventory](https://lilxyzw.github.io/lilycalInventory/) 文档。
 
-## Import model and clothing
+## 导入模型和衣服
 
-See [Model Import and Publishing](./import.md)
+见 [模型的导入与发布](./import.md)
 
-## Unpack model and clothing
+## 解压模型和衣服
 
-Right-click the model, `Prefab -> Unpack Completely`
+右击模型，`Prefab -> Unpack Completely`
 
 ![clothing-unpack](/tips/vrchat/avatar/image/clothing-unpack.png)
 
-## Create empty object
+## 建立空对象
 
 ![clothing-create-empty](/tips/vrchat/avatar/image/clothing-create-empty.png)
 
-## Add component
+## 添加组件
 
 ![clothing-add-component](/tips/vrchat/avatar/image/clothing-add-component.png)
 
-## Add menu
+## 添加菜单
 
 ![clothing-add-menu](/tips/vrchat/avatar/image/clothing-add-menu.png)

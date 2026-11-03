@@ -1,8 +1,8 @@
 ---
-title: フロントエンド
+title: 前端
 author: Lee
 ---
 
-## 目次
+## 目录
 
 <ArticlesMenu />

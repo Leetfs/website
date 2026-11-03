@@ -3,6 +3,6 @@ title: Python
 author: Lee
 ---
 
-## Table of Contents
+## 目录
 
 <ArticlesMenu />

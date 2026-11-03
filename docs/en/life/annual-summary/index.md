@@ -1,8 +1,8 @@
 ---
-title: Annual Summary
+title: 年度总结
 author: Lee
 ---
 
-## Contents
+## 目录
 
 <ArticlesMenu />

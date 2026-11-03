@@ -1,70 +1,70 @@
 ---
-title: Debian での Docker インストール
+title: Debian 安装 docker
 author: Lee
 ---
 
-## Docker のインストール
+## 安装docker
 
-### パッケージインデックスを更新する
+### 更新软件包索引
 
 ```bash
 sudo apt update
 ```
 
-### 依存パッケージのインストール
+### 安装依赖包
 
 ```bash
 sudo apt install apt-transport-https ca-certificates curl software-properties-common
 ```
 
-### Docker公式のGPGキーを追加
+### 添加 Docker 官方的 GPG 密钥
 
 ```bash
 curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 ```
 
-### Docker公式APTリポジトリを追加
+### 添加 Docker 官方 APT 仓库源
 
 ```bash
 echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 ```
 
-### インデックスを再度更新する
+### 重新更新索引
 
 ```bash
 sudo apt update
 ```
 
-### Docker のインストール
+### 安装 Docker
 
 ```bash
 sudo apt install docker-ce docker-ce-cli containerd.io
 ```
 
-### Docker を起動し、自動起動を設定
+### 启动并设置为开机自启
 
 ```bash
 sudo systemctl start docker
 sudo systemctl enable docker
 ```
 
-### 正常に動作しているか確認する
+### 验证是否正常运行
 
 ```bash
 sudo docker --version
 ```
 
-正しくインストールされている場合、バージョンが表示されます
+正确安装时会输出版本号
 
-## Docker Compose のインストール
+## 安装 Docker Compose
 
-オプションです。必要に応じてインストールしてください
+可选项，根据需求决定是否安装
 
 ```bash
 sudo apt install docker-compose
 ```
 
-インストールが完了したら、以下のコマンドでインストールを確認してください：
+安装完成后，运行以下命令验证安装：
 
 ```bash
 docker-compose --version

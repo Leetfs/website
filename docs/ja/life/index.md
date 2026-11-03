@@ -1,12 +1,12 @@
 ---
-title: 日常の些細なこと
-icon: クリエイティブ
+title: 生活琐事
+icon: creative
 author: Lee
 category:
-  - 日常の些細なこと
+  - 生活琐事
 index: false
 ---
 
-## 目次
+## 目录
 
 <ArticlesMenu />

@@ -3,17 +3,17 @@ title: Numba
 author: Lee
 ---
 
-## Introduction
+## 简介
 
-Automatically compile Python functions into high-performance machine code using `@jit` or `@njit`.
+通过 `@jit` 或 `@njit`，自动将的 Python 函数编译为高性能机器码。
 
-## Installation
+## 安装
 
 ```bash
 pip install numba
 ```
 
-## Usage Example
+## 使用示例
 
 ```python{1,3}
 from numba import njit
@@ -22,5 +22,5 @@ from numba import njit
 def add(a, b):
     return a + b
 
-print(add(1, 2))  # Output: 3
+print(add(1, 2))  # 输出：3
 ```

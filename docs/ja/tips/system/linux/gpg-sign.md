@@ -1,15 +1,15 @@
 ---
-title: ターミナル環境でのGPG署名エラーの修正
+title: 修复终端环境使用 GPG 签名报错
 author: Lee
 ---
 
-## 問題の調査
+## 排查问题
 
-ターミナルを使ってサーバーに接続し、Yubikey内のGPGキーでGitコミットに署名しようとした際にエラーが表示されました。 簡単な調査内容：
+使用终端连接服务器，调 yubikey 内的 GPG 密钥签 Git 提交时提示错误，简要排查：
 
 ![](/tips/system/linux/pubilc/gpg-sign-img/gpg-sign-1.png)
 
-有効な秘密鍵が存在するか確認：
+验证是否有有效私钥：
 
 ```bash
 gpg --list-secret-keys --keyid-format LONG
@@ -17,7 +17,7 @@ gpg --list-secret-keys --keyid-format LONG
 
 ![](/tips/system/linux/pubilc/gpg-sign-img/gpg-sign-2.png)
 
-スマートカードが正しく読み取れるかテストする：
+测试是否正确读取智能卡：
 
 ```bash
 gpg --card-status
@@ -25,13 +25,13 @@ gpg --card-status
 
 ![](/tips/system/linux/pubilc/gpg-sign-img/gpg-sign-3.png)
 
-GPGを直接使って署名テスト：
+直接使用 GPG 测试签名：
 
 ```bash
 echo "test" | gpg --clearsign
 ```
 
-出力結果：
+获得输出：
 
 ```bash
 -----BEGIN PGP SIGNED MESSAGE-----
@@ -42,14 +42,14 @@ gpg: signing failed: Inappropriate ioctl for device
 gpg: [stdin]: clear-sign failed: Inappropriate ioctl for device
 ```
 
-エラーメッセージから、複数のターミナル環境ではGPGが現在使用している端末デバイスを自動認識できず、PINコードの入力プロンプトが正しくユーザーに伝わらないことが分かりました。 GPG_TTY環境変数の設定で修正を試みます：
+观察报错发现，多终端环境下 GPG 无法自动识别当前正在使用的终端设备，导致不能正确的将 PIN 码输入提示传递给用户，配置 GPG_TTY 环境变量尝试修复：
 
 ```bash
 export GPG_TTY=$(tty)
 ```
 
-再度署名テストを行う：
+重新测试签名：
 
 ![](/tips/system/linux/pubilc/gpg-sign-img/gpg-sign-4.png)
 
-認証ダイアログが正常に表示され、これで問題が解決されました。
+成功弹出校验框，至此问题解决。

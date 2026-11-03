@@ -1,42 +1,42 @@
 ---
-title: lit を使って LLVM IR ファイルをテストする
+title: 使用 lit 测试 LLVM IR 文件
 author: Lee
 ---
 
-## 用語マッチング
+## 术语匹配
 
-- lit: LLVM インテグレーテッド テスター
-- .ll: LLVM IR ファイル
+- lit: LLVM Integrated Tester
+- .ll: LLVM IR 文件
 
-## 前提条件
+## 前置条件
 
-llvm がインストール済み
+已安装 llvm
 
-## テスト手順
+## 测试流程
 
 ```yaml
 float.ll
   |
   v
-lit で RUN コマンド実行 -> llc で出力を生成
+lit 执行 RUN 指令 -> llc 生成输出
   |
   v
-FileCheck で出力を検証
+FileCheck 校验输出
   |
-  +--✔️ すべて一致：PASS
+  +--✔️ 全部匹配：PASS
   |
-  +--❌ エラーあり：FAIL
+  +--❌ 有错：FAIL
 ```
 
-## 実行コマンド
+## 执行语句
 
-特定のファイルやフォルダーを指定できます。
+可指定某一文件，也可指定某文件夹。
 
 ```bash
 llvm-lit llvm/test/CodeGen/RISCV/VentusGPGPU/float.ll
 ```
 
-## 出力
+## 输出
 
 ```bash
 -- Testing: 1 tests, 1 workers --
@@ -46,19 +46,19 @@ Testing Time: 0.07s
   Passed: 1
 ```
 
-## よく使うコマンド
+## 常用指令
 
-| コマンド                      | 説明                                           | 例                                     |
-| ------------------------- | -------------------------------------------- | ------------------------------------- |
-| `llvm-lit <test_dir>`     | 指定したディレクトリ内のすべてのテストケースを実行                    | `llvm-lit ./test`                     |
-| `-v` または `--verbose`      | 詳細なテスト出力を表示                                  | `llvm-lit -v ./test`                  |
-| `-j <N>` または `--jobs=<N>` | 並列で実行するテスト数を指定                               | `llvm-lit -j 4 ./test`                |
-| `--max-tests <N>`         | 最大テスト数の制限                                    | `llvm-lit --max-tests=100 ./test`     |
-| `--filter=<pattern>`      | 指定したパターンに一致するテストを実行（テスト名によるフィルタリング）          | `llvm-lit --filter=xyz ./test`        |
-| `--show-unsupported`      | サポートされていないテストを表示                             | `llvm-lit --show-unsupported ./test`  |
-| `--test-messages`         | 各テストの詳細な出力を表示（標準出力と標準エラー出力を含む）               | `llvm-lit --test-messages ./test`     |
-| `--help`                  | `llvm-lit` のヘルプドキュメントを表示し、すべての対応オプションや引数をリスト | `llvm-lit --help`                     |
-| `--dump-input=help`       | テストが失敗した場合、入力の内容を表示して、失敗理由のデバッグを支援           | `llvm-lit --dump-input=help ./test`   |
-| `--continue-on-error`     | どれかのテストが失敗しても、他のテストを継続実行し、テストプロセスを停止しない      | `llvm-lit --continue-on-error ./test` |
-| `--output=<file>`         | テスト結果を指定ファイルに出力                              | `llvm-lit --output=result.txt ./test` |
-| `--no-filecheck`          | `FileCheck` 出力の生成を無効化                        | `llvm-lit --no-filecheck ./test`      |
+| 指令                      | 描述                               | 示例                                    |
+| ----------------------- | -------------------------------- | ------------------------------------- |
+| `llvm-lit <test_dir>`   | 执行指定目录下的所有测试用例                   | `llvm-lit ./test`                     |
+| `-v` 或 `--verbose`      | 显示详细的测试输出信息                      | `llvm-lit -v ./test`                  |
+| `-j <N>` 或 `--jobs=<N>` | 指定并行运行的测试数                       | `llvm-lit -j 4 ./test`                |
+| `--max-tests <N>`       | 限制最多执行的测试数量                      | `llvm-lit --max-tests=100 ./test`     |
+| `--filter=<pattern>`    | 运行符合给定模式的测试（根据测试名称过滤）            | `llvm-lit --filter=xyz ./test`        |
+| `--show-unsupported`    | 显示不支持的测试                         | `llvm-lit --show-unsupported ./test`  |
+| `--test-messages`       | 显示每个测试的详细输出信息（包括标准输出和错误输出）       | `llvm-lit --test-messages ./test`     |
+| `--help`                | 显示 `llvm-lit` 的帮助文档，列出所有支持的选项和参数 | `llvm-lit --help`                     |
+| `--dump-input=help`     | 如果测试失败，显示输入的内容，帮助调试失败原因          | `llvm-lit --dump-input=help ./test`   |
+| `--continue-on-error`   | 如果某个测试失败，继续执行其他测试，不停止测试过程        | `llvm-lit --continue-on-error ./test` |
+| `--output=<file>`       | 将测试结果输出到指定文件                     | `llvm-lit --output=result.txt ./test` |
+| `--no-filecheck`        | 禁用 `FileCheck` 输出的生成             | `llvm-lit --no-filecheck ./test`      |

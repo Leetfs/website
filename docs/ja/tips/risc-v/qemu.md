@@ -1,15 +1,15 @@
 ---
-title: QEMU を使用して RISC-V プログラムを実行する
+title: 使用 QEMU 运行 RISC-V 程序
 author: Lee
 ---
 
-## インストール
+## 安装
 
 ```bash
 apt install qemu-user
 ```
 
-## 使用方法
+## 使用
 
 ```bash
 qemu-riscv64 ./hello

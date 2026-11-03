@@ -1,28 +1,28 @@
 ---
-title: RISC-V GNU コンパイラツールチェーン
+title: RISC-V GNU 编译器工具链
 author: Lee
 ---
 
-## 前提条件
+## 前置条件
 
-本記事ではプリビルド版を使用します。 ビルド自体をしたい場合は公式ドキュメントを参照してください。
+本文章使用预编译版本，想自行编译请参考官方文档。
 
-## インストール編
+## 安装篇
 
-- [releases](https://github.com/riscv-collab/riscv-gnu-toolchain/releases) ページで適切なパッケージを選択してください。
-- ダウンロードしたファイルを `/opt` に解凍し、`/opt/riscv/bin` を `PATH` に追加してください。
+- 前往 [releases](https://github.com/riscv-collab/riscv-gnu-toolchain/releases) 页面挑选合适的包。
+- 将下载的文件解压到 `/opt`, 并把 `/opt/riscv/bin` 添加到 `PATH`。
 
 ```bash
-curl -fL https://github.com/riscv-collab/riscv-gnu-toolchain/releases/download/2025.01.20/riscv64-glibc-ubuntu-22.04-gcc-nightly-2025.01.20-nightly.tar.xz -o /tmp/riscv64-toolchain.tar.xz # ダウンロード
+curl -fL https://github.com/riscv-collab/riscv-gnu-toolchain/releases/download/2025.01.20/riscv64-glibc-ubuntu-22.04-gcc-nightly-2025.01.20-nightly.tar.xz -o /tmp/riscv64-toolchain.tar.xz # 下载
 
-tar -xf /tmp/riscv64-toolchain.tar.xz -C /opt/ # 解凍
+tar -xf /tmp/riscv64-toolchain.tar.xz -C /opt/ #解压
 
-rm /tmp/riscv64-toolchain.tar.xz # アーカイブを削除
+rm /tmp/riscv64-toolchain.tar.xz # 移除压缩包
 
-export PATH=/opt/riscv/bin:$PATH # 環境変数の設定
+export PATH=/opt/riscv/bin:$PATH # 设置环境变量
 ```
 
-以下のコマンドで正しくインストールされたかテストできます（以下は glibc ツールチェーン用。他のバージョンは公式ドキュメントを参照してください~）
+可使用以下命令测试是否正确安装（以下命令适用于 glibc 工具链，其余版本参照官方文档~）
 
 ```bash
 riscv64-unknown-linux-gnu-gcc --version
@@ -32,54 +32,54 @@ riscv64-unknown-linux-gnu-objdump --version
 riscv64-unknown-linux-gnu-gdb --version
 ```
 
-### docker でのインストール
+### 在 docker 里安装
 
-dockerfile の利用を推奨します。
+推荐使用 dockerfile。
 
 ```dockerfile
-# クロスコンパイラツールチェーンのダウンロードと展開
+# 下载并解压交叉编译工具链
 RUN curl -fL https://github.com/riscv-collab/riscv-gnu-toolchain/releases/download/2025.01.20/riscv64-glibc-ubuntu-22.04-gcc-nightly-2025.01.20-nightly.tar.xz -o /tmp/riscv64-toolchain.tar.xz && \
     tar -xf /tmp/riscv64-toolchain.tar.xz -C /opt/ && \
     rm /tmp/riscv64-toolchain.tar.xz
 
-# クロスコンパイラツールチェーンパスの設定
+# 设置交叉编译工具链路径
 ENV PATH=/opt/riscv/bin:$PATH
 ```
 
-## 使い方編
+## 使用篇
 
-このツールチェーンと cmake を利用することで RISC-V プログラムをクロスコンパイルできます。
+可以使用此工具链 + cmake 交叉编译 RISC-V 程序。
 
-- `toolchain-riscv64.cmake`（または好きな名前）を作成し、cmake のクロスコンパイル設定ファイルとします。
-- `cmake -D CMAKE_TOOLCHAIN_FILE=ファイルパス/toolchain-riscv64.cmake` でこのファイルを指定してください。
-- `make -j $(nproc)` を実行してバイナリを作成します。
+- 建一个 `toolchain-riscv64.cmake` （或你喜欢的名字） 作为 cmake 交叉编译配置文件。
+- 使用 `cmake -D CMAKE_TOOLCHAIN_FILE=文件路径/toolchain-riscv64.cmake` 指定使用此文件。
+- 运行 `make -j $(nproc)` make 出二进制程序。
 
-こちらが私の `toolchain-riscv64.cmake` のサンプルです
+以下是我的 `toolchain-riscv64.cmake` 样板
 
 ```cmake
-# クロスコンパイル対象のアーキテクチャ設定
+# 设置交叉编译的目标架构
 set(CMAKE_SYSTEM_NAME Linux)
 set(CMAKE_SYSTEM_PROCESSOR riscv64)
 
-# クロスコンパイラツールチェーンパス
+# 设置交叉编译工具链路径
 set(tools /opt/riscv)
 
-# C および C++ コンパイラの設定
+# 设置 C 和 C++ 编译器
 set(CMAKE_C_COMPILER ${tools}/bin/riscv64-unknown-linux-gnu-gcc)
 set(CMAKE_CXX_COMPILER ${tools}/bin/riscv64-unknown-linux-gnu-g++)
 
-# sysroot の設定（ある場合）
+# 设置 sysroot（如果有）
 set(CMAKE_SYSROOT /opt/riscv/sysroot)
 
-# 検索パスの設定
+# 配置查找路径
 set(CMAKE_FIND_ROOT_PATH ${CMAKE_SYSROOT})
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 
-# 静的リンクの使用
+# 使用静态链接
 set(CMAKE_EXE_LINKER_FLAGS "-static")
-# set(CMAKE_CXX_FLAGS "-static -O3") #最適化を有効化
+# set(CMAKE_CXX_FLAGS "-static -O3") #启用优化
 # set(CMAKE_C_FLAGS "-static -O3")
 set(BUILD_SHARED_LIBS OFF)
 ```
