@@ -1,8 +1,8 @@
 ---
-title: Frontend
+title: 前端
 author: Lee
 ---
 
-## Table of Contents
+## 目录
 
 <ArticlesMenu />
