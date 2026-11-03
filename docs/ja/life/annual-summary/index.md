@@ -1,8 +1,8 @@
 ---
-title: 年度のまとめ
+title: 年度总结
 author: Lee
 ---
 
-## 目次
+## 目录
 
 <ArticlesMenu />
