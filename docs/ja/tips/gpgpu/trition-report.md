@@ -1,15 +1,15 @@
 ---
-title: Triton の使用体験とパフォーマンス分析
+title: Triton 使用体验与性能分析
 author: Lee
 ---
 
-## 概要
+## 概述
 
-Triton はディープラーニングのために最適化された GPGPU プログラミングフレームワークで、**シンプルかつ高性能**、Python 環境で効率的に記述できます~
+Triton 是为深度学习优化的 GPGPU 编程框架，**简洁、高性能**，使用 python 环境高效编写~
 
-## インストールおよび使用方法
+## 安装及使用
 
-pip を使用します。
+使用 pip。
 
 ```bash
 uv pip install triton
@@ -22,9 +22,9 @@ import triton
 ...
 ```
 
-## パフォーマンス最適化
+## 性能优化
 
-### スレッドブロックサイズの調整
+### 调整线程块大小
 
 #### vecadd: BLOCK_SIZE = 16
 
