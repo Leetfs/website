@@ -3,10 +3,10 @@ title: Git & GitHub
 author: Lee
 ---
 
-## Introduction
+## 简介
 
-This is a Git and GitHub tutorial for beginners~
+这里是给初学者的 Git 和 GitHub 教程~
 
-## Table of Contents
+## 目录
 
 <ArticlesMenu />
