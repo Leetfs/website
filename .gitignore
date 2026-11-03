@@ -2,14 +2,13 @@
 /node_modules/
 
 # Build and generated output
-/.next/
 /out/
 /dist/
 /coverage/
-/app/generated/
-/public/api/articles/
+/docs/.vitepress/cache/
+/docs/.vitepress/.temp/
+/docs/.vitepress/components.d.ts
 *.tsbuildinfo
-next-env.d.ts
 
 # Local tooling and caches
 /.agents/
