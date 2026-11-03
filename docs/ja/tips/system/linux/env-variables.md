@@ -1,17 +1,17 @@
 ---
-title: 環境変数の永続化
+title: 持久化环境变量
 author: Lee
 ---
 
-## 設定
+## 配置
 
-`.bashrc` を開く
+打开 `.bashrc`
 
 ```bash
 nano ~/.bashrc
 ```
 
-最後に `export` 文を追加する
+在最后面加上 `export` 语句
 
 ```bash
 export VENTUS_INSTALL_PREFIX=/root/J142/llvm-project/install
