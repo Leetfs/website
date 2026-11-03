@@ -1,63 +1,63 @@
 ---
-title: Resume
+title: 简历
 author: Lee
 ---
 
-## Personal Profile
+## 个人简介
 
-**Passionate about open-source, technology, and equality.**\*\*
+**热爱开源、技术与平等。**
 
-Experience in front-end development, CI/CD systems, and Linux distribution development, with deep involvement in the RISC-V ecosystem.
+具备前端开发、CI/CD 系统与 Linux 发行版开发经验，深度参与 RISC-V 生态建设。
 
-## Skills
+## 技能
 
-- Programming Languages: Proficient in C/C++, familiar with React, Vue frontend frameworks and Electron cross-platform desktop application development.
-- System Development: Deep understanding of Linux system architecture, experience independently building LFS (Linux From Scratch); familiar with RISC-V architecture and underlying toolchains (including systemd, glibc, and riscv64 cross-compilation).
-- Compilation Technology: Familiar with LLVM framework and code generation flow, skilled in using CMake and other build tools.
-- Infrastructure: Proficient in setting up CI/CD automation pipelines such as Jenkins and GitHub Actions, familiar with Docker containers and Nginx configuration.
+- 编程语言： 熟练掌握 C/C++，熟悉 React、Vue 前端框架及 Electron 跨平台桌面端应用开发。
+- 系统开发： 深入理解 Linux 系统架构，具备独立构建 LFS (Linux From Scratch) 经验；熟悉 RISC-V 架构及底层工具链（包括 systemd、glibc 及 riscv64 交叉编译）。
+- 编译技术： 熟悉 LLVM 框架与代码生成流程，熟练使用 CMake 等构建工具。
+- 基础设施： 掌握 Jenkins、GitHub Actions 等 CI/CD 自动化流水线搭建，熟悉 Docker 容器与 Nginx 配置。
 
-## Project Experience
+## 项目经历
 
-### openRuyi Linux distribution development
+### openRuyi Linux 发行版开发
 
-_Institute of Software, Chinese Academy of Sciences_ | 2026.03 - Present
+_中国科学院软件研究所_ | 2026.03 - 至今
 
-- Independently completed the refactoring and adaptation of the Amazon SageMaker SDK for the RISC-V ecosystem, handling complex namespace conflicts.
-- Responsible for tracking upstream CVE vulnerability dynamics, performing vulnerability fixes through backporting security patches, and conducting rigorous compilation and regression testing in the RISC-V environment to ensure the stability of the fix.
-- Participate in the design, development, and maintenance of innovative distribution tools, introducing automation and AI capabilities to the distribution infrastructure.
+- 独立完成 Amazon SageMaker SDK 在 RISC-V 生态的重构与适配，处理了复杂的 Namespace 冲突。
+- 负责追踪上游 CVE 漏洞动态，通过向后移植安全补丁完成漏洞修复，并在 RISC-V 环境下进行严格的编译与回归测试，确保修复方案的稳定性。
+- 参与发行版创新工具的设计、研发和维护工作，为发行版基础设施引入自动化与 AI 能力。
 
-### Shadow GPGPU LLVM Toolchain Development
+### 乘影 GPGPU LLVM 工具链开发
 
-_Institute of Software, Chinese Academy of Sciences_ | May 2025 - Present
+_中国科学院软件研究所_ | 2025.05 - 2025.07
 
-- Participated in the open-source ecosystem construction of the Ventus GPGPU project, supporting RISC-V custom instruction set extensions.
-- Added half-precision floating-point (half) support for vectors in the Ventus LLVM toolchain.
-- Resolved RISC-V instruction set compatibility and code generation issues during CodeGen in the development process.
+- 参与乘影 GPGPU 项目的开源生态建设，支持 RISC-V 自定义指令集扩展。
+- 为乘影 LLVM 工具链新增向量下的半精度浮点型（half）支持。
+- 开发过程中解决 CodeGen 阶段 RISC-V 指令集的兼容性与代码生成问题。
 
-### RISC-V Automated Testing and Performance Analysis Platform Development
+### RISC-V 自动化测试与性能分析平台开发
 
-_Institute of Software, Chinese Academy of Sciences_ | February 2025 - May 2025
+_中国科学院软件研究所_ | 2025.02 - 2025.05
 
-- Participated in the development and maintenance of a Jenkins-based RISC-V automated testing and performance analysis platform, focusing on performance optimization and data analysis in RISC-V Vector Extension (RVV) scenarios.
-- Responsible for implementing automated testing workflows, performance comparison analysis, and automatically generating HTML reports for test results.
-- Automatically tracked performance changes of OpenCV on RISC-V platforms, conducted performance testing on PRs and commits, ensuring accurate capture and feedback of the impact of code modifications on performance.
+- 参与基于 Jenkins 的 RISC-V 自动化测试与性能分析平台开发与维护，对启用 RISC-V 向量扩展（RVV）场景进行性能优化与数据分析。
+- 负责实现自动化测试流程、性能对比分析功能，并为测试结果自动生成 html 报告。
+- 自动跟踪 OpenCV 在 RISC-V 平台上的性能变化，对 PR 和 commit 进行性能检测，确保代码修改对性能的影响被准确捕捉与反馈。
 
-### Open Source Organization Member
+### 开源组织成员
 
-_[Project Trans](https://github.com/project-trans)_ | September 2024 - Present
+_[Project Trans](https://github.com/project-trans)_ | 2024.09 - 至今
 
-- Participated in frontend feature development, independently completed the development of multiple modules.
-- Responsible for part of the CI/CD logic and created bots for the organization's subordinate repositories.
-- Reviewed Pull Requests, participated in code reviews, and provided modification suggestions to contributors.
+- 参与前端功能开发，独立完成多个模块的开发工作。
+- 负责部分 CI/CD 逻辑，并为组织下属仓库制作 bot。
+- 审核 Pull Request，参与代码评审，为贡献者提出修改建议。
 
-_[Traveling](https://github.com/travellings-link/travellings)_ | 2025.06 - Present
+_[开往](https://github.com/travellings-link/travellings)_ | 2025.06 - 至今
 
-- Participate in bot development, fix CI flow
-- Participate in frontend development and documentation improvements
+- 参与 bot 开发，修复 CI 流
+- 参与前端开发及文档改进
 
-## Education Background
+## 教育背景
 
-Bachelor's degree in Computer Science and Technology, currently pursuing.
+计算机科学与技术，本科在读。
 
 <!-- 其他不重要的经历，仅作记录。 -->
 
