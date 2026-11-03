@@ -3,10 +3,10 @@ title: GPGPU
 author: Lee
 ---
 
-## 概要
+## 简介
 
-GPUを使って汎用計算を行う。
+用 GPU 做通用计算。
 
-## 目次
+## 目录
 
 <ArticlesMenu />
