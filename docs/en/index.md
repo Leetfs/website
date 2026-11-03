@@ -4,23 +4,23 @@ layout: home
 
 hero:
   name: "Lee's blog"
-  text: "Welcome to my blog~"
-  tagline: "Occasional Nonsense and Some Experience"
+  text: "欢迎来到我的 blog~"
+  tagline: "\n偶尔的废话和些许经验"
   image:
     src: /logo.png
     alt: Lee's blog
     style: "margin-top: 2%;"
   actions:
     - theme: brand
-      text: About
-      link: /en/about/
+      text: 关于
+      link: /about/
     - theme: alt
-      text: Some experience
-      link: /en/tips/
+      text: 一些经验
+      link: /tips/
     - theme: alt
-      text: Daily Life
-      link: /en/life/
+      text: 生活琐事
+      link: /life/
     - theme: alt
-      text: Friendly links
-      link: /en/friendly/
+      text: 友情链接
+      link: /friendly/
 ---
