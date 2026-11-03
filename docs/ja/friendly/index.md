@@ -1,6 +1,6 @@
 ---
 layout: page
-title: 友達リンク
+title: 友情链接
 ---
 
 <script setup>
@@ -10,39 +10,39 @@ import {
   VPTeamMembers
 } from 'vitepress/theme'
 
-const title = '友達リンク'
-const lead = 'ここは私の友人たちです～(ฅ´ω`ฅ)'
+const title = '友情链接'
+const lead = '这里是我的朋友们~(ฅ´ω`ฅ)'
 
 // icon: <https://simpleicons.org/>
 const members = [
   {
     avatar: "/friendly/lumi.PNG",
     name: "猫卷",
-    title: "優しくて純粋な猫。",
+    title: "善良的猫卷，春节的猫卷，乖孩子猫卷",
     links: [{ icon: "github", link: "https://github.com/lumigj", ariaLabel: "猫卷" }],
   },
   {
     avatar: "/friendly/nhui.jpg",
     name: "玲雨兰夜",
-    title: "玲雨兰夜の個人サイトへようこそ。",
+    title: "欢迎来到玲雨兰夜的个人站点。",
     links: [{ icon: "devbox", link: "http://nhui.top/", ariaLabel: "玲雨兰夜" }],
   },
   {
     avatar: "https://avatars.githubusercontent.com/u/85744569",
     name: "香菜",
-    title: "技術、生活、個人の記録。",
+    title: "技术、生活与个人记录。",
     links: [{ icon: "devbox", link: "https://mdzz.pro/", ariaLabel: "香菜" }],
   },
   {
     avatar: "https://www.iacg.moe/upload/cat.png",
     name: "DokiDoki·大黄猫",
-    title: "更新を続けるウェブ雑貨店。",
+    title: "持续更新的网络杂货店。",
     links: [{ icon: "devbox", link: "https://www.iacg.moe/", ariaLabel: "DokiDoki·大黄猫" }],
   },
   {
     avatar: "/friendly/catherina.png",
     name: "Catherina",
-    title: "友人であり、素晴らしい同僚でもあります。",
+    title: "是朋友，也是很好的同事",
     links: [{ icon: "devbox", link: "https://catherina.moe/", ariaLabel: "Catherina" }],
   },
 ]
@@ -64,7 +64,7 @@ const members = [
     position: fixed;
     bottom: 3%;
     right: 2%;
-    width: 185px;          /* 表示エリアのサイズ */
+    width: 185px;          /* 显示区尺寸 */
     height: 140px;
     overflow: hidden;
     z-index: 9999;
@@ -74,9 +74,9 @@ const members = [
   }
 
   .promo-zoom {
-    width: 310px;          /* 元のコンテンツの幅 */
-    height: 250px;         /* 元のコンテンツの高さ */
-    transform: scale(0.6); /* 表示縮尺 */
+    width: 310px;          /* 原始内容宽度 */
+    height: 250px;         /* 原始内容高度 */
+    transform: scale(0.6); /* 缩放显示比例 */
     transform-origin: top left;
     pointer-events: auto;
   }
