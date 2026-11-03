@@ -1,8 +1,8 @@
 ---
-title: VRChat Model Modification Tutorial
+title: VRChat 改模教程
 author: Lee
 ---
 
-## Table of Contents
+## 目录
 
 <ArticlesMenu />
