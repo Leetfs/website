@@ -1,83 +1,83 @@
 ---
-title: Home Assistant Reverse Proxy + Access Whitelist
+title: Home Assistant 反代 + 访问白名单
 author: Lee
 ---
 
-## Installation
+## 安装
 
-Refer to the official documentation: <https://www.home-assistant.io/installation>
+参考官方文档: <https://www.home-assistant.io/installation>
 
-I installed using Docker Compose and recommend this method.[Official documentation](https://www.home-assistant.io/installation/linux#docker-compose)
+我使用 Docker compose 安装，推荐大家也使用此方案。[官方文档](https://www.home-assistant.io/installation/linux#docker-compose)
 
-## Reverse Proxy
+## 反代
 
-Home Assistant's security policy disables reverse proxy by default. Modify `configuration.yaml`
+Home Assistant 的安全策略默认禁止反代，修改 `configuration.yaml`
 
 ```yaml
 # configuration.yaml
 http:
-  # It is recommended to only configure SSL in nginx; internal reverse proxy does not need two layers of SSL
-  #ssl_certificate: [.crt file]
-  #ssl_key: [.key file]
+  # 建议仅在nginx配置ssl，内部反代没必要配两层ssl
+  #ssl_certificate: [.crt文件]
+  #ssl_key: [.key文件]
   use_x_forwarded_for: true
-  trusted_proxies: # reverse proxy allowlist; change if your IP is not this one
+  trusted_proxies: #反代白名单，如不是此ip自行更改即可
     - 127.0.0.1
     - ::1
-  server_host: 127.0.0.1 # listen only to access from this IP, used to restrict access only via reverse proxy (optional)
+  server_host: 127.0.0.1 #仅监听来自此ip的访问，用于设置仅可通过反代访问（可选）
 ```
 
-## nginx Configuration
+## nginx 配置
 
-Installation: See [Beginner's Guide to nginx Reverse Proxy](./nginx)
+安装：参考 [nginx 反代入门](./nginx)
 
-Get certificate: [Certbot Automated SSL Certificates](./certbot)
+获取证书：[Certbot 自动获取 SSL 证书](./certbot)
 
 ### WebSocket
 
-WebSocket must be enabled or access will not work properly
+必须启用 WebSocket，否则无法正常访问
 
 ```
-    # Reverse proxy configuration
+    # 反向代理配置
     location / {
-        # Required WebSocket headers
+        # 必需的 WebSocket 头部
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
 
-        # Read and write timeout settings
+        # 读写超时时间配置
         proxy_read_timeout 86400;
         proxy_send_timeout 86400;
 
-        # Prevent Nginx from caching WebSocket data
+        # 防止 Nginx 缓存 WebSocket 数据
         proxy_buffering off;
 ```
 
-### Example
+### 样例
 
 ```
 server {
-    listen 443 ssl; # SSL listen
+    listen 443 ssl; # SSL 监听
     listen [::]:443 ssl;
 
-    server_name your_domain;
+    server_name 你的域名;
 
-    # SSL certificate path
+    # SSL 证书路径
     ssl_certificate /etc/letsencrypt/live/;
     ssl_certificate_key /etc/letsencrypt/live/;
 
-    # Security optimization
+    # 安全性优化
     ssl_protocols TLSv1.2 TLSv1.3;
     ssl_prefer_server_ciphers on;
     ssl_ciphers 'ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305';
     ssl_session_cache shared:SSL:10m;
 
-    # HSTS (optional, enforces HTTPS)
+    # HSTS（可选，启用后强制 HTTPS 访问）
     add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
 
-    # Limit file upload size
+    # 限制文件上传大小
     client_max_body_size 20G;
 
-    # Reverse proxy configuration
+    # 反向代理配置
     location / {
         proxy_set_header Host $host;
         proxy_set_header X-Forwarded-Proto https;
@@ -85,37 +85,37 @@ server {
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Host $server_name;
 
-        proxy_pass http://127.0.0.1:8123; # Backend service address
+        proxy_pass http://127.0.0.1:8123; # 后端服务地址
 
-        # Enhance proxy security
+        # 增强代理安全性
         proxy_set_header X-Frame-Options SAMEORIGIN;
         proxy_set_header X-XSS-Protection "1; mode=block";
         proxy_set_header X-Content-Type-Options nosniff;
 
-        # Required WebSocket headers
+        # 必需的 WebSocket 头部
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
 
-        # Read and write timeout settings
+        # 读写超时时间配置
         proxy_read_timeout 86400;
         proxy_send_timeout 86400;
 
-        # Prevent Nginx from caching WebSocket data
+        # 防止 Nginx 缓存 WebSocket 数据
         proxy_buffering off;
 
-        # Restrict access, only allow access from LAN
-        # allow ip_here;  # hk
-        # allow ip_here_as_well;    #jp
-        # deny all;              # deny all other requests
+        # 限制访问，仅允许局域网内访问
+        # allow 这里是ip;  # hk
+        # allow 这里也是ip;    #jp
+        # deny all;              # 拒绝其他所有请求
     }
 }
 server {
     listen 80;
     listen [::]:80;
 
-    server_name your_domain;
+    server_name 你的域名;
 
-    return 301 https://$host$request_uri; # Permanently redirect to HTTPS
+    return 301 https://$host$request_uri; # 永久跳转到 HTTPS
 }
 ```
