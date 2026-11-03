@@ -1,58 +1,58 @@
 ---
-title: nginx リバースプロキシ入門
+title: nginx 反代入门
 author: Lee
 ---
 
-## 概要
+## 概述
 
-本チュートリアルは Debian をベースに、nginx を使って稼働中の Docker コンテナへリバースプロキシする例を示します。
+本教程基于 debian，使用 nginx 反代到正在运行的 docker 容器举例。
 
-### なぜリバースプロキシを使うのか？
+### 为什么要反代？
 
-以下はインターネットから調べたものです：
+以下是网上搜的：
 
-リバースプロキシはクライアントのリクエストを受け取り、それをウェブサーバーに転送し、その結果をクライアントに返すサーバーです。
+反向代理是一种服务器，它接受客户端的请求，将请求转发给网络服务器，然后将结果返回给客户端，就像代理服务器处理了请求一样。
 
-リバースプロキシはサーバー側を代理するもので、ウェブサーバーの立場に立っています。その実際のサーバーはクライアントから見えません。これが「リバース」と呼ばれる理由です。
+反向代理代理的是服务器，是和网络服务器站在一方的。其真实服务器对于客户端不可见。这就是它叫“反向”的原因。
 
-リバースプロキシの用途：
+反向代理可用于:
 
-サーバーを保護し、サーバーの実際のIPを隠す。
-負荷分散：アクセス量やサーバー負荷に応じてリクエストを異なるサーバーへ割り当てる。
-静的コンテンツや、短期間に大量発生する動的リクエストのキャッシュ。
-アプリケーションレイヤーのファイアウォールとして保護を提供。
-SSL通信の暗号化／復号。
+保护服务器，隐藏服务器真实 IP。
+负载均衡，根据访问流量和服务器负载情况，将请求分发到不同服务器上。
+缓存静态内容以及部分短时间的大量动态请求。
+作为应用层防火墙提供防护。
+加密/解密 SSL 通信。
 
-### 例を挙げると
+### 举个例子
 
-例えば、サーバー上で a、b、c の3つのウェブサイトを実行したい場合、これらのウェブサイトはすべて443番ポートを使う必要がありますが、サーバーにはIPが1つしかなく、3つの443を分けられません.
+例如 我们要在服务器上运行 a b c 三个网站，这三个网站均需要使用 443 端口，但我们的服务器只有一个ip，没办法分出来三个443.
 
-このときリバースプロキシnginxが443番ポートを一括管理し、a.leetfs.comでアクセスするユーザーはサイトaへ、b.leetfs.com経由のユーザーはサイトbへ、cも同じように振り分けます。
+这个时候：反代出现了，由 nginx 统一接管 443 端口，将通过 a.leetfs.com 访问的用户转到站点a，将通过 b.leetfs.com 访问的用户转到网站b，c也同理。
 
-## インストール
+## 安装
 
-1. システムインデックスを更新する: `sudo apt update`
-2. nginx をインストール: `sudo apt install nginx`
+1. 更新系统索引 `sudo apt update`
+2. 安装 nginx `sudo apt install nginx`
 
-インストール完了後、Nginx は自動的に起動し、起動時に有効になります。 `sudo systemctl status nginx` で nginx の状態を確認できます。
+安装完成后，Nginx 会自动启动并设置为开机自启，可通过 `sudo systemctl status nginx` 检查 nginx 的状态。
 
-## nginx の設定
+## 配置 nginx
 
-- デフォルトの設定ファイル: `/etc/nginx/nginx.conf`
-- サイト設定ディレクトリ: `/etc/nginx/sites-available/`
-- 実際に有効化されている設定ファイルの保存先: `etc/nginx/sites-enabled/`
+- 默认配置文件: `/etc/nginx/nginx.conf`
+- 网站配置目录: `/etc/nginx/sites-available/`
+- 用于存放实际启用的配置文件: `etc/nginx/sites-enabled/`
 
-続いて `/etc/nginx/sites-available/` ディレクトリを編集し、nginxを設定します。
+接下来，我们将通过修改 `/etc/nginx/sites-available/` 目录来配置 nginx。
 
-## Docker へのリバースプロキシ
+## 反代到 docker
 
-ホスト上で docker で weblate サービスを動かしており、このコンテナが443番ポートを直接使用するのはスマートではありません。 この場合、443番ポートはその一つのサービスのみに使用されてしまいます。
+我们的主机上通过 docker 运行了 weblate 服务，该容器默认直接接管服务器 443 端口太不优雅，会导致这台服务器的 443 端口只能跑这一个服务。
 
-> このセクションを読むには docker の基礎知識が少し必要です。
+> 阅读此章节需要您略微了解 docker。
 
-### dockerfileの設定
+### 配置 dockerfile
 
-このコンテナのdockerfileを見てみましょう。 ports の下にある `- 443:4443` はサーバーの443番ポートで受信し、それをこの docker コンテナの 4443 番ポートへ転送することを意味します。
+让我们观测这个容器的 dockerfile，ports下方的 `- 443:4443` 代表监听服务器的 443 端口，并将收到的请求转发到这个 docker 容器所使用的 4443 端口上。
 
 ```yaml
 services:
@@ -60,30 +60,30 @@ services:
     ports:
       - 443:4443
     environment:
-# ...以下省略
+# ...后面略
 ```
 
-443という標準のhttpsポートを、サーバーで未使用の他のポート、例えば `- 4443:4443` に変更し、変更後はコンテナを再読み込みして適用します。
+我们先将 443 这个标准 https 端口改为服务器没有被占用的其它端口，例如 `- 4443:4443`，修改后重载容器，应用更改。
 
-## nginx 設定ファイルの編集
+## 修改 nginx 配置文件
 
-サイト設定ディレクトリ `/etc/nginx/sites-available/` に移動し、新しい設定ファイルを作成します。ここではファイル名を `weblate` とします
+切换到网站配置目录: `/etc/nginx/sites-available/`，新建一个配置文件，这里我取名叫 `weblate`
 
-設定ファイルの内容は以下のコードを参考にしてください：
+配置文件内容参考以下代码：
 
 ```nginx
 server {
-    listen 443 ssl; # sslはssl暗号化を使用することを示す
+    listen 443 ssl; # ssl代表使用ssl加密
     listen [::]:443 ssl;
 
-    server_name leetfs.com; # リバースプロキシしたいドメイン
+    server_name leetfs.com; # 需要反代的域名
 
-    ssl_certificate /var/lib/docker/volumes/weblate-docker_weblate-data/_data/ssl/fullchain.pem; # ssl証明書
-    ssl_certificate_key /var/lib/docker/volumes/weblate-docker_weblate-data/_data/ssl/privkey.pem; # ssl秘密鍵
+    ssl_certificate /var/lib/docker/volumes/weblate-docker_weblate-data/_data/ssl/fullchain.pem; # ssl证书
+    ssl_certificate_key /var/lib/docker/volumes/weblate-docker_weblate-data/_data/ssl/privkey.pem; # ssl私钥
 
-    ssl_protocols TLSv1.2 TLSv1.3;  # TLSv1.2とTLSv1.3を有効化し、SSLv3等の古いプロトコルは無効化
-    ssl_ciphers 'ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256';  # 推奨暗号スイート
-    ssl_prefer_server_ciphers on;  # サーバー側の暗号スイートを優先
+    ssl_protocols TLSv1.2 TLSv1.3;  # 启用 TLSv1.2 和 TLSv1.3，禁用 SSLv3 和过时的协议
+    ssl_ciphers 'ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256';  # 推荐的加密套件
+    ssl_prefer_server_ciphers on;  # 优先使用服务器的加密套件
 
     location / {
         proxy_set_header Host $host;
@@ -92,9 +92,9 @@ server {
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Host $server_name;
 
-        proxy_pass https://127.0.0.1:4443; # 上記設定でコンテナの転送ポートを4443にしたためここも4443。127.0.0.1はサーバー自身を示します。
+        proxy_pass https://127.0.0.1:4443; # 需要反代到的位置，因为我们上文将容器转发端口配置为了4443，故这里使用4443。127.0.0.1代表服务器自己。
 
-        # 代理のセキュリティを高める
+        # 增强代理安全性
         proxy_set_header X-Frame-Options SAMEORIGIN;
         proxy_set_header X-XSS-Protection "1; mode=block";
         proxy_set_header X-Content-Type-Options nosniff;
@@ -103,44 +103,44 @@ server {
 
 ```
 
-設定ファイルを編集後、シンボリックリンクを作成し設定ファイルを有効化します（weblate を各自のファイル名に置き換えてください）
+修改配置文件后创建一个符号链接，将该配置文件启用（记得把 weblate 换成你自己的文件名）
 
 ```bash
 sudo ln -s /etc/nginx/sites-available/weblate /etc/nginx/sites-enabled/
 ```
 
-- 設定ファイルが正しいかテスト: `sudo nginx -t`
-- Nginx 設定を再読み込み: `sudo systemctl reload nginx`
+- 测试配置文件是否正确：`sudo nginx -t`
+- 重新加载 Nginx 配置: `sudo systemctl reload nginx`
 
-### 証明書の取得
+### 获取证书
 
-上記の `ssl_certificate` と `ssl_certificate_key` には証明書と秘密鍵のパスを記入し、[Certbot による SSL 証明書の自動取得](./certbot) を参照してください
+上文中 `ssl_certificate` 和 `ssl_certificate_key` 需填入证书和私钥路径，参考 [Certbot 自动获取 SSL 证书](./certbot)
 
-## サイト設定の無効化
+## 禁用站点配置
 
-特定サイトの設定を無効化したい場合は、シンボリックリンクを削除するだけで本体ファイルを消す必要はありません。 再利用も簡単です。
+如果想禁用某个站点的设置，仅需删除符号链接，而无需移除文件本体，便于以后复用。
 
 ```bash
-sudo rm /etc/nginx/sites-enabled/ファイル名
+sudo rm /etc/nginx/sites-enabled/文件名
 ```
 
-作業完了後は必ずNginx設定を再読み込みしてください: `sudo systemctl reload nginx`
+搞定后记得重载 Nginx 配置: `sudo systemctl reload nginx`
 
-## 同時接続/リクエストレート制限を追加
+## 添加并发连接/请求速率限制
 
-httpブロックの下に配置します。
+放到 http 块下。
 
 ```bash
 # etc/nginx/nginx.conf
 
-# 同時接続数制限 (1 IP あたりの同時接続数が 20 を超えないようにする)
+# 并发连接限制（每 IP 同时连接数不超过 20）
 limit_conn_zone $binary_remote_addr zone=per_ip_conn:10m;
 limit_conn per_ip_conn 20;
 
-# リクエストレート制限 (1 IP あたり 1 秒間に最大 20 リクエスト)
+# 请求速率限制（每 IP 每秒最多 20 次请求）
 limit_req_zone $binary_remote_addr zone=per_ip_req:10m rate=20r/s;
 
-# バーストパラメータ、ユーザーエクスペリエンス向上 (バーストアクセス時にすぐに制限しない)
+# 突发参数，提高用户体验（突发访问时不立即限流）
 limit_req zone=per_ip_req burst=40 nodelay;
 
 ```
