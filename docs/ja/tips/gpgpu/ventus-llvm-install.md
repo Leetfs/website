@@ -1,23 +1,23 @@
 ---
-title: Ventus GPGPU LLVM コンパイラのインストールメモ
+title: 乘影 GPGPU LLVM 编译器安装手记
 author: Lee
 ---
 
-## 概要
+## 简介
 
-Ventus GPGPU は**RISC-V 向けの GPGPU** アーキテクチャです。\
-本記事はこのリポジトリを参考にしています：<https://github.com/THU-DSP-LAB/llvm-project>。
+乘影 GPGPU 是一个**面向 RISC-V 的 GPGPU** 架构。\
+本文参考此仓库：<https://github.com/THU-DSP-LAB/llvm-project>。
 
-## 依存関係のインストール
+## 安装依赖
 
 ```bash
 sudo apt install -y git build-essential clang cmake ninja-build ccache zlib1g-dev libtool autoconf automake device-tree-compiler bsdmainutils ruby clinfo
 ```
 
-## ファイルのダウンロード
+## 下载文件
 
 :::tip
-フォルダを作成し、全てのリポジトリをそのディレクトリにクローンします。 ここではファイル名を `J142` とします。
+创建一个文件夹，将所有仓库克隆到该目录中，以下取 `J142` 为文件名。
 :::
 
 - llvm-ventus : `git clone https://github.com/THU-DSP-LAB/llvm-project.git`
@@ -27,7 +27,7 @@ sudo apt install -y git build-essential clang cmake ninja-build ccache zlib1g-de
 - driver : `git clone https://github.com/THU-DSP-LAB/ventus-driver.git`
 - rodinia : `git clone https://github.com/THU-DSP-LAB/gpu-rodinia.git`
 
-## 環境変数の設定
+## 设置环境变量
 
 ```bash
 export VENTUS_INSTALL_PREFIX=/root/J142/llvm-project/install
@@ -39,14 +39,14 @@ export PATH=/root/J142/llvm-project/build/bin:$PATH
 export BUILD_TYPE=Debug
 ```
 
-## コンパイラのビルド
+## 构建编译器
 
 ```bash
 cd J142/llvm-project
 ./build-ventus.sh
 ```
 
-## インストール状況の確認
+## 检查安装状态
 
 ```bash
 cd J142/pocl/build/bin
@@ -55,7 +55,7 @@ cd J142/pocl/build/bin
 
 ![](/tips/gpgpu/images/llvm-img/poclcc.png)
 
-## テストケースの実行
+## 运行测试用例
 
 ```bash
 cd J142/pocl/build/examples/vecadd
