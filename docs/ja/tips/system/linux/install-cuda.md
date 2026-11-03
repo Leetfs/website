@@ -1,13 +1,13 @@
 ---
-title: CUDA Toolkit のインストール
+title: 安装 CUDA Toolkit
 author: Lee
 ---
 
-## インストール
+## 安装
 
-[公式サイト](https://developer.nvidia.com/cuda-downloads)にアクセスして、適切なパッケージを選択してください。
+前往[官网](https://developer.nvidia.com/cuda-downloads)挑选合适的包。
 
-## 環境変数
+## 环境变量
 
 ```bash
 export PATH=/usr/local/cuda-12.8/bin:$PATH
@@ -16,13 +16,13 @@ export LIBRARY_PATH=$LIBRARY_PATH:/usr/local/cuda-12.8/lib64
 export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:/usr/local/cuda-12.8/include
 ```
 
-## インストール状況のテスト
+## 测试安装状态
 
 ```bash
 nvcc --version
 ```
 
-### 出力
+### 返回
 
 ```text
 nvcc: NVIDIA (R) Cuda compiler driver
