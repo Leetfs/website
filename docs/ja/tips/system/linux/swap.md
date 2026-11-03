@@ -1,52 +1,52 @@
 ---
-title: debianのswap設定
+title: debian 配置 swap
 author: Lee
 ---
 
-## 作成
+## 创建
 
-`free -h` コマンドで現在のswap領域の利用状況を確認できます
+可使用 `free -h` 检查当前 swap 分区的使用情况
 
-### 新しいスワップファイルを作成する（サイズは任意）
+### 创建一个新的交换文件（大小自己填）
 
 ```bash
 sudo fallocate -l 1G /swapfile
 ```
 
-### ファイルの権限をrootのみに設定する（オプション）
+### 设置文件权限为仅root（可选）
 
 ```bash
 sudo chmod 600 /swapfile
 ```
 
-### ファイルをスワップ領域としてフォーマットする
+### 格式化文件为交换空间
 
 ```bash
 sudo mkswap /swapfile
 ```
 
-### swapを有効化する
+### 启用 swap
 
 ```bash
 sudo swapon /swapfile
 ```
 
-### 自動マウントを有効化する
+### 启用自动挂载
 
-etc/fstabファイルに入り、末尾に次の行を追加します：
+进入 etc/fstab 文件，在末尾加入：
 
 ```bash
 /swapfile none swap sw 0 0
 ```
 
-## 変更
+## 修改
 
-### swapのトリガー閾値を変更する
+### 修改 swap 触发阈值
 
-etc/sysctl.confファイルを開き、`vm.swappiness=80`の値を変更します。もし無ければ新しく追加してください。
+进入 etc/sysctl.conf 文件，修改 `vm.swappiness=80` 后面的值。如果没有自己加一条进去。
 
-### swap領域のサイズを変更する
+### 修改 swap 空间大小
 
-- `swapoff -a`でswapを無効化する
-- 以前作成した`swapfile`を削除する
-- 作成手順を再度実行する
+- 使用 `swapoff -a` 关闭 swap
+- 删掉之前创建的 `swapfile`
+- 重新执行创建流程
